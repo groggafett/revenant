@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Card Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0d0b08; color: #c8a96e;
+  font-family: 'Cinzel', Georgia, serif;
+  height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 10px;
+  background: linear-gradient(180deg, #1c1510 0%, #120f0a 100%);
+  border-bottom: 2px solid #3a2a10;
+  flex-shrink: 0; z-index: 20; gap: 8px;
+}
+.top-title { font-size: 15px; font-weight: 700; letter-spacing: 0.2em; color: #c8a060; text-transform: uppercase; }
+.top-sub { font-size: 9px; color: #5a4828; letter-spacing: 0.15em; text-transform: uppercase; text-align: right; }
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex; flex-shrink: 0;
+  background: #0f0d0a; border-bottom: 1px solid #2a1e0a;
+}
+.tab {
+  flex: 1; padding: 11px 4px; text-align: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #5a4828; cursor: pointer;
+  border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+}
+.tab.active { color: #c8a060; border-bottom-color: #c8a060; }
+.tab.p1.active { color: #4a78d8; border-bottom-color: #4a78d8; }
+.tab.p2.active   { color: #cc3030; border-bottom-color: #cc3030; }
+.tab.lane.active { color: #40a878; border-bottom-color: #40a878; }
+.tab.io.active   { color: #9060c8; border-bottom-color: #9060c8; }
+
+/* ── MAIN SCROLL AREA ── */
+.view { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px; -webkit-overflow-scrolling: touch; }
+.view.active { display: flex; flex-direction: column; gap: 6px; }
+
+/* ── CARD LIST ITEM ── */
+.card-row {
+  background: linear-gradient(160deg, #1a1610 0%, #100c08 100%);
+  border: 1px solid #2a1e0a; border-radius: 4px;
+  padding: 8px 10px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: border-color 0.15s;
+}
+.card-row:active { border-color: #c8a060; }
+.card-row .cr-cost {
+  width: 22px; height: 22px; flex-shrink: 0;
+  background: #8a5010; border: 2px solid #c08020; border-radius: 3px;
+  transform: rotate(45deg); display: flex; align-items: center; justify-content: center;
+}
+.card-row .cr-cost span { transform: rotate(-45deg); font-size: 10px; font-weight: 900; color: #f0d080; }
+.card-row .cr-info { flex: 1; min-width: 0; }
+.card-row .cr-name { font-size: 10px; font-weight: 700; color: #c8a060; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-row .cr-type { font-size: 9px; color: #5a4828; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1px; }
+.card-row .cr-stats { font-size: 9px; color: #7a6030; margin-top: 2px; }
+.cr-actions { display: flex; gap: 5px; flex-shrink: 0; }
+.icon-btn {
+  font-size: 13px; background: none; border: none; cursor: pointer; color: #5a4828;
+  padding: 2px 4px; font-family: inherit; transition: color 0.15s;
+}
+.icon-btn.edit:active { color: #c8a060; }
+.icon-btn.del:active  { color: #cc3030; }
+
+/* ── ADD CARD BUTTON ── */
+.add-btn {
+  width: 100%; font-family: 'Cinzel', Georgia, serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #c8a060; background: linear-gradient(160deg, #1e1a10 0%, #141008 100%);
+  border: 1px dashed #4a3818; border-radius: 4px;
+  padding: 10px; cursor: pointer;
+}
+.add-btn:active { border-color: #c8a060; }
+
+/* ── FORM PANEL (slide up) ── */
+.form-panel {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: linear-gradient(0deg, #0d0b08 0%, #16120c 100%);
+  border-top: 2px solid #4a3818;
+  transform: translateY(100%); transition: transform 0.2s ease;
+  overflow-y: auto; max-height: 85dvh;
+  padding: 10px 10px 24px;
+}
+.form-panel.open { transform: translateY(0); }
+.form-title {
+  font-size: 11px; font-weight: 700; color: #c8a060; letter-spacing: 0.15em;
+  text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+}
+.form-close { font-size: 16px; color: #5a4828; cursor: pointer; padding: 0 4px; }
+.form-section {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 0.2em; color: #5a4828;
+  margin: 8px 0 4px; padding-bottom: 3px; border-bottom: 1px solid #2a1e0a;
+}
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 5px; }
+.field-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+.field-grid.cols5 { grid-template-columns: repeat(5, 1fr); }
+.field-full { margin-bottom: 5px; }
+.field label {
+  display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em;
+  color: #5a4828; margin-bottom: 3px;
+}
+.field input, .field textarea, .field select {
+  width: 100%; background: #0a0806; border: 1px solid #2a1e0a; border-radius: 3px;
+  color: #c8a060; font-family: 'Cinzel', Georgia, serif; font-size: 13px;
+  padding: 8px 8px; -webkit-appearance: none; appearance: none;
+  outline: none;
+}
+.field input:focus, .field textarea:focus { border-color: #5a4020; }
+.field input::placeholder, .field textarea::placeholder { color: #3a2e18; font-style: italic; opacity: 1; }
+.field textarea { resize: none; height: 64px; font-size: 12px; line-height: 1.5; }
+.field select { color: #c8a060; }
+.save-btn {
+  width: 100%; font-family: 'Cinzel', Georgia, serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  color: #c8a060; background: linear-gradient(160deg, #2a2010 0%, #1a1408 100%);
+  border: 1px solid #5a4020; border-radius: 4px;
+  padding: 14px; cursor: pointer; margin-top: 12px;
+  box-shadow: 0 0 8px rgba(200,160,60,0.1);
+}
+.save-btn:active { border-color: #c8a060; box-shadow: 0 0 12px rgba(200,160,60,0.4); }
+
+/* ── DECK BUILDER ── */
+.deck-header {
+  background: linear-gradient(160deg, #14120c 0%, #0e0c08 100%);
+  border: 1px solid #2a1e0a; border-radius: 4px;
+  padding: 8px 10px; display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.deck-count-txt { font-size: 11px; color: #7a6030; }
+.deck-count-num { font-size: 18px; font-weight: 700; }
+.deck-count-num.p1 { color: #4a78d8; }
+.deck-count-num.p2 { color: #cc3030; }
+.deck-count-num.full { color: #50c030; }
+.clear-btn {
+  font-family: 'Cinzel', Georgia, serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #7a3030;
+  background: #1a0808; border: 1px solid #3a1010; border-radius: 3px;
+  padding: 7px 12px; cursor: pointer;
+}
+.clear-btn:active { border-color: #cc3030; color: #cc3030; }
+.save-deck-btn {
+  font-family: 'Cinzel', Georgia, serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #50c030;
+  background: #081408; border: 1px solid #1a3a10; border-radius: 3px;
+  padding: 7px 12px; cursor: pointer;
+}
+.save-deck-btn:active { border-color: #50c030; }
+.autofill-btn {
+  font-family: 'Cinzel', Georgia, serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #c8a060;
+  background: #1a1408; border: 1px solid #4a3818; border-radius: 3px;
+  padding: 7px 12px; cursor: pointer;
+}
+.autofill-btn:active { border-color: #c8a060; }
+.save-status {
+  font-size: 10px; color: #50c030; letter-spacing: 0.1em; opacity: 0;
+  transition: opacity 0.3s; text-align: center; margin-top: 4px;
+}
+.save-status.show { opacity: 1; }
+
+/* Deck card row */
+.deck-card-row {
+  background: linear-gradient(160deg, #1a1610 0%, #100c08 100%);
+  border: 1px solid #2a1e0a; border-radius: 4px;
+  padding: 6px 8px; display: flex; align-items: center; gap: 8px;
+}
+.deck-card-row .cr-cost { width: 18px; height: 18px; }
+.deck-card-row .cr-cost span { font-size: 8px; }
+.dcr-count {
+  flex-shrink: 0; font-size: 14px; font-weight: 900; color: #c8a060; width: 22px; text-align: center;
+}
+.dcr-btns { display: flex; gap: 3px; flex-shrink: 0; }
+.dcr-btn {
+  width: 28px; height: 28px; font-family: 'Cinzel', Georgia, serif;
+  font-size: 16px; font-weight: 700; color: #c8a060;
+  background: #1a1610; border: 1px solid #3a2a10; border-radius: 3px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  line-height: 1;
+}
+.dcr-btn:active { border-color: #c8a060; }
+.dcr-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ── TOAST / OVERLAY BLOCKER ── */
+.overlay {
+  display: none; position: fixed; inset: 0; z-index: 40;
+  background: rgba(0,0,0,0.5);
+}
+.overlay.show { display: block; }
+
+/* ── LANE EFFECT ROW ── */
+.lane-row {
+  background: linear-gradient(160deg, #0e1a12 0%, #090e0a 100%);
+  border: 1px solid #1a3020; border-radius: 4px;
+  padding: 8px 10px; display: flex; align-items: center; gap: 8px;
+}
+.lane-icon {
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+  background: #0a2818; border: 2px solid #30784a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+}
+.lane-trigger {
+  font-size: 6px; color: #30784a; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1px;
+}
+
+/* ── IO VIEW ── */
+.io-section {
+  background: linear-gradient(160deg, #14120c 0%, #0e0c08 100%);
+  border: 1px solid #2a1e0a; border-radius: 4px; padding: 12px;
+}
+.io-label { font-size: 8px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #c8a060; margin-bottom: 6px; }
+.io-sub { font-size: 7px; color: #5a4828; margin-bottom: 10px; line-height: 1.6; }
+.io-btn {
+  width: 100%; font-family: 'Cinzel', Georgia, serif;
+  font-size: 9px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 9px; border-radius: 4px; cursor: pointer;
+}
+.io-btn.export { color: #9060c8; background: #100c18; border: 1px solid #3a1a60; }
+.io-btn.export:active { border-color: #9060c8; }
+.io-btn.import { color: #c8a060; background: #1a1408; border: 1px solid #4a3818; margin-top: 6px; }
+.io-btn.import:active { border-color: #c8a060; }
+#import-file { display: none; }
+.io-status { font-size: 7px; color: #50c030; text-align: center; margin-top: 6px; opacity: 0; transition: opacity 0.3s; }
+.io-status.show { opacity: 1; }
+.storage-key-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 0; border-bottom: 1px solid #1a1408; font-size: 8px;
+}
+.storage-key-name { color: #7a6030; font-family: monospace; }
+.storage-key-size { color: #3a2e18; font-size: 7px; }
+.storage-clear-btn {
+  font-family: 'Cinzel', Georgia, serif; font-size: 6px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: #7a3030;
+  background: #1a0808; border: 1px solid #3a1010; border-radius: 2px;
+  padding: 2px 6px; cursor: pointer;
+}
+.storage-clear-btn:active { border-color: #cc3030; color: #cc3030; }
+
+/* ── EMPTY STATE ── */
+.empty-msg { text-align: center; padding: 24px 16px; color: #3a2e18; font-size: 9px; letter-spacing: 0.1em; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div>
+    <div class="top-title">Card Forge</div>
+    <div style="font-size:6px;color:#3a2e18;letter-spacing:0.15em;text-transform:uppercase;">Grimdark Companion</div>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <button class="add-btn" onclick="openForm(null)">＋ New Card</button>
+    <button class="add-btn" style="background:#0a1408;border-color:#1a4010;color:#40a060" onclick="normaliseRepo()">⟳ Normalise</button>
+  </div>
+</div>
+<div class="io-status" id="normalise-status" style="text-align:center">Normalised ✓</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <div class="tab active" id="tab-repo" onclick="switchTab('repo')">Repo</div>
+  <div class="tab p1"    id="tab-p1"   onclick="switchTab('p1')">P1</div>
+  <div class="tab p2"    id="tab-p2"   onclick="switchTab('p2')">P2</div>
+  <div class="tab lane"  id="tab-lane" onclick="switchTab('lane')">Lanes</div>
+  <div class="tab io"    id="tab-io"   onclick="switchTab('io')">I/O</div>
+</div>
+
+<!-- REPOSITORY VIEW -->
+<div class="view active" id="view-repo">
+  <div id="repo-list"></div>
+</div>
+
+<!-- DECK P1 VIEW -->
+<div class="view" id="view-p1">
+  <div class="deck-header">
+    <div>
+      <div class="deck-count-txt">Cards in Deck</div>
+      <span class="deck-count-num p1" id="p1-count">0</span>
+      <span class="deck-count-txt"> / 16</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="autofill-btn" onclick="autoFill(1)">Auto Fill</button>
+      <button class="clear-btn" onclick="clearDeck(1)">Clear</button>
+      <button class="save-deck-btn" onclick="saveDeck(1)">Save ✓</button>
+    </div>
+  </div>
+  <div class="save-status" id="p1-saved">Saved to localStorage</div>
+  <div id="deck-p1-list"></div>
+</div>
+
+<!-- DECK P2 VIEW -->
+<div class="view" id="view-p2">
+  <div class="deck-header">
+    <div>
+      <div class="deck-count-txt">Cards in Deck</div>
+      <span class="deck-count-num p2" id="p2-count">0</span>
+      <span class="deck-count-txt"> / 16</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <button class="autofill-btn" onclick="autoFill(2)">Auto Fill</button>
+      <button class="clear-btn" onclick="clearDeck(2)">Clear</button>
+      <button class="save-deck-btn" onclick="saveDeck(2)">Save ✓</button>
+    </div>
+  </div>
+  <div class="save-status" id="p2-saved">Saved to localStorage</div>
+  <div id="deck-p2-list"></div>
+</div>
+
+<!-- LANE EFFECTS VIEW -->
+<div class="view" id="view-lane">
+  <div id="lane-list"></div>
+  <button class="add-btn" style="color:#40a878;border-color:#1a4028" onclick="openLaneForm(null)">＋ New Lane Effect</button>
+</div>
+
+<!-- I/O VIEW -->
+<div class="view" id="view-io">
+  <div class="io-section">
+    <div class="io-label">Import Cards from CSV</div>
+    <div class="io-sub">Paste your CSV below and tap Import. This replaces the entire card repo and clears saved decks.</div>
+    <textarea id="csv-paste" style="width:100%;height:120px;background:#0a0806;border:1px solid #2a1e0a;border-radius:3px;color:#c8a060;font-family:monospace;font-size:9px;padding:6px;resize:none;outline:none" placeholder="id,name,variant,display name,type..."></textarea>
+    <button class="io-btn import" style="margin-top:6px;width:100%" onclick="importCSV()">⬆ Import CSV</button>
+    <div class="io-status" id="csv-import-status">Imported successfully</div>
+  </div>
+  <div class="io-section">
+    <div class="io-label">Export Cards as CSV</div>
+    <div class="io-sub">Copy the card repo as CSV to edit in Google Sheets or Excel.</div>
+    <button class="io-btn export" onclick="exportCSV()">⬇ Copy CSV</button>
+    <div class="io-status" id="csv-copy-status">Copied to clipboard</div>
+  </div>
+  <div class="io-section">
+    <div class="io-label">Storage</div>
+    <div class="io-sub">Tap a key to clear it.</div>
+    <div id="storage-keys"></div>
+  </div>
+</div>
+<div class="overlay" id="overlay" onclick="closeForm(); closeLaneForm()"></div>
+
+<!-- CARD FORM PANEL -->
+<div class="form-panel" id="form-panel">
+  <div class="form-title">
+    <span id="form-title-txt">New Card</span>
+    <span class="form-close" onclick="closeForm()">✕</span>
+  </div>
+
+  <!-- Identity — always shown -->
+  <div class="form-section">Identity</div>
+  <div class="field-full field"><label>Display Name</label><input id="f-name" type="text" placeholder="Iron Vanguard" oninput="updateArtId()"></div>
+  <div class="field-grid cols2">
+    <div class="field"><label>Internal Name</label><input id="f-internal" type="text" placeholder="city_militia" oninput="updateArtId()"></div>
+    <div class="field"><label>Variant <span style="color:#3a2e18;font-style:italic">(optional)</span></label><input id="f-variant" type="text" placeholder="crossbows" oninput="updateArtId()"></div>
+  </div>
+  <div class="field-full field">
+    <label style="color:#5a4828">Art ID</label>
+    <div id="f-artid-display" style="font-family:monospace;font-size:11px;color:#c8a060;background:#0a0806;border:1px solid #2a1e0a;border-radius:3px;padding:6px 8px;letter-spacing:0.05em">—</div>
+  </div>
+  <div class="field-grid cols3">
+    <div class="field"><label>Type</label>
+      <select id="f-type">
+        <option value="Common">Common</option>
+        <option value="Uncommon">Uncommon</option>
+        <option value="Hero">Hero</option>
+        <option value="Power">Power</option>
+      </select>
+    </div>
+    <div class="field"><label>Faction</label>
+      <select id="f-faction">
+        <option value="none">None / Universal</option>
+        <option value="order_of_iron">⚙ Order of Iron</option>
+        <option value="order_of_flames">♨ Order of Flames</option>
+        <option value="order_of_light">☼ Order of Light</option>
+        <option value="order_of_the_veil">☽ Order of the Veil</option>
+        <option value="order_of_beasts">♈ Order of Beasts</option>
+        <option value="order_of_artifice">◆ Order of Artifice</option>
+        <option value="order_of_shadows">† Order of Shadows</option>
+      </select>
+    </div>
+    <div class="field"><label>Cost</label><input id="f-cost" type="number" min="1" max="10" placeholder="3"></div>
+  </div>
+
+  <!-- Dynamic fields — rerendered on type/effect change -->
+  <div id="form-dynamic"></div>
+
+  <!-- Always shown -->
+  <div class="form-section">Description</div>
+  <div class="field-full field">
+    <label>Special / Ability text</label>
+    <textarea id="f-special" placeholder="Stalwart: This unit cannot be pushed back."></textarea>
+  </div>
+  <div class="field-full field">
+    <label>Flavour text <span style="color:#3a2e18;font-style:italic">(lore)</span></label>
+    <textarea id="f-flavour" placeholder="Forged in the fires of the Iron Citadel…" style="height:48px"></textarea>
+  </div>
+
+  <button class="save-btn" onclick="saveCard()">Save Card</button>
+</div>
+
+<!-- LANE EFFECT FORM PANEL -->
+<div class="form-panel" id="lane-form-panel">
+  <div class="form-title">
+    <span id="lane-form-title-txt">New Lane Effect</span>
+    <span class="form-close" onclick="closeLaneForm()">✕</span>
+  </div>
+  <div class="form-section">Identity</div>
+  <div class="field-grid">
+    <div class="field"><label>Name</label><input id="lf-name" type="text" placeholder="Acid Rain"></div>
+    <div class="field"><label>Trigger</label>
+      <select id="lf-trigger">
+        <option value="passive">Passive</option>
+        <option value="round_start">Round Start</option>
+        <option value="on_deploy">On Deploy</option>
+        <option value="on_slain">On Slain</option>
+        <option value="on_attack">On Attack</option>
+        <option value="on_roll_6">On Roll of 6</option>
+        <option value="on_reveal">On Reveal</option>
+      </select>
+    </div>
+  </div>
+  <div class="field-grid">
+    <div class="field"><label>Value (optional)</label><input id="lf-value" type="number" placeholder="1"></div>
+    <div class="field"><label>Key (engine id)</label><input id="lf-key" type="text" placeholder="acid_rain"></div>
+  </div>
+  <div class="field-full field"><label>Effect Type (mechanic)</label>
+    <select id="lf-effect">
+      <option value="damage_all_round_start">Damage All — Round Start</option>
+      <option value="save_modifier">Save Modifier — Passive</option>
+      <option value="bonus_dmg_on_six">Bonus Damage on Six — On Roll</option>
+      <option value="range_cap">Range Cap — Passive</option>
+      <option value="attack_bonus_on_slain">Attack Bonus on Slain — Triggered</option>
+      <option value="none">None (flavour only)</option>
+    </select>
+  </div>
+  <div class="form-section">Description</div>
+  <div class="field-full field">
+    <label>Shown to players on reveal</label>
+    <textarea id="lf-desc" placeholder="At the start of each round, deal 1 damage to every unit in this lane."></textarea>
+  </div>
+  <button class="save-btn" style="color:#40a878;border-color:#30784a" onclick="saveLaneEffect()">Save Lane Effect</button>
+</div>
+<script>
+const FACTIONS = {
+  none:               { name: 'None',               icon: '' },
+  order_of_iron:      { name: 'Order of Iron',      icon: '⚙' },
+  order_of_flames:    { name: 'Order of Flames',    icon: '♨' },
+  order_of_light:     { name: 'Order of Light',     icon: '☼' },
+  order_of_the_veil:  { name: 'Order of the Veil',  icon: '☽' },
+  order_of_beasts:    { name: 'Order of Beasts',    icon: '♈' },
+  order_of_artifice:  { name: 'Order of Artifice',  icon: '◆' },
+  order_of_shadows:   { name: 'Order of Shadows',   icon: '†' },
+};
+
+// ── DEFAULT CARDS ──
+const DEFAULT_CARDS = [
+  { id:'c1', name:'Knight Errant', type:'Uncommon', faction:'order_of_iron', cost:3, hp:8, maxHp:8, move:3, save:'4+',
+    weapon:{name:'Broadsword', range:1, attacks:3, hit:'3+', ap:2, damage:2},
+    special:'Stalwart: This unit may not be pushed back by enemy abilities.' },
+  { id:'c2', name:'Scout', type:'Common', faction:'order_of_iron', cost:2, hp:5, maxHp:5, move:4, save:'5+',
+    weapon:{name:'Short Bow', range:4, attacks:2, hit:'4+', ap:0, damage:1},
+    special:'Vanguard: May be deployed one row forward of the deployment zone.' },
+  { id:'c3', name:'Iron Golem', type:'Uncommon', faction:'order_of_iron', cost:5, hp:14, maxHp:14, move:2, save:'2+',
+    weapon:{name:'Iron Fist', range:1, attacks:4, hit:'3+', ap:3, damage:3},
+    special:'Unyielding: Ignore the first wound suffered each turn.' },
+  { id:'c4', name:'Wretch', type:'Common', faction:'none', cost:1, hp:3, maxHp:3, move:3, save:'6+',
+    weapon:{name:'Crude Club', range:1, attacks:1, hit:'5+', ap:0, damage:1},
+    special:'Expendable: When this unit is slain, draw one card.' },
+  { id:'c5', name:'Dread Knight', type:'Hero', faction:'order_of_flames', cost:4, hp:10, maxHp:10, move:3, save:'3+',
+    weapon:{name:'Cursed Blade', range:1, attacks:3, hit:'3+', ap:2, damage:3},
+    special:'Death Mark: At the start of your turn, deal 1 damage to the nearest enemy unit.' },
+];
+
+// ── DEFAULT LANE EFFECTS ──
+const DEFAULT_LANE_EFFECTS = [
+  { id:'l1', name:'Acid Rain',      key:'acid_rain',      effect:'damage_all_round_start', trigger:'round_start', value:1,    description:'At the start of each round, deal 1 damage to every unit in this lane.' },
+  { id:'l2', name:'Hallowed Ground',key:'hallowed_ground', effect:'save_modifier',          trigger:'passive',     value:1,    description:'All saves in this lane are improved by 1 (e.g. 4+ becomes 3+).' },
+  { id:'l3', name:'Comet Strike',   key:'comet_strike',   effect:'bonus_dmg_on_six',        trigger:'on_roll_6',   value:2,    description:'Whenever any attack roll produces a natural 6, deal 2 bonus damage.' },
+  { id:'l4', name:'Choking Fog',    key:'choking_fog',    effect:'range_cap',               trigger:'passive',     value:2,    description:'Ranged weapons in this lane have their range reduced to 2.' },
+  { id:'l5', name:'Blood Frenzy',   key:'blood_frenzy',   effect:'attack_bonus_on_slain',   trigger:'on_slain',    value:1,    description:'When any unit is slain here, all other units gain +1 attack until end of round.' },
+];
+
+// ── STATE ──
+let repo     = [];
+let laneDeck = [];
+let decks    = { 1: {}, 2: {} };
+let editId   = null;
+let editLaneId = null;
+let activeTab  = 'repo';
+let _editCard  = null;
+
+// ── EFFECT DEFINITIONS — drives dynamic form fields ──
+const EFFECT_DEFS = {
+  add_resources:        { label:'Add Resources',        valueLabel:'Amount',          valuePlaceholder:'2',   needsWeapon:false },
+  add_resources_random: { label:'Add Resources (Random)',valueLabel:'Range (lo,hi)',   valuePlaceholder:'1,4', needsWeapon:false },
+  damage_lane:          { label:'Damage Lane',           valueLabel:null,              valuePlaceholder:null,  needsWeapon:true  },
+  modify_lane_score:    { label:'Modify Lane Score',     valueLabel:'Multiplier',      valuePlaceholder:'0.5', needsWeapon:false },
+  redeploy_unit:        { label:'Redeploy Unit',         valueLabel:null,              valuePlaceholder:null,  needsWeapon:false },
+  place_structure:      { label:'Place Structure',       valueLabel:null,              valuePlaceholder:null,  needsWeapon:false },
+};
+
+function renderFormFields() {
+  const typeEl = document.getElementById('f-type');
+  const effectEl = document.getElementById('f-effect');
+  const type = (typeEl ? typeEl.value : 'Common').trim();
+  const effect = effectEl ? effectEl.value : '';
+  const isPower = type === 'Power';
+  const def = isPower && effect ? EFFECT_DEFS[effect] : null;
+  const needsWeapon = !isPower || (def ? def.needsWeapon : false);
+
+  const dyn = document.getElementById('form-dynamic');
+  if(!dyn) return;
+
+  var html = '';
+
+  if(!isPower) {
+    html += '<div class="form-section">Unit Stats</div>';
+    html += '<div class="field-grid cols3">';
+    html += '<div class="field"><label>HP</label><input id="f-hp" type="number" min="1" max="30" placeholder="8"></div>';
+    html += '<div class="field"><label>Move (-1=immobile)</label><input id="f-move" type="number" min="-1" max="8" placeholder="1"></div>';
+    html += '<div class="field"><label>Save (e.g. 4+)</label><input id="f-save" type="text" placeholder="4+"></div>';
+    html += '</div>';
+  }
+
+  if(needsWeapon) {
+    html += '<div class="form-section">Weapon</div>';
+    html += '<div class="field-full field"><label>Weapon Name</label><input id="f-wname" type="text" placeholder="Broadsword"></div>';
+    html += '<div class="field-grid cols5">';
+    html += '<div class="field"><label>Range</label><input id="f-range" type="text" placeholder="1"></div>';
+    html += '<div class="field"><label>Atk</label><input id="f-atk" type="number" min="1" max="10" placeholder="3"></div>';
+    html += '<div class="field"><label>Hit</label><input id="f-hit" type="text" placeholder="3+"></div>';
+    html += '<div class="field"><label>AP</label><input id="f-ap" type="number" min="0" max="6" placeholder="2"></div>';
+    html += '<div class="field"><label>Dmg</label><input id="f-dmg" type="number" min="1" max="10" placeholder="2"></div>';
+    html += '</div>';
+  }
+
+  if(isPower) {
+    html += '<div class="form-section">Power Effect</div>';
+    html += '<div class="field"><label>Effect</label><select id="f-effect" onchange="renderFormFields()">';
+    html += '<option value="">— choose effect —</option>';
+    var keys = Object.keys(EFFECT_DEFS);
+    for(var i=0; i<keys.length; i++) {
+      var selected = keys[i] === effect ? ' selected' : '';
+      html += '<option value="' + keys[i] + '"' + selected + '>' + EFFECT_DEFS[keys[i]].label + '</option>';
+    }
+    html += '</select></div>';
+    if(def && def.valueLabel) {
+      html += '<div class="field"><label>' + def.valueLabel + '</label>';
+      html += '<input id="f-value" type="text" placeholder="' + def.valuePlaceholder + '"></div>';
+    }
+  }
+
+  dyn.innerHTML = html;
+
+  // Restore saved values
+  var c = _editCard;
+  if(!c) return;
+  var fields = [
+    ['f-hp', c.hp], ['f-move', c.move], ['f-save', c.save],
+    ['f-wname', c.weapon ? c.weapon.name : null],
+    ['f-range', c.weapon ? c.weapon.range : null],
+    ['f-atk', c.weapon ? c.weapon.attacks : null],
+    ['f-hit', c.weapon ? c.weapon.hit : null],
+    ['f-ap', c.weapon ? c.weapon.ap : null],
+    ['f-dmg', c.weapon ? c.weapon.damage : null],
+    ['f-effect', c.effect],
+    ['f-value', c.value != null ? String(c.value) : null]
+  ];
+  for(var j=0; j<fields.length; j++) {
+    var el = document.getElementById(fields[j][0]);
+    if(el && fields[j][1] != null) el.value = fields[j][1];
+  }
+}
+
+function slugify(str) {
+  return (str || '').toLowerCase().trim().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+}
+
+function updateArtId() {
+  const internal = document.getElementById('f-internal')?.value.trim();
+  const variant  = document.getElementById('f-variant')?.value.trim();
+  const name     = document.getElementById('f-name')?.value.trim();
+  const base = slugify(internal || name);
+  const slug = base + (variant ? '_' + slugify(variant) : '');
+  const el = document.getElementById('f-artid-display');
+  if(el) el.textContent = slug || '—';
+}
+
+// ── LOAD / SAVE localStorage ──
+function loadData() {
+  try {
+    const raw = localStorage.getItem('grim_card_repo');
+    repo = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_CARDS));
+  } catch { repo = JSON.parse(JSON.stringify(DEFAULT_CARDS)); }
+
+  try {
+    const ld = localStorage.getItem('grim_lane_deck');
+    laneDeck = ld ? JSON.parse(ld) : JSON.parse(JSON.stringify(DEFAULT_LANE_EFFECTS));
+  } catch { laneDeck = JSON.parse(JSON.stringify(DEFAULT_LANE_EFFECTS)); }
+
+  try {
+    const d1 = localStorage.getItem('grim_deck_p1');
+    decks[1] = d1 ? JSON.parse(d1) : {};
+  } catch { decks[1] = {}; }
+
+  try {
+    const d2 = localStorage.getItem('grim_deck_p2');
+    decks[2] = d2 ? JSON.parse(d2) : {};
+  } catch { decks[2] = {}; }
+}
+
+function normaliseRepo() {
+  const validTypes = ['Common','Uncommon','Hero','Power'];
+  repo = repo.map(c => {
+    const rawType = (c.type||'Common');
+    // Find matching valid type case-insensitively, stripping all non-alpha
+    const cleanType = validTypes.find(t => t.toLowerCase() === rawType.replace(/[^a-zA-Z]/g,'').toLowerCase()) || 'Common';
+    const isPower = cleanType === 'Power';
+    return {
+      ...c,
+      type:         cleanType,
+      faction:      (c.faction||'none').replace(/[^\w_]/g,'').trim() || 'none',
+      name:         (c.name||'').trim(),
+      internalName: (c.internalName||'').trim(),
+      variant:      (c.variant||'').trim(),
+      artId:        (c.artId||'').trim(),
+      effect:       c.effect ? c.effect.replace(/[^a-z_]/g,'') : null,
+      hp:           isPower ? null : (c.hp||null),
+      move:         isPower ? null : (c.move!==undefined ? c.move : null),
+      save:         isPower ? null : (c.save||null),
+      weapon:       isPower && (c.effect||'').replace(/[^a-z_]/g,'')!=='damage_lane' ? null : c.weapon,
+    };
+  });
+  saveRepo();
+  renderRepo();
+  const st = document.getElementById('normalise-status');
+  st.textContent = 'Normalised ' + repo.length + ' cards (' + repo.filter(c=>c.type==='Power').length + ' Power) ✓';
+  st.classList.add('show');
+  setTimeout(() => st.classList.remove('show'), 3000);
+}
+
+function saveRepo() { localStorage.setItem('grim_card_repo', JSON.stringify(repo)); }
+function saveLaneDeck() { localStorage.setItem('grim_lane_deck', JSON.stringify(laneDeck)); }
+
+function saveDeck(player) {
+  localStorage.setItem(`grim_deck_p${player}`, JSON.stringify(decks[player]));
+  const el = document.getElementById(`p${player}-saved`);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.getElementById(`view-${tab}`).classList.add('active');
+  if      (tab === 'repo') renderRepo();
+  else if (tab === 'lane') renderLane();
+  else if (tab === 'p1')   renderDeck(1);
+  else if (tab === 'p2')   renderDeck(2);
+  else if (tab === 'io')   renderStorageKeys();
+}
+
+// ── RENDER LANE EFFECTS ──
+const TRIGGER_LABELS = {
+  passive:'Passive', round_start:'Round Start', on_deploy:'On Deploy',
+  on_slain:'On Slain', on_attack:'On Attack', on_roll_6:'On Roll of 6', on_reveal:'On Reveal'
+};
+function renderLane() {
+  const list = document.getElementById('lane-list');
+  list.innerHTML = '';
+  if (!laneDeck.length) {
+    list.innerHTML = '<div class="empty-msg">No lane effects yet</div>';
+    return;
+  }
+  laneDeck.forEach(fx => {
+    const row = document.createElement('div');
+    row.className = 'lane-row';
+    row.innerHTML = `
+      <div class="lane-icon">✦</div>
+      <div class="cr-info" style="flex:1;min-width:0">
+        <div class="cr-name" style="color:#40a878">${fx.name}</div>
+        <div class="lane-trigger">${TRIGGER_LABELS[fx.trigger]||fx.trigger}${fx.value!=null?' · '+fx.value:''}</div>
+        <div class="cr-stats">${fx.description}</div>
+      </div>
+      <div class="cr-actions">
+        <button class="icon-btn edit" onclick="openLaneForm('${fx.id}')">✎</button>
+        <button class="icon-btn del"  onclick="deleteLaneEffect('${fx.id}')">✕</button>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+
+// ── LANE FORM ──
+function openLaneForm(id) {
+  editLaneId = id;
+  const fx = id ? laneDeck.find(l => l.id === id) : null;
+  document.getElementById('lane-form-title-txt').textContent = fx ? 'Edit Lane Effect' : 'New Lane Effect';
+  document.getElementById('lf-name').value    = fx?.name        ?? '';
+  document.getElementById('lf-trigger').value = fx?.trigger     ?? 'passive';
+  document.getElementById('lf-value').value   = fx?.value       ?? '';
+  document.getElementById('lf-key').value     = fx?.key         ?? '';
+  document.getElementById('lf-effect').value  = fx?.effect      ?? 'none';
+  document.getElementById('lf-desc').value    = fx?.description ?? '';
+  document.getElementById('lane-form-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeLaneForm() {
+  document.getElementById('lane-form-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function saveLaneEffect() {
+  const name = document.getElementById('lf-name').value.trim();
+  if (!name) { document.getElementById('lf-name').focus(); return; }
+  const valRaw = document.getElementById('lf-value').value;
+  const fx = {
+    id:          editLaneId || ('l' + Date.now().toString(36)),
+    name,
+    key:         document.getElementById('lf-key').value.trim() || name.toLowerCase().replace(/\s+/g,'_'),
+    effect:      document.getElementById('lf-effect').value,
+    trigger:     document.getElementById('lf-trigger').value,
+    value:       valRaw !== '' ? parseInt(valRaw) : null,
+    description: document.getElementById('lf-desc').value.trim(),
+  };
+  if (editLaneId) {
+    const idx = laneDeck.findIndex(l => l.id === editLaneId);
+    if (idx !== -1) laneDeck[idx] = fx;
+  } else {
+    laneDeck.push(fx);
+  }
+  saveLaneDeck();
+  closeLaneForm();
+  renderLane();
+}
+
+function deleteLaneEffect(id) {
+  laneDeck = laneDeck.filter(l => l.id !== id);
+  saveLaneDeck();
+  renderLane();
+}
+
+// ── EXPORT / IMPORT ──
+function exportCSV() {
+  const header = 'id,display_name,internal_name,variant,art_id,type,faction,cost,hp,move,save,weapon_name,range,attacks,hit,ap,damage,special,flavour,effect,value';
+  const rows = repo.map(c => [
+    c.id,
+    c.name,
+    c.internalName || slugify(c.name),
+    c.variant || '',
+    c.artId || slugify(c.internalName || c.name),
+    c.type, c.faction || 'none',
+    c.cost, c.hp, c.move, c.save,
+    c.weapon?.name || '', c.weapon?.range ?? '', c.weapon?.attacks ?? '', c.weapon?.hit || '', c.weapon?.ap ?? '', c.weapon?.damage ?? '',
+    (c.special || '').replace(/,/g, ';'),
+    (c.flavour || '').replace(/,/g, ';'),
+    c.effect || '',
+    c.value != null ? String(c.value) : ''
+  ].join(','));
+  const csv = [header, ...rows].join('\n');
+  navigator.clipboard?.writeText(csv).catch(()=>{});
+  const ta = document.createElement('textarea');
+  ta.value = csv; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  const st = document.getElementById('csv-copy-status');
+  st.classList.add('show');
+  setTimeout(() => st.classList.remove('show'), 2000);
+}
+
+function importCSV() {
+  const raw = document.getElementById('csv-paste').value.trim();
+  if (!raw) return;
+  try {
+    const lines = raw.split('\n').map(l => l.trim().replace(/\r/g,'')).filter(Boolean);
+    const headers = lines[0].split(',').map(h => h.trim().replace(/\r/g,''));
+    const idx = h => headers.indexOf(h);
+    const get = (cols, key) => (cols[idx(key)] || '').trim();
+    const autoPlus = v => v && !v.includes('+') ? v + '+' : v;
+
+    const parsed = lines.slice(1).map((line, i) => {
+      const cols = line.split(',');
+      // Flexible column getter — tries multiple name variants
+      const g = (...keys) => {
+        for(const key of keys) {
+          const i = headers.findIndex(h => h.toLowerCase().replace(/[\s_]/g,'') === key.toLowerCase().replace(/[\s_]/g,''));
+          if(i >= 0 && cols[i] !== undefined) { const v = cols[i].trim().replace(/\r/g,''); if(v) return v; }
+        }
+        return '';
+      };
+      // Special field may contain commas — find its column and join to end
+      const specialColIdx = headers.findIndex(h => h.toLowerCase().replace(/[\s_]/g,'') === 'special');
+      const flavourColIdx = headers.findIndex(h => h.toLowerCase().replace(/[\s_]/g,'') === 'flavour' || h.toLowerCase().replace(/[\s_]/g,'') === 'flavor');
+      let specialRaw = '';
+      if(specialColIdx >= 0) {
+        const endIdx = flavourColIdx > specialColIdx ? flavourColIdx : cols.length;
+        specialRaw = cols.slice(specialColIdx, endIdx).join(',').replace(/^"|"$/g,'').replace(/;/g,',').trim();
+      }
+      const autoPlus = v => v && !v.includes('+') ? v + '+' : v;
+      const hpRaw = g('hp');
+      const hp = hpRaw ? (parseInt(hpRaw) || null) : null;
+      const internalName = g('internalname','internal_name','name');
+      const displayName  = g('displayname','display_name') || internalName;
+      const variant      = g('variant') || '';
+      const artId        = g('artid','art_id') || (internalName + (variant ? '_' + slugify(variant) : ''));
+      const rangeRaw     = g('range');
+      const rangeVal     = rangeRaw ? (rangeRaw.includes('-') ? rangeRaw : (parseInt(rangeRaw) || 1)) : null;
+      const effectVal    = g('effect') || null;
+      const valueRaw     = g('value');
+      const parsedValue  = !valueRaw ? null : valueRaw.includes(',') ? valueRaw.split(',').map(Number) : (isNaN(Number(valueRaw)) ? valueRaw : Number(valueRaw));
+      const wname        = g('weaponname','weapon_name');
+      const hasWeapon    = !!wname || !!rangeRaw || !!g('attacks');
+      return {
+        id:           g('id') || artId,
+        name:         displayName,
+        internalName,
+        variant,
+        artId,
+        type:         (g('type') || 'Common').trim(),
+        faction:      g('faction') || 'none',
+        cost:         parseInt(g('cost')) || 1,
+        hp, maxHp: hp,
+        move:         g('move') !== '' ? parseInt(g('move')) : null,
+        save:         autoPlus(g('save')) || null,
+        weapon: hasWeapon ? {
+          name:    wname || '',
+          range:   rangeVal,
+          attacks: parseInt(g('attacks')) || 1,
+          hit:     autoPlus(g('hit')) || '4+',
+          ap:      parseInt(g('ap')) || 0,
+          damage:  parseInt(g('damage')) || 1,
+        } : null,
+        special: specialRaw || '',
+        flavour: flavourColIdx >= 0 ? (cols[flavourColIdx] || '').trim() : '',
+        effect:  effectVal,
+        value:   parsedValue,
+      };
+    }).filter(c => c.name);
+
+    if (!parsed.length) { alert('No valid cards found'); return; }
+    repo = parsed;
+    // Clear decks — IDs may have changed, must rebuild
+    decks = { 1: {}, 2: {} };
+    localStorage.removeItem('grim_deck_p1');
+    localStorage.removeItem('grim_deck_p2');
+    saveRepo();
+    document.getElementById('csv-paste').value = '';
+    renderStorageKeys();
+    if (activeTab === 'repo') renderRepo();
+    const st = document.getElementById('csv-import-status');
+    st.classList.add('show');
+    setTimeout(() => st.classList.remove('show'), 2500);
+  } catch(e) { alert('CSV parse error: ' + e.message); }
+}
+
+function exportToClipboard() {
+  const data = {
+    grim_card_repo: repo,
+    grim_lane_deck: laneDeck,
+    grim_deck_p1:   decks[1],
+    grim_deck_p2:   decks[2],
+  };
+  const json = JSON.stringify(data, null, 2);
+  navigator.clipboard?.writeText(json).catch(()=>{});
+  // Fallback: select the text in a temp element
+  const ta = document.createElement('textarea');
+  ta.value = json; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  const st = document.getElementById('copy-status');
+  st.classList.add('show');
+  setTimeout(() => st.classList.remove('show'), 2000);
+}
+
+function importFromPaste() {
+  const raw = document.getElementById('import-paste').value.trim();
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    if (data.grim_card_repo) { repo     = data.grim_card_repo; saveRepo(); }
+    if (data.grim_lane_deck) { laneDeck = data.grim_lane_deck; saveLaneDeck(); }
+    if (data.grim_deck_p1)   { decks[1] = data.grim_deck_p1;  localStorage.setItem('grim_deck_p1', JSON.stringify(decks[1])); }
+    if (data.grim_deck_p2)   { decks[2] = data.grim_deck_p2;  localStorage.setItem('grim_deck_p2', JSON.stringify(decks[2])); }
+    document.getElementById('import-paste').value = '';
+    renderStorageKeys();
+    if (activeTab === 'repo') renderRepo();
+    const st = document.getElementById('io-status');
+    st.classList.add('show');
+    setTimeout(() => st.classList.remove('show'), 2500);
+  } catch { alert('Invalid JSON'); }
+}
+
+const GRIM_KEYS = ['grim_card_repo','grim_lane_deck','grim_deck_p1','grim_deck_p2'];
+
+function renderStorageKeys() {
+  const el = document.getElementById('storage-keys');
+  if (!el) return;
+  el.innerHTML = '';
+  GRIM_KEYS.forEach(key => {
+    const val = localStorage.getItem(key);
+    const row = document.createElement('div');
+    row.className = 'storage-key-row';
+    row.innerHTML = `
+      <span class="storage-key-name">${key}</span>
+      <span class="storage-key-size">${val ? (val.length/1024).toFixed(1)+'kb' : 'not set'}</span>
+      ${val ? `<button class="storage-clear-btn" onclick="clearKey('${key}')">Clear</button>` : '<span style="font-size:7px;color:#2a1e0a">—</span>'}`;
+    el.appendChild(row);
+  });
+}
+
+function clearKey(key) {
+  localStorage.removeItem(key);
+  loadData();
+  renderStorageKeys();
+  if (activeTab === 'repo') renderRepo();
+  else if (activeTab === 'lane') renderLane();
+}
+
+// ── RENDER REPO ──
+function renderRepo() {
+  const list = document.getElementById('repo-list');
+  list.innerHTML = '';
+  if (!repo.length) {
+    list.innerHTML = '<div class="empty-msg">No cards yet — add one below</div>';
+    return;
+  }
+  repo.forEach(card => {
+    const row = document.createElement('div');
+    row.className = 'card-row';
+    row.innerHTML = `
+      <div class="cr-cost"><span>${card.cost}</span></div>
+      <div class="cr-info">
+        <div class="cr-name">${card.name}</div>
+        <div class="cr-type">${(FACTIONS[card.faction]?.icon ? FACTIONS[card.faction].icon+' ' : '')}${card.type}</div>
+        <div class="cr-stats">${card.weapon ? ("HP "+card.hp+" · "+card.weapon.name+" AP"+card.weapon.ap+" D"+card.weapon.damage) : (card.effect||"Power Card")}</div>
+      </div>
+      <div class="cr-actions">
+        <button class="icon-btn edit" onclick="openForm('${card.id}')">✎</button>
+        <button class="icon-btn del"  onclick="deleteCard('${card.id}')">✕</button>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+
+// ── RENDER DECK ──
+function cardLimit(type) {
+  if (type === 'Hero')     return 1;
+  if (type === 'Uncommon') return 3;
+  return Infinity; // Common
+}
+
+function deckTotal(player) {
+  return Object.values(decks[player]).reduce((a,b)=>a+b, 0);
+}
+
+function renderDeck(player) {
+  const list  = document.getElementById(`deck-p${player}-list`);
+  const count = document.getElementById(`p${player}-count`);
+  const total = deckTotal(player);
+  list.innerHTML = '';
+
+  count.textContent = total;
+  count.className = `deck-count-num ${player===1?'p1':'p2'}${total>=16?' full':''}`;
+
+  if (!repo.length) {
+    list.innerHTML = '<div class="empty-msg">Add cards to the repository first</div>';
+    return;
+  }
+
+  repo.forEach(card => {
+    const qty = decks[player][card.id] || 0;
+    const row = document.createElement('div');
+    row.className = 'deck-card-row';
+    const atLimit = total >= 16 || qty >= cardLimit(card.type);
+    row.innerHTML = `
+      <div class="cr-cost"><span>${card.cost}</span></div>
+      <div class="cr-info" style="flex:1;min-width:0">
+        <div class="cr-name">${card.name}</div>
+        <div class="cr-type">${(FACTIONS[card.faction]?.icon ? FACTIONS[card.faction].icon+' ' : '')}${card.type} · HP ${card.hp} · MV ${card.move===-1?'—':card.move+'"'}</div>
+      </div>
+      <div class="dcr-btns">
+        <button class="dcr-btn" onclick="deckAdj(${player},'${card.id}',-1)" ${qty===0?'disabled':''}>−</button>
+        <div class="dcr-count">${qty||''}</div>
+        <button class="dcr-btn" onclick="deckAdj(${player},'${card.id}',1)" ${atLimit?'disabled':''}>＋</button>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+
+function deckAdj(player, cardId, delta) {
+  const card = repo.find(c => c.id === cardId);
+  const cur = decks[player][cardId] || 0;
+  const newVal = cur + delta;
+  const total = deckTotal(player);
+  if (delta > 0 && total >= 16) return;
+  if (delta > 0 && newVal > cardLimit(card?.type)) return;
+  if (newVal <= 0) delete decks[player][cardId];
+  else decks[player][cardId] = newVal;
+  renderDeck(player);
+}
+
+function clearDeck(player) {
+  decks[player] = {};
+  renderDeck(player);
+}
+
+function autoFill(player) {
+  let total = deckTotal(player);
+  if (total >= 16 || !repo.length) return;
+  while (total < 16) {
+    const available = repo.filter(card => {
+      const qty = decks[player][card.id] || 0;
+      return qty < cardLimit(card.type);
+    });
+    if (!available.length) break;
+    const card = available[Math.floor(Math.random() * available.length)];
+    decks[player][card.id] = (decks[player][card.id] || 0) + 1;
+    total++;
+  }
+  renderDeck(player);
+}
+
+// ── FORM ──
+function openForm(id) {
+  editId = id;
+  const card = id ? repo.find(c => c.id === id) : null;
+  _editCard = card;
+  document.getElementById('form-title-txt').textContent = card ? 'Edit Card' : 'New Card';
+  document.getElementById('f-name').value     = card?.name      ?? '';
+  document.getElementById('f-internal').value = card?.internalName ?? '';
+  document.getElementById('f-variant').value  = card?.variant   ?? '';
+  const typeEl = document.getElementById('f-type');
+  const typeVal = (card?.type||'Common').trim();
+  typeEl.value = typeVal;
+  // Force match in case of encoding issues
+  if(typeEl.value !== typeVal) {
+    for(var i=0; i<typeEl.options.length; i++) {
+      if(typeEl.options[i].value.trim().toLowerCase() === typeVal.toLowerCase()) {
+        typeEl.selectedIndex = i; break;
+      }
+    }
+  }
+  document.getElementById('f-faction').value  = card?.faction   ?? 'none';
+  document.getElementById('f-cost').value     = card?.cost      ?? '';
+  document.getElementById('f-special').value  = card?.special   ?? '';
+  document.getElementById('f-flavour').value  = card?.flavour   ?? '';
+  const base = slugify(card?.internalName || card?.name || '');
+  const slug = base + (card?.variant ? '_' + slugify(card.variant) : '');
+  document.getElementById('f-artid-display').textContent = slug || '—';
+  renderFormFields();
+  // For Power cards, restore effect dropdown and re-render to show value field
+  if((card?.type||'').trim() === 'Power' && card?.effect) {
+    var effectEl = document.getElementById('f-effect');
+    if(effectEl) {
+      effectEl.value = card.effect;
+      renderFormFields(); // re-render to show value field for this effect
+      // Restore value field
+      var valueEl = document.getElementById('f-value');
+      if(valueEl && card.value != null) valueEl.value = String(card.value);
+    }
+  }
+  document.getElementById('form-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeForm() {
+  document.getElementById('form-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function saveCard() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+  const internalName = document.getElementById('f-internal').value.trim();
+  const variant      = document.getElementById('f-variant').value.trim();
+  const base  = slugify(internalName || name);
+  const artId = base + (variant ? '_' + slugify(variant) : '');
+  const type  = document.getElementById('f-type').value;
+  const isPower = type === 'Power';
+  // Safe field readers — fields may not exist if type hides them
+  const gv = id => document.getElementById(id)?.value ?? '';
+  const hp = parseInt(gv('f-hp')) || (isPower ? null : 1);
+  const rangeRaw = gv('f-range').trim();
+  const rangeVal = rangeRaw.includes('-') ? rangeRaw : (parseInt(rangeRaw) || 1);
+  const effectVal = gv('f-effect') || null;
+  const valueRaw  = gv('f-value').trim();
+  const parsedValue = !valueRaw ? null : valueRaw.includes(',') ? valueRaw.split(',').map(Number) : (isNaN(Number(valueRaw)) ? valueRaw : Number(valueRaw));
+  const needsWeapon = !isPower || (effectVal && EFFECT_DEFS[effectVal]?.needsWeapon);
+  const card = {
+    id:           editId || artId,
+    name,
+    internalName: internalName || slugify(name),
+    variant:      variant || '',
+    artId:        artId || slugify(name),
+    type,
+    faction:      gv('f-faction'),
+    cost:         parseInt(gv('f-cost'))  || 1,
+    hp,
+    maxHp:        hp,
+    move:         isPower ? null : (gv('f-move') === '' ? 1 : parseInt(gv('f-move'))),
+    save:         isPower ? null : (gv('f-save').trim() || '6+'),
+    weapon: needsWeapon ? {
+      name:    gv('f-wname').trim() || 'Fists',
+      range:   rangeVal,
+      attacks: parseInt(gv('f-atk')) || 1,
+      hit:     gv('f-hit').trim()    || '4+',
+      ap:      parseInt(gv('f-ap'))  || 0,
+      damage:  parseInt(gv('f-dmg')) || 1,
+    } : null,
+    special: gv('f-special').trim() || 'None: No special ability.',
+    flavour: gv('f-flavour').trim() || '',
+    effect:  effectVal,
+    value:   parsedValue,
+  };
+
+  if (editId) {
+    const idx = repo.findIndex(c => c.id === editId);
+    if (idx !== -1) repo[idx] = card;
+  } else {
+    repo.push(card);
+  }
+  saveRepo();
+  closeForm();
+  renderRepo();
+}
+
+function deleteCard(id) {
+  repo = repo.filter(c => c.id !== id);
+  // Clean from decks
+  [1,2].forEach(p => delete decks[p][id]);
+  saveRepo();
+  renderRepo();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var typeEl = document.getElementById('f-type');
+  if(typeEl) typeEl.addEventListener('change', renderFormFields);
+  var dyn = document.getElementById('form-dynamic');
+  if(dyn) dyn.addEventListener('blur', function(e) {
+    if(e.target.id === 'f-save' || e.target.id === 'f-hit') {
+      var v = e.target.value.trim();
+      if(v && v.indexOf('+') === -1) e.target.value = v + '+';
+    }
+  }, true);
+});
+
+// ── INIT ──
+try { loadData(); } catch(e) { console.warn('loadData failed', e); }
+try { renderRepo(); } catch(e) { console.warn('renderRepo failed', e); }
+</script>
+</body>
+</html>
