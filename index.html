@@ -1403,6 +1403,20 @@ pointer-events: none;
 </div>
 
 <script>
+window.onerror = (msg, src, line, col, err) => {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#800;color:#fff;font-size:11px;padding:6px 8px;font-family:monospace;white-space:pre-wrap;';
+  d.textContent = `ERR: ${msg}\nLine ${line}:${col}\n${err?.stack||''}`;
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(), 8000);
+};
+window.addEventListener('unhandledrejection', e => {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#860;color:#fff;font-size:11px;padding:6px 8px;font-family:monospace;white-space:pre-wrap;';
+  d.textContent = 'PROMISE: ' + (e.reason?.message||e.reason||'unknown') + '\n' + (e.reason?.stack||'');
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(), 8000);
+});
   const CARDS = [
     { id:'cmoklh74g0', name:'City Militia', internalName:'city_militia', variant:'improvised', artId:'city_militia_improvised', type:'Common', faction:'order_of_iron', cost:1, hp:5, maxHp:5, move:1, save:'5+',
       weapon:{name:'improvised weapons', range:1, attacks:5, hit:'4+', ap:0, damage:1},
@@ -2129,7 +2143,7 @@ pointer-events: none;
 
 
   // ── DRAG FROM HAND ──
-  const DRAG_THRESHOLD = 8;
+  const DRAG_THRESHOLD = 3;
   const INSPECT_MS = 500;
   let dragState = null;
 
@@ -2150,7 +2164,7 @@ pointer-events: none;
     const t = e.touches[0];
     // Visual "ready" — slight scale on touch
     sourceEl.style.transform = 'scale(1.08)';
-    navigator.vibrate?.(8);
+    try{navigator.vibrate?.(8);}catch(e){}
     dragState = {
       card, sourceEl,
       startX: t.clientX, startY: t.clientY,
@@ -2159,7 +2173,7 @@ pointer-events: none;
         // Long press — open inspector
         if (dragState && !dragState.active) {
           const c = dragState.card;
-          navigator.vibrate?.(15);
+          try{navigator.vibrate?.(15);}catch(e){}
           cancelDragState();
           onHandCardTap(c);
         }
@@ -2169,11 +2183,10 @@ pointer-events: none;
     document.addEventListener('touchend',  onHandDragEnd,  {once: true});
   }
 
-  function liftHandCard() {
+  function liftHandCard(x, y) {
     if (!dragState || dragState.active) return;
     clearTimeout(dragState.inspectTimer);
     dragState.sourceEl.style.transform = '';
-    const x = dragState.startX, y = dragState.startY;
     const ghost = dragState.sourceEl.cloneNode(true);
     ghost.style.transform = '';
     Object.assign(ghost.style, {
@@ -2188,9 +2201,18 @@ pointer-events: none;
     document.body.appendChild(ghost);
     dragState.active = true;
     dragState.ghostEl = ghost;
-    navigator.vibrate?.(20);
+    try{navigator.vibrate?.(20);}catch(e){}
     fitBoard();
-    selectHandCard(dragState.card);
+    // Clear previous selection state without renderHand (avoid DOM rebuild during touch)
+    state.selectedHandCard = null;
+    state.pendingTile = null;
+    state.activeAction = null;
+    clearHighlights();
+    clearConfirm();
+    // Now set new drag card and highlight deploy tiles
+    state.selectedHandCard = card;
+    const p = state.players[state.activePlayer];
+    if (p.resources >= card.cost) highlightDeployTiles(true);
   }
 
   function clearDragHover() {
@@ -2203,7 +2225,13 @@ pointer-events: none;
     const dx = t.clientX - dragState.startX;
     const dy = t.clientY - dragState.startY;
     if (!dragState.active) {
-      if (Math.hypot(dx, dy) > DRAG_THRESHOLD) liftHandCard();
+      if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+        liftHandCard(t.clientX, t.clientY);
+        if (dragState?.ghostEl) {
+          dragState.ghostEl.style.left = t.clientX - 34 + 'px';
+          dragState.ghostEl.style.top  = t.clientY - 90 + 'px';
+        }
+      }
       return;
     }
     e.preventDefault();
@@ -2619,7 +2647,7 @@ pointer-events: none;
     clearTimeout(_tileTouchTimer);
     _tileTouchTimer = setTimeout(() => {
       if (!_tileTouchMoved) {
-        navigator.vibrate?.(15);
+        try{navigator.vibrate?.(15);}catch(e){}
         const unit = state.board[tileId];
         if (unit) openProfile(unit, 'board', tileId);
       }
@@ -3849,6 +3877,7 @@ pointer-events: none;
     probe.src = 'art/board.jpg';
     const probe2 = new Image();
     probe2.onload = () => { bp.style.display = 'none'; };
+    probe2.onerror = () => {};
     probe2.src = 'art/board.png';
   }
 
