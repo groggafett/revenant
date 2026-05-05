@@ -4225,7 +4225,20 @@ window.addEventListener('unhandledrejection', e => {
     probe2.src = 'art/board.png';
   }
 
-  window.addEventListener('load',()=>requestAnimationFrame(()=>{ initGame(); }));
+  window.addEventListener('load',()=>requestAnimationFrame(()=>{
+    fetch('cards.json')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data) {
+          if (data.cardRepo)   localStorage.setItem('grim_card_repo', JSON.stringify(data.cardRepo));
+          if (data.deckP1)     localStorage.setItem('grim_deck_p1',   JSON.stringify(data.deckP1));
+          if (data.deckP2)     localStorage.setItem('grim_deck_p2',   JSON.stringify(data.deckP2));
+          if (data.laneDeck)   localStorage.setItem('grim_lane_deck', JSON.stringify(data.laneDeck));
+        }
+      })
+      .catch(()=>{})
+      .finally(()=>{ initGame(); });
+  }));
 
   // ── DOUBLE TAP TO ZOOM ──
   let _lastTap=0, _lastTapX=0, _lastTapY=0;
