@@ -201,6 +201,13 @@ box-shadow: 0 0 16px rgba(0,0,0,0.7);
 border: 2px solid #c8a060 !important;
 box-shadow: 0 0 10px rgba(200,160,60,0.5) !important;
 }
+.tile.drag-hover {
+transform: scale(1.12) !important;
+border: 2px solid #f0d080 !important;
+box-shadow: 0 0 18px rgba(240,208,80,0.8) !important;
+z-index: 5;
+transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
 
 .tile.confirm-tile {
 border-color: #40a030 !important;
@@ -2046,6 +2053,7 @@ pointer-events: none;
       const el=document.createElement('div');
       const col = p.color;
       el.className=`card ${col}-card${isSelected?' selected':''}${!canAfford?' unavailable':''}`;
+      el.dataset.uid = card.uid;
       el.innerHTML = (card.type||'').trim() === 'Power'
         ? `<div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#1a1020;border:1.5px solid #8a40c0;display:flex;align-items:center;justify-content:center;font-size:9px;z-index:1;">⚡</div>
            <div class="card-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;text-align:center">${card.name}</div>
@@ -2106,6 +2114,14 @@ pointer-events: none;
 
   function onHandCardTouchStart(e, card, sourceEl) {
     if (e.touches.length > 1) return;
+    // Clean up any stale drag state from interrupted gesture
+    if (dragState) {
+      clearTimeout(dragState.timer);
+      dragState.ghostEl?.remove();
+      document.removeEventListener('touchmove', onHandDragMove);
+      document.removeEventListener('touchend',  onHandDragEnd);
+      dragState = null;
+    }
     const t = e.touches[0];
     dragState = {
       card, sourceEl,
@@ -2114,24 +2130,21 @@ pointer-events: none;
       active: false, ghostEl: null,
       timer: setTimeout(() => liftHandCard(card, sourceEl), HOLD_MS)
     };
-    // passive:true during detection — won't block scroll
-    document.addEventListener('touchmove', onHandDragMove, {passive: true});
+    // passive:false from the start — needed to preventDefault once active
+    document.addEventListener('touchmove', onHandDragMove, {passive: false});
     document.addEventListener('touchend',  onHandDragEnd,  {once: true});
   }
 
   function liftHandCard(card, sourceEl) {
-    if (!dragState) return; // finger moved too much before hold fired
-    // Switch to non-passive so we can preventDefault and lock everything
-    document.removeEventListener('touchmove', onHandDragMove);
-    document.addEventListener('touchmove', onHandDragMove, {passive: false});
+    if (!dragState) return;
     const x = dragState.currentX, y = dragState.currentY;
     const ghost = sourceEl.cloneNode(true);
     Object.assign(ghost.style, {
       position:'fixed', pointerEvents:'none', zIndex:'999',
       width:'68px', aspectRatio:'5/7',
-      left: x - 34 + 'px', top: y - 130 + 'px',
-      transform:'scale(1.2)', opacity:'0.92',
-      transition:'transform 0.12s ease',
+      left: x - 34 + 'px', top: y - 34 + 'px',
+      transform:'scale(1.15)', opacity:'0.92',
+      transition:'transform 0.1s ease',
       borderRadius:'4px',
       boxShadow:'0 8px 24px rgba(0,0,0,0.7)'
     });
@@ -2140,6 +2153,10 @@ pointer-events: none;
     dragState.ghostEl = ghost;
     fitBoard();
     selectHandCard(card);
+  }
+
+  function clearDragHover() {
+    document.querySelectorAll('.tile.drag-hover').forEach(t => t.classList.remove('drag-hover'));
   }
 
   function onHandDragMove(e) {
@@ -2157,10 +2174,15 @@ pointer-events: none;
       }
       return;
     }
-    // Active drag — lock all scrolling/panning
+    // Active — lock all scrolling/panning
     e.preventDefault();
     dragState.ghostEl.style.left = t.clientX - 34 + 'px';
-    dragState.ghostEl.style.top  = t.clientY - 130 + 'px';
+    dragState.ghostEl.style.top  = t.clientY - 34 + 'px';
+    // Tile hover highlight
+    clearDragHover();
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const tile = el?.closest('[data-id]');
+    if (tile?.classList.contains('highlight-deploy')) tile.classList.add('drag-hover');
   }
 
   function onHandDragEnd(e) {
@@ -2175,16 +2197,33 @@ pointer-events: none;
       return;
     }
     const t = e.changedTouches[0];
+    clearDragHover();
     dragState.ghostEl.style.display = 'none';
     const el = document.elementFromPoint(t.clientX, t.clientY);
     const tile = el?.closest('[data-id]');
     const tileId = tile?.dataset.id;
     const validDrop = tileId && tile.classList.contains('highlight-deploy');
-    dragState.ghostEl.remove();
-    dragState = null;
     if (validDrop) {
+      dragState.ghostEl.remove();
+      dragState = null;
       onTileTap(tileId);
     } else {
+      // Snap ghost back to source card position
+      const ghost = dragState.ghostEl;
+      const src = dragState.card;
+      dragState = null;
+      const srcEl = document.querySelector(`.card[data-uid="${src.uid}"]`);
+      if (srcEl) {
+        const r = srcEl.getBoundingClientRect();
+        ghost.style.transition = 'left 0.2s ease, top 0.2s ease, opacity 0.2s ease, transform 0.2s ease';
+        ghost.style.left = r.left + 'px';
+        ghost.style.top  = r.top  + 'px';
+        ghost.style.transform = 'scale(1)';
+        ghost.style.opacity = '0';
+        setTimeout(() => { ghost.remove(); }, 220);
+      } else {
+        ghost.remove();
+      }
       deselectAll();
     }
   }
