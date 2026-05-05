@@ -2109,36 +2109,52 @@ pointer-events: none;
 
 
   // ── DRAG FROM HAND ──
-  const HOLD_MS = 300;
+  const DRAG_THRESHOLD = 8;
+  const INSPECT_MS = 500;
   let dragState = null;
+
+  function cancelDragState() {
+    if (!dragState) return;
+    clearTimeout(dragState.inspectTimer);
+    dragState.ghostEl?.remove();
+    if (dragState.sourceEl) dragState.sourceEl.style.transform = '';
+    document.removeEventListener('touchmove', onHandDragMove);
+    document.removeEventListener('touchend',  onHandDragEnd);
+    dragState = null;
+  }
 
   function onHandCardTouchStart(e, card, sourceEl) {
     if (e.touches.length > 1) return;
-    // Clean up any stale drag state from interrupted gesture
-    if (dragState) {
-      clearTimeout(dragState.timer);
-      dragState.ghostEl?.remove();
-      document.removeEventListener('touchmove', onHandDragMove);
-      document.removeEventListener('touchend',  onHandDragEnd);
-      dragState = null;
-    }
+    cancelDragState();
     const t = e.touches[0];
+    // Visual "ready" — slight scale on touch
+    sourceEl.style.transform = 'scale(1.08)';
+    navigator.vibrate?.(8);
     dragState = {
       card, sourceEl,
       startX: t.clientX, startY: t.clientY,
-      currentX: t.clientX, currentY: t.clientY,
       active: false, ghostEl: null,
-      timer: setTimeout(() => liftHandCard(card, sourceEl), HOLD_MS)
+      inspectTimer: setTimeout(() => {
+        // Long press — open inspector
+        if (dragState && !dragState.active) {
+          const c = dragState.card;
+          navigator.vibrate?.(15);
+          cancelDragState();
+          onHandCardTap(c);
+        }
+      }, INSPECT_MS)
     };
-    // passive:false from the start — needed to preventDefault once active
     document.addEventListener('touchmove', onHandDragMove, {passive: false});
     document.addEventListener('touchend',  onHandDragEnd,  {once: true});
   }
 
-  function liftHandCard(card, sourceEl) {
-    if (!dragState) return;
-    const x = dragState.currentX, y = dragState.currentY;
-    const ghost = sourceEl.cloneNode(true);
+  function liftHandCard() {
+    if (!dragState || dragState.active) return;
+    clearTimeout(dragState.inspectTimer);
+    dragState.sourceEl.style.transform = '';
+    const x = dragState.startX, y = dragState.startY;
+    const ghost = dragState.sourceEl.cloneNode(true);
+    ghost.style.transform = '';
     Object.assign(ghost.style, {
       position:'fixed', pointerEvents:'none', zIndex:'999',
       width:'68px', aspectRatio:'5/7',
@@ -2151,8 +2167,9 @@ pointer-events: none;
     document.body.appendChild(ghost);
     dragState.active = true;
     dragState.ghostEl = ghost;
+    navigator.vibrate?.(20);
     fitBoard();
-    selectHandCard(card);
+    selectHandCard(dragState.card);
   }
 
   function clearDragHover() {
@@ -2162,26 +2179,18 @@ pointer-events: none;
   function onHandDragMove(e) {
     if (!dragState) return;
     const t = e.touches[0];
-    dragState.currentX = t.clientX;
-    dragState.currentY = t.clientY;
+    const dx = t.clientX - dragState.startX;
+    const dy = t.clientY - dragState.startY;
     if (!dragState.active) {
-      // Only cancel on clear horizontal scroll intent before lift
-      if (Math.abs(t.clientX - dragState.startX) > 22) {
-        clearTimeout(dragState.timer);
-        document.removeEventListener('touchmove', onHandDragMove);
-        document.removeEventListener('touchend',  onHandDragEnd);
-        dragState = null;
-      }
+      if (Math.hypot(dx, dy) > DRAG_THRESHOLD) liftHandCard();
       return;
     }
-    // Active — lock all scrolling/panning
     e.preventDefault();
     dragState.ghostEl.style.left = t.clientX - 34 + 'px';
     dragState.ghostEl.style.top  = t.clientY - 34 + 'px';
-    // Tile hover highlight
     clearDragHover();
-    const el = document.elementFromPoint(t.clientX, t.clientY);
-    const tile = el?.closest('[data-id]');
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    const tile = under?.closest('[data-id]');
     if (tile?.classList.contains('highlight-deploy')) tile.classList.add('drag-hover');
   }
 
@@ -2189,18 +2198,16 @@ pointer-events: none;
     document.removeEventListener('touchmove', onHandDragMove);
     if (!dragState) return;
     if (!dragState.active) {
-      // Short tap — open inspector
-      clearTimeout(dragState.timer);
-      const card = dragState.card;
-      dragState = null;
-      onHandCardTap(card);
+      // Released without moving and before long-press — do nothing, return to normal
+      cancelDragState();
       return;
     }
+    clearTimeout(dragState.inspectTimer);
     const t = e.changedTouches[0];
     clearDragHover();
     dragState.ghostEl.style.display = 'none';
-    const el = document.elementFromPoint(t.clientX, t.clientY);
-    const tile = el?.closest('[data-id]');
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    const tile = under?.closest('[data-id]');
     const tileId = tile?.dataset.id;
     const validDrop = tileId && tile.classList.contains('highlight-deploy');
     if (validDrop) {
@@ -2208,7 +2215,6 @@ pointer-events: none;
       dragState = null;
       onTileTap(tileId);
     } else {
-      // Snap ghost back to source card position
       const ghost = dragState.ghostEl;
       const src = dragState.card;
       dragState = null;
@@ -2220,7 +2226,7 @@ pointer-events: none;
         ghost.style.top  = r.top  + 'px';
         ghost.style.transform = 'scale(1)';
         ghost.style.opacity = '0';
-        setTimeout(() => { ghost.remove(); }, 220);
+        setTimeout(() => ghost.remove(), 220);
       } else {
         ghost.remove();
       }
@@ -3826,13 +3832,13 @@ pointer-events: none;
   },{passive:false});
 
   outer.addEventListener('touchstart',e=>{
-    if(dragState?.active) return;
+    if(dragState) return;
     if(e.touches.length===2){isPinching=true;lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
     else if(!isPinching){startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;}
   },{passive:true});
 
   outer.addEventListener('touchmove',e=>{
-    if(dragState?.active) return;
+    if(dragState) return;
     e.preventDefault();
     if(e.touches.length===2){
       isPinching=true;
