@@ -76,6 +76,12 @@ font-size: 22px; flex-shrink: 0;
 .avatar.p1 { border-color: var(--p1-dark); box-shadow: 0 0 10px rgba(40,80,160,0.4); }
 .avatar.p2 { border-color: var(--p2-dark); box-shadow: 0 0 10px rgba(160,20,20,0.4); }
 .score-num { font-size: 30px; font-weight: 900; line-height: 1; text-shadow: 0 0 12px currentColor; }
+.res-badge {
+font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+color: #c8a060; opacity: 0.8; line-height: 1;
+display: flex; align-items: center; gap: 2px;
+}
+.res-badge::before { content: '◆'; font-size: 7px; }
 .p1-col { color: var(--p1); }
 .p2-col { color: var(--p2); }
 .turn-block {
@@ -360,8 +366,8 @@ min-width: 70px; text-align: center;
 position: absolute; left: 50%; top: 50%;
 transform: translateX(-50%) translateY(-50%);
 display: flex; align-items: center;
-pointer-events: none;
-z-index: 1;
+pointer-events: all;
+z-index: 2;
 }
 .res-cost-preview {
 position: absolute; left: calc(50% + 32px);
@@ -371,6 +377,48 @@ letter-spacing: 0.05em; white-space: nowrap;
 }
 .res-cost-preview.show { opacity: 1; }
 .hub-toggle { display: none; }
+.hub-left { flex-shrink: 0; display: flex; align-items: center; }
+.hub-right { flex-shrink: 0; display: flex; align-items: center; }
+.hub-cancel {
+font-family: 'Cinzel', Georgia, serif; font-size: 9px; font-weight: 700;
+letter-spacing: 0.08em; text-transform: uppercase;
+background: #0e0c08; border: 1px solid #3a1010; border-radius: 4px;
+color: #803030; padding: 7px 10px; cursor: pointer;
+}
+.hub-cancel:active { color: #c04040; border-color: #c04040; }
+.hub-cta {
+font-family: 'Cinzel', Georgia, serif; font-size: 9px; font-weight: 700;
+letter-spacing: 0.08em; text-transform: uppercase;
+background: #1a1408; border: 1px solid #c8a060; border-radius: 4px;
+color: #f0d080; padding: 7px 10px; cursor: pointer;
+display: flex; flex-direction: column; align-items: center; gap: 1px;
+min-width: 70px;
+animation: confirm-pulse 0.8s ease-in-out infinite;
+}
+.hub-cta-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; }
+.hub-cta-cost  { font-size: 8px; color: #c87030; letter-spacing: 0.05em; }
+.hub-cta:active { background: #2a2010; }
+/* Unit action buttons — shown during activation */
+.hub-actions {
+display: none; align-items: center; justify-content: center;
+gap: 8px; position: absolute; left: 50%; transform: translateX(-50%);
+pointer-events: all;
+}
+.hub-actions.active { display: flex; }
+.act-btn {
+display: flex; flex-direction: column; align-items: center; gap: 2px;
+background: #0e0c08; border: 1px solid #2a1e0a;
+border-radius: 6px; padding: 6px 10px; cursor: pointer;
+font-family: 'Cinzel', Georgia, serif; color: #5a4828;
+transition: border-color 0.15s, color 0.15s, background 0.15s;
+min-width: 44px;
+}
+.act-btn .act-icon { font-size: 16px; line-height: 1; }
+.act-btn .act-label { font-size: 6px; letter-spacing: 0.1em; text-transform: uppercase; }
+.act-btn.act-available { border-color: #3a2e10; color: #a08050; }
+.act-btn.act-selected { border-color: #c8a060; color: #f0d080; background: #1a1408; box-shadow: 0 0 8px rgba(200,160,60,0.3); }
+.act-btn.act-unavailable { opacity: 0.25; pointer-events: none; }
+.act-btn:active { background: #1a1408; }
 .res-diamond-wrap {
 transform: none;
 display: flex; align-items: center; justify-content: center; position: relative; pointer-events: all;
@@ -391,6 +439,12 @@ font-size: 17px; font-weight: 900; color: #f0d080; line-height: 1;
 }
 .res-diamond.depleted { background: #5a2010; border-color: #803010; box-shadow: none; }
 .res-diamond.depleted span { color: #c04040; }
+@keyframes confirm-pulse {
+  0%,100% { box-shadow: 0 0 14px rgba(255,240,180,0.5); border-color: #f0d080; background: #8a5010; }
+  50%      { box-shadow: 0 0 28px rgba(255,255,255,0.9); border-color: #ffffff; background: #c08030; }
+}
+.res-diamond.pending-confirm { animation: confirm-pulse 0.8s ease-in-out infinite; cursor: pointer; }
+.res-diamond.pending-confirm span { color: #ffffff; }
 
 /* +N gain animation */
 .res-gain {
@@ -445,11 +499,32 @@ display: flex; align-items: center;
 padding: 6px 8px 10px; gap: 6px;
 }
 .inspector-card-view {
-display: none; position: relative;
-padding: 4px 6px; flex-direction: row; gap: 5px;
-align-items: flex-start;
+display: none;
+position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+z-index: 90;
+flex-direction: column; align-items: center;
+justify-content: flex-start;
+}
+.inspector-card-view::before {
+content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+background: rgba(0,0,0,0.65); z-index: 0;
 }
 .inspector-card-view.active { display: flex; }
+.inspector-card-view.strip-mode {
+position: relative; top: auto; left: auto; right: auto; bottom: auto;
+flex-direction: row; align-items: flex-start;
+background: none; z-index: auto;
+padding: 4px 6px; gap: 5px;
+}
+.inspector-card-view.strip-mode::before { display: none; }
+.inspector-card-view.strip-mode .prof-card-visual {
+width: 86px; margin-top: 0;
+box-shadow: inset 0 1px 0 rgba(180,140,60,0.08);
+}
+.inspector-card-view.strip-mode .prof-right-col {
+width: auto; flex: 1;
+background: none; border: none; border-radius: 0; padding: 0;
+}
 .prof-close-abs {
 position: absolute; top: 5px; right: 6px;
 font-size: 14px; color: #5a4828; cursor: pointer; line-height: 1; z-index: 5;
@@ -480,14 +555,16 @@ padding-top: 18px; /* space for abs close btn */
 }
 /* ── PROFILE CARD VISUAL ── */
 .prof-card-visual {
-width: 86px; flex-shrink: 0; border-radius: 4px; aspect-ratio: 5/7;
+width: min(160px, 44vw); flex-shrink: 0; border-radius: 6px; aspect-ratio: 5/7;
 border: 1px solid #3a2a10;
 background: linear-gradient(160deg,#1a1610,#100c08);
 display: flex; flex-direction: column;
 justify-content: flex-end; align-items: center;
-padding-bottom: 6px;
-box-shadow: inset 0 1px 0 rgba(180,140,60,0.08);
+padding-bottom: 8px;
+box-shadow: inset 0 1px 0 rgba(180,140,60,0.08), 0 8px 32px rgba(0,0,0,0.6);
 transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+position: relative; z-index: 1;
+margin-top: 10%;
 }
 .prof-card-visual.p1-unit { border-color: #2e3a6a; }
 .prof-card-visual.p2-unit { border-color: #5a1818; }
@@ -530,7 +607,10 @@ transition: opacity 0.15s, color 0.15s;
 
 /* ── PROFILE RIGHT COLUMN — 3 equal rows ── */
 .prof-right-col {
-flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 120px;
+width: min(320px, 92vw); display: flex; flex-direction: column;
+background: rgba(10,8,4,0.92); border: 1px solid #2a1e0a;
+border-radius: 0 0 6px 6px; padding: 6px 8px;
+position: relative; z-index: 1;
 }
 .prof-row {
 flex: 1; display: flex; align-items: center; gap: 4px;
@@ -772,8 +852,8 @@ padding: 6px; cursor: pointer; margin-bottom: 4px;
 .inspector.p2-active { background: linear-gradient(0deg,rgba(20,8,8,0.7) 0%,rgba(32,10,10,0.7) 100%); border-top-color: #3a1010; }
 
 /* Player colour on profile */
-.inspector-card-view.p1-card-view { background: linear-gradient(0deg,rgba(8,12,20,0.7),rgba(14,18,32,0.7)); }
-.inspector-card-view.p2-card-view { background: linear-gradient(0deg,rgba(20,6,6,0.7),rgba(26,8,8,0.7)); }
+.inspector-card-view.p1-card-view::before { background: rgba(4,8,20,0.72); }
+.inspector-card-view.p2-card-view::before { background: rgba(20,4,4,0.72); }
 /* Power card layout — hides stats rows, expands ability box */
 .inspector-card-view.power-card .prof-weapon-txt { display:none; }
 .inspector-card-view.power-card .prof-hp-stat    { display:none; }
@@ -1233,6 +1313,7 @@ pointer-events: none;
   <div class="player-side left active" id="side-p1">
     <div class="avatar p1">⚔</div>
     <div class="score-num p1-col" id="score-p1">0</div>
+    <span class="res-badge" id="res-badge-p1">3</span>
   </div>
   <div class="turn-block">
     <div class="turn-label">Turn</div>
@@ -1247,6 +1328,7 @@ pointer-events: none;
   <div class="player-side right inactive" id="side-p2">
     <div class="avatar p2">☠</div>
     <div class="score-num p2-col" id="score-p2">0</div>
+    <span class="res-badge" id="res-badge-p2">3</span>
   </div>
 </div>
 
@@ -1309,9 +1391,9 @@ pointer-events: none;
         <div class="pile-lbl">☠</div>
       </div>
     </div>
-    <div class="inspector-card-view" id="inspector-card-view">
+    <div class="inspector-card-view" id="inspector-card-view" onclick="closeProfile()">
       <!-- Col 1: card visual — tappable when unactivated -->
-      <div class="prof-card-visual" id="prof-card-visual" onclick="onCardVisualTap()">
+      <div class="prof-card-visual" id="prof-card-visual" onclick="event.stopPropagation();onCardVisualTap()">
         <div class="prof-cv-bottom">
           <div class="prof-cv-diamond" id="prof-cv-diamond">
             <span class="diamond-cost" id="prof-cost" style="transform:rotate(-45deg);font-size:11px;font-weight:900;color:#f0d080;line-height:1">3</span>
@@ -1328,7 +1410,7 @@ pointer-events: none;
         </div>
       </div>
       <!-- Col 2: right content -->
-      <div class="prof-right-col">
+      <div class="prof-right-col" onclick="event.stopPropagation()">
         <!-- Row 1: unit profile -->
         <div class="prof-row">
           <span class="prof-faction-icon" id="prof-faction-icon"></span>
@@ -1382,22 +1464,52 @@ pointer-events: none;
         </div>
       </div>
     </div>
+
   </div>
   <!-- Hub row — anchored bottom -->
   <div class="hub-row" id="hub-row">
-    <div class="hub-name p1-col" id="hub-name">Player I</div>
+    <!-- Left slot: player name or cancel -->
+    <div class="hub-left">
+      <div class="hub-name p1-col" id="hub-name">Player I</div>
+      <button class="hub-cancel" id="hub-cancel" style="display:none" onclick="onHubCancel()">✕ Cancel</button>
+    </div>
+    <!-- Centre slot: diamond or action buttons -->
     <div class="hub-center">
-      <div class="res-diamond-wrap">
+      <div class="res-diamond-wrap" id="hub-diamond-wrap">
         <div class="res-diamond" id="hub-res-diamond">
           <span id="hub-res">5</span>
         </div>
-        <span class="res-cost-preview" id="res-cost-preview" style="display:none"></span>
+      </div>
+      <div class="hub-actions" id="hub-actions">
+        <button class="act-btn" id="act-btn-move" onclick="selectAction('move')">
+          <span class="act-icon">⏩</span>
+          <span class="act-label">Move</span>
+        </button>
+        <button class="act-btn" id="act-btn-attack" onclick="selectAction('attack')">
+          <span class="act-icon">⚔</span>
+          <span class="act-label">Fight</span>
+        </button>
+        <button class="act-btn" id="act-btn-ability" onclick="selectAction('ability')" style="display:none">
+          <span class="act-icon">✦</span>
+          <span class="act-label">Ability</span>
+        </button>
+        <button class="act-btn" id="act-btn-skip" onclick="skipAction()">
+          <span class="act-icon">⊘</span>
+          <span class="act-label">Skip</span>
+        </button>
       </div>
     </div>
-    <div class="pass-widget">
-      <div class="pass-mine" id="pass-mine" onclick="passAction()">Pass ▶</div>
-      <div class="pass-divider"></div>
-      <div class="pass-opp" id="pass-opp">Opp ●</div>
+    <!-- Right slot: CTA button or pass widget -->
+    <div class="hub-right">
+      <div class="pass-widget" id="pass-widget">
+        <div class="pass-mine" id="pass-mine" onclick="passAction()">Pass ▶</div>
+        <div class="pass-divider"></div>
+        <div class="pass-opp" id="pass-opp">Opp ●</div>
+      </div>
+      <button class="hub-cta" id="hub-cta" style="display:none" onclick="onHubCta()">
+        <span class="hub-cta-label" id="hub-cta-label">Deploy</span>
+        <span class="hub-cta-cost" id="hub-cta-cost"></span>
+      </button>
     </div>
   </div>
 </div>
@@ -2020,6 +2132,8 @@ window.addEventListener('unhandledrejection', e => {
     // Scores + round always update
     document.getElementById('score-p1').textContent=state.players[1].score;
     document.getElementById('score-p2').textContent=state.players[2].score;
+    document.getElementById('res-badge-p1').textContent=state.players[1].resources;
+    document.getElementById('res-badge-p2').textContent=state.players[2].resources;
     document.getElementById('turn-num').textContent=`${state.round} / ${state.maxRounds}`;
 
     if(state.phase==='scoring') {
@@ -2144,13 +2258,14 @@ window.addEventListener('unhandledrejection', e => {
 
   // ── DRAG FROM HAND ──
   const DRAG_THRESHOLD = 3;
-  const INSPECT_MS = 500;
+  const INSPECT_MS = 300;
   let dragState = null;
 
   function cancelDragState() {
     if (!dragState) return;
     clearTimeout(dragState.inspectTimer);
     dragState.ghostEl?.remove();
+    clearDragHover();
     if (dragState.sourceEl) dragState.sourceEl.style.transform = '';
     document.removeEventListener('touchmove', onHandDragMove);
     document.removeEventListener('touchend',  onHandDragEnd);
@@ -2160,6 +2275,7 @@ window.addEventListener('unhandledrejection', e => {
   function onHandCardTouchStart(e, card, sourceEl) {
     if (e.touches.length > 1) return;
     e.preventDefault(); // seize touch — no scroll or pan from this point
+    if(state.pendingTile) cancelPendingDeploy();
     cancelDragState();
     const t = e.touches[0];
     // Visual "ready" — slight scale on touch
@@ -2168,14 +2284,14 @@ window.addEventListener('unhandledrejection', e => {
     dragState = {
       card, sourceEl,
       startX: t.clientX, startY: t.clientY,
-      active: false, ghostEl: null,
+      active: false, ghostEl: null, hoveredLane: null, hoverTile: null,
       inspectTimer: setTimeout(() => {
-        // Long press — open inspector
+        // Long press — open modal overlay
         if (dragState && !dragState.active) {
           const c = dragState.card;
           try{navigator.vibrate?.(15);}catch(e){}
           cancelDragState();
-          onHandCardTap(c);
+          openProfile(c, 'hand', null, {strip: false});
         }
       }, INSPECT_MS)
     };
@@ -2187,6 +2303,8 @@ window.addEventListener('unhandledrejection', e => {
     if (!dragState || dragState.active) return;
     clearTimeout(dragState.inspectTimer);
     dragState.sourceEl.style.transform = '';
+    dragState.sourceEl.style.opacity = '0';
+    dragState.sourceEl.style.pointerEvents = 'none';
     const ghost = dragState.sourceEl.cloneNode(true);
     ghost.style.transform = '';
     Object.assign(ghost.style, {
@@ -2202,7 +2320,7 @@ window.addEventListener('unhandledrejection', e => {
     dragState.active = true;
     dragState.ghostEl = ghost;
     try{navigator.vibrate?.(20);}catch(e){}
-    fitBoard();
+    resetBoardZoom();
     // Clear previous selection state without renderHand (avoid DOM rebuild during touch)
     state.selectedHandCard = null;
     state.pendingTile = null;
@@ -2210,9 +2328,9 @@ window.addEventListener('unhandledrejection', e => {
     clearHighlights();
     clearConfirm();
     // Now set new drag card and highlight deploy tiles
-    state.selectedHandCard = card;
+    state.selectedHandCard = dragState.card;
     const p = state.players[state.activePlayer];
-    if (p.resources >= card.cost) highlightDeployTiles(true);
+    if (p.resources >= dragState.card.cost) highlightDeployTiles(true);
   }
 
   function clearDragHover() {
@@ -2237,10 +2355,31 @@ window.addEventListener('unhandledrejection', e => {
     e.preventDefault();
     dragState.ghostEl.style.left = t.clientX - 34 + 'px';
     dragState.ghostEl.style.top  = t.clientY - 90 + 'px';
-    clearDragHover();
+    // Only update tile hover when it changes — prevents flicker
     const under = document.elementFromPoint(t.clientX, t.clientY);
     const tile = under?.closest('[data-id]');
-    if (tile?.classList.contains('highlight-deploy')) tile.classList.add('drag-hover');
+    const newHoverTile = tile?.classList.contains('highlight-deploy') ? tile : null;
+    if (newHoverTile !== dragState.hoverTile) {
+      clearDragHover();
+      dragState.hoverTile = newHoverTile;
+      if (newHoverTile) newHoverTile.classList.add('drag-hover');
+    }
+    // Cluster detection with padding — prevents edge flicker
+    const CLUSTER_PAD_Y = 40;
+    const clusters = getDeployClusters();
+    const fx = t.clientX, fy = t.clientY;
+    // Match vertically within cluster row, then pick closest lane by x
+    const inRow = clusters.filter(c => fy >= c.top - CLUSTER_PAD_Y && fy <= c.bottom + CLUSTER_PAD_Y);
+    const hit = inRow.length ? inRow.reduce((a, b) =>
+      Math.abs(fx - (a.left + a.right)/2) < Math.abs(fx - (b.left + b.right)/2) ? a : b
+    ) : null;
+    if (hit && hit.lane !== dragState.hoveredLane) {
+      dragState.hoveredLane = hit.lane;
+      zoomToCluster(hit);
+    } else if (!hit && dragState.hoveredLane) {
+      dragState.hoveredLane = null;
+      resetBoardZoom();
+    }
   }
 
   function onHandDragEnd(e) {
@@ -2254,6 +2393,7 @@ window.addEventListener('unhandledrejection', e => {
     clearTimeout(dragState.inspectTimer);
     const t = e.changedTouches[0];
     clearDragHover();
+    resetBoardZoom();
     dragState.ghostEl.style.display = 'none';
     const under = document.elementFromPoint(t.clientX, t.clientY);
     const tile = under?.closest('[data-id]');
@@ -2275,7 +2415,11 @@ window.addEventListener('unhandledrejection', e => {
         ghost.style.top  = r.top  + 'px';
         ghost.style.transform = 'scale(1)';
         ghost.style.opacity = '0';
-        setTimeout(() => ghost.remove(), 220);
+        // Restore source card as ghost arrives back
+        setTimeout(() => {
+          ghost.remove();
+          if (srcEl) { srcEl.style.opacity = ''; srcEl.style.pointerEvents = ''; }
+        }, 220);
       } else {
         ghost.remove();
       }
@@ -2288,9 +2432,10 @@ window.addEventListener('unhandledrejection', e => {
     // If tapping already-selected card, deselect
     if(state.selectedHandCard?.uid===card.uid){
       deselectAll();
-    } else {
-      selectHandCard(card);
+      return;
     }
+    selectHandCard(card);
+    // Tap = strip inspector, long press = modal (handled in touch handler)
     openProfile(card, 'hand');
   }
 
@@ -2651,7 +2796,7 @@ window.addEventListener('unhandledrejection', e => {
         const unit = state.board[tileId];
         if (unit) openProfile(unit, 'board', tileId);
       }
-    }, 500);
+    }, 300);
     const onMove = e2 => {
       const t2 = e2.touches[0];
       if (Math.hypot(t2.clientX - startX, t2.clientY - startY) > 8) {
@@ -2671,7 +2816,12 @@ window.addEventListener('unhandledrejection', e => {
 
   function onTileTap(tileId) {
     const tile=document.querySelector(`[data-id="${tileId}"]`);
-    if(!tile) return;
+    if(!tile) {
+      // Tap on empty board space — cancel pending
+      if(state.pendingTile) cancelPendingDeploy();
+      else if(state._ctaAction==='activate') onHubCancel();
+      return;
+    }
 
     // Tile-target power card — highlighted tile resolves the effect
     if(state._pendingPowerCard && state._pendingPowerReg?.subtype === 'tile_target') {
@@ -2698,11 +2848,22 @@ window.addEventListener('unhandledrejection', e => {
       return;
     }
 
-    // Tapping a tile with a unit — pulse only (profile opens on long press)
+    // Tapping a tile with a unit — select and show inspector + activate CTA
     if(state.board[tileId]){
       const unit = state.board[tileId];
       const lane = unitLane(tileId);
       if(lane) snapToLane(lane);
+      const isOwn = unit.owner === state.activePlayer;
+      const p = state.players[state.activePlayer];
+      const canActivate = isOwn && unit.actionsLeft === null && p.resources >= 1 && !state.activeUnit;
+      if (canActivate) {
+        openProfile(unit, 'board', tileId);
+        setBarState('pending', { label:'Activate', cost:1, action:'activate' });
+      } else if (isOwn && state.activeUnit?.card?.uid === unit.uid) {
+        // Tapping active unit — do nothing, already activated
+      } else {
+        openProfile(unit, 'board', tileId);
+      }
       return;
     }
 
@@ -2766,25 +2927,23 @@ window.addEventListener('unhandledrejection', e => {
     const tile=document.querySelector(`[data-id="${tileId}"]`);
     if(!tile) return;
     tile.classList.add('confirm-tile');
-    const btn=document.createElement('div');
-    btn.className='confirm-btn'; btn.id='confirm-btn';
-    btn.innerHTML='<span>✓</span>';
-    btn.addEventListener('click', e=>{ e.stopPropagation(); executeDeployTo(tileId); });
-    tile.appendChild(btn);
-    // Show cost preview
-    if(state.selectedHandCard){
-      const el=document.getElementById('res-cost-preview');
-      el.textContent=`−${state.selectedHandCard.cost}`;
-      el.style.display='inline';
-    }
+    const cost = state.selectedHandCard?.cost ?? 0;
+    setBarState('pending', { label:'Deploy', cost, action:'deploy' });
   }
 
   function clearConfirm() {
     document.querySelectorAll('.confirm-tile').forEach(t=>t.classList.remove('confirm-tile'));
     const btn=document.getElementById('confirm-btn');
     if(btn) btn.remove();
-    const el=document.getElementById('res-cost-preview');
-    if(el){ el.style.display='none'; el.textContent=''; }
+    if (!state.activeUnit) setBarState('default');
+  }
+
+  function cancelPendingDeploy() {
+    const tileId = state.pendingTile;
+    clearConfirm();
+    state.pendingTile = null;
+    // Restore card to hand
+    deselectAll();
   }
 
   function executeDeployTo(tileId) {
@@ -2859,7 +3018,7 @@ window.addEventListener('unhandledrejection', e => {
     document.getElementById('prof-cv-diamond')?.classList.toggle('res-pulse', on);
   }
 
-  function openProfile(card, context, tileId=null) {
+  function openProfile(card, context, tileId=null, opts={}) {
     profileCard=card; profileContext=context; profileTileId=tileId;
 
     // Clear previous selected tile
@@ -3000,7 +3159,9 @@ window.addEventListener('unhandledrejection', e => {
     }
 
     document.getElementById('inspector-deck').style.display='none';
-    document.getElementById('inspector-card-view').className='inspector-card-view active';
+    const isStrip = !!state.activeUnit || context === 'hand' || opts?.strip;
+    const cv = document.getElementById('inspector-card-view');
+    cv.className = 'inspector-card-view active' + (isStrip ? ' strip-mode' : '');
     document.getElementById('inspector').classList.add('open');
   }
 
@@ -3009,7 +3170,10 @@ window.addEventListener('unhandledrejection', e => {
     state.selectedBoardTile = null;
     setResPulse(false);
     document.getElementById('inspector-card-view').className='inspector-card-view';
-    document.getElementById('inspector-deck').style.display='flex';
+    // Only restore deck view if not in activated state
+    if (!state.activeUnit) {
+      document.getElementById('inspector-deck').style.display='flex';
+    }
   }
 
   // ── RENDER UNIT ON TILE ──
@@ -3395,6 +3559,117 @@ window.addEventListener('unhandledrejection', e => {
     renderHub();
   }
 
+
+
+  function onHubCta() {
+    // Handled by setBarState wiring in Step 2
+    if (state._ctaAction === 'deploy' && state.pendingTile) executeDeployTo(state.pendingTile);
+    else if (state._ctaAction === 'activate') activateUnit();
+  }
+
+  function onHubCancel() {
+    if (state._ctaAction === 'deploy') cancelPendingDeploy();
+    else if (state._ctaAction === 'activate') {
+      state._ctaAction = null;
+      setBarState('default');
+      deselectAll();
+    }
+  }
+
+  function skipAction() {
+    endUnit();
+  }
+
+  function setBarState(state_name, opts={}) {
+    const deck    = document.getElementById('inspector-deck');
+    const pass    = document.getElementById('pass-widget');
+    const diamond = document.getElementById('hub-diamond-wrap');
+    const actions = document.getElementById('hub-actions');
+    const cancel  = document.getElementById('hub-cancel');
+    const hubName = document.getElementById('hub-name');
+    const cta     = document.getElementById('hub-cta');
+    const ctaLbl  = document.getElementById('hub-cta-label');
+    const ctaCost = document.getElementById('hub-cta-cost');
+
+    // Reset all first
+    deck.style.display    = 'none';
+    pass.style.display    = 'none';
+    diamond.style.display = 'none';
+    actions.classList.remove('active');
+    cancel.style.display  = 'none';
+    hubName.style.display = '';
+    cta.style.display     = 'none';
+
+    if (state_name === 'default') {
+      deck.style.display    = '';
+      diamond.style.display = '';
+      pass.style.display    = '';
+
+    } else if (state_name === 'pending') {
+      // Pending spend — cancel left, diamond centre, CTA right
+      deck.style.display    = '';  // keep hand visible
+      diamond.style.display = '';
+      cancel.style.display  = '';
+      hubName.style.display = 'none';
+      cta.style.display     = '';
+      ctaLbl.textContent    = opts.label  || 'Confirm';
+      ctaCost.textContent   = opts.cost   ? `−${opts.cost}` : '';
+      state._ctaAction      = opts.action || null;
+
+    } else if (state_name === 'activated') {
+      // Activated — name left, actions centre, no right
+      deck.style.display = 'none';
+      actions.classList.add('active');
+    }
+  }
+
+  function showActionBar(unit) {
+    // Show ability button only if unit has an ability
+    const ab = unit?.ability || unit?.special;
+    document.getElementById('act-btn-ability').style.display = ab ? 'flex' : 'none';
+    setBarState('activated');
+  }
+
+  function hideActionBar() {
+    state._ctaAction = null;
+    setBarState('default');
+  }
+
+  function updateActionBar() {
+    const unit = state.activeUnit?.card;
+    if (!unit) return;
+    const actions = unit.actionsLeft ?? 0;
+    const current = state.activeAction;
+    const immobile = unit.move === -1;
+
+    const btnMove    = document.getElementById('act-btn-move');
+    const btnAttack  = document.getElementById('act-btn-attack');
+    const btnAbility = document.getElementById('act-btn-ability');
+    const btnEnd     = document.getElementById('act-btn-end');
+
+    // Move
+    if (immobile || actions === 0) btnMove.className = 'act-btn act-unavailable';
+    else if (current === 'move')    btnMove.className = 'act-btn act-selected';
+    else                            btnMove.className = 'act-btn act-available';
+
+    // Attack
+    if (actions === 0)               btnAttack.className = 'act-btn act-unavailable';
+    else if (current === 'attack')   btnAttack.className = 'act-btn act-selected';
+    else                             btnAttack.className = 'act-btn act-available';
+
+    // Ability (only shown if unit has one)
+    if (btnAbility.style.display !== 'none') {
+      const ab = unit.ability;
+      const canUse = ab && actions >= (ab.apCost || 1);
+      if (!canUse)                    btnAbility.className = 'act-btn act-unavailable';
+      else if (current === 'ability') btnAbility.className = 'act-btn act-selected';
+      else                            btnAbility.className = 'act-btn act-available';
+    }
+
+    // End — always available when unit is active
+    btnEnd.className = 'act-btn act-available';
+  }
+
   function activateUnit() {
     const p=state.players[state.activePlayer];
     const unit=state.board[profileTileId];
@@ -3409,7 +3684,11 @@ window.addEventListener('unhandledrejection', e => {
     if(tile) { tile.classList.add('unit-active','unit-selected'); }
     renderUnit(tile, unit);
     renderHub();
+    showActionBar(unit);
     openProfile(unit,'board',profileTileId);
+    setBarState('activated');
+    selectAction('move');
+    updateActionBar();
   }
 
   // ── SELECT ACTION (Move / Attack) ──
@@ -3419,9 +3698,10 @@ window.addEventListener('unhandledrejection', e => {
     // Reset ability button if shown
     const btn = document.querySelector('.ability-btn.ability-active');
     if (btn) btn.className = 'ability-btn ability-idle';
-    if(state.activeAction===action){ state.activeAction=null; refreshActionButtons(); return; }
+    if(state.activeAction===action){ state.activeAction=null; refreshActionButtons(); updateActionBar(); return; }
     state.activeAction=action;
     refreshActionButtons();
+    updateActionBar();
     const unit=state.activeUnit?.card;
     const tid=state.activeUnit?.tileId;
     if(!unit||!tid) return;
@@ -3503,6 +3783,7 @@ window.addEventListener('unhandledrejection', e => {
     unit.actionsLeft=0;
     clearHighlights();
     closeProfile();
+    hideActionBar();
     endCurrentTurn();
     waitThenAdvance();
   }
@@ -3510,6 +3791,7 @@ window.addEventListener('unhandledrejection', e => {
   function endCurrentTurn() {
     deselectAll();
     closeProfile();
+    hideActionBar();
     state.activeUnit=null; state.activeAction=null;
     clearHighlights();
     document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
@@ -3850,6 +4132,42 @@ window.addEventListener('unhandledrejection', e => {
     inner.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
     setTimeout(()=>{ inner.style.transition=''; }, 350);
   }
+  function getDeployClusters() {
+    // Group highlight-deploy tiles by data-lane into clusters with bounding boxes
+    const outerRect = outer.getBoundingClientRect();
+    const groups = {};
+    document.querySelectorAll('.tile.highlight-deploy').forEach(t => {
+      const key = t.dataset.lane || 'default';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(t.getBoundingClientRect());
+    });
+    return Object.entries(groups).map(([lane, rects]) => ({
+      lane,
+      left:   Math.min(...rects.map(r => r.left)),
+      right:  Math.max(...rects.map(r => r.right)),
+      top:    Math.min(...rects.map(r => r.top)),
+      bottom: Math.max(...rects.map(r => r.bottom)),
+      cx: (Math.min(...rects.map(r=>r.left)) + Math.max(...rects.map(r=>r.right))) / 2 - outerRect.left,
+      cy: (Math.min(...rects.map(r=>r.top))  + Math.max(...rects.map(r=>r.bottom))) / 2 - outerRect.top,
+    }));
+  }
+
+  function zoomToCluster(cluster) {
+    const targetScale = 1.25;
+    const ow = outer.clientWidth;
+    const oh = outer.clientHeight;
+    const worldCx = (cluster.cx - tx) / scale;
+    const worldCy = (cluster.cy - ty) / scale;
+    const newTx = clamp(ow/2 - worldCx * targetScale, ow - inner.offsetWidth * targetScale, 0);
+    const playerBar = document.getElementById('player-bar');
+    const barH = playerBar ? playerBar.offsetHeight : 160;
+    const newTy = clamp((oh - barH - 20) - worldCy * targetScale, oh - inner.offsetHeight * targetScale, 0);
+    inner.style.transition = 'transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94)';
+    scale = targetScale; tx = newTx; ty = newTy;
+    inner.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+    setTimeout(() => { inner.style.transition = ''; }, 320);
+  }
+
   function snapBack(){
     const ow=outer.clientWidth;
     const sw=inner.offsetWidth*scale;
@@ -3860,6 +4178,32 @@ window.addEventListener('unhandledrejection', e => {
       inner.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
       setTimeout(()=>{ inner.style.transition=''; },300);
     }
+  }
+
+  function zoomToTile(tileId) {
+    const tile = document.querySelector(`[data-id="${tileId}"]`);
+    if (!tile) return;
+    const outerRect = outer.getBoundingClientRect();
+    const tileRect = tile.getBoundingClientRect();
+    const targetScale = 1.6;
+    // Tile centre in outer coordinates
+    const tileCx = tileRect.left - outerRect.left + tileRect.width / 2;
+    const tileCy = tileRect.top  - outerRect.top  + tileRect.height / 2;
+    // New tx/ty so tile centre stays at same screen position after scale change
+    const newTx = tileCx - (tileCx - tx) * (targetScale / scale);
+    const newTy = tileCy - (tileCy - ty) * (targetScale / scale);
+    inner.style.transition = 'transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94)';
+    scale = targetScale;
+    tx = clamp(newTx, outer.clientWidth  - inner.offsetWidth  * scale, 0);
+    ty = clamp(newTy, outer.clientHeight - inner.offsetHeight * scale, 0);
+    inner.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+    setTimeout(() => { inner.style.transition = ''; }, 260);
+  }
+
+  function resetBoardZoom() {
+    inner.style.transition = 'transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94)';
+    fitBoard();
+    setTimeout(() => { inner.style.transition = ''; }, 320);
   }
 
   function fitBoard(){
