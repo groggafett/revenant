@@ -201,6 +201,14 @@ box-shadow: 0 0 16px rgba(0,0,0,0.7);
 border: 2px solid #c8a060 !important;
 box-shadow: 0 0 10px rgba(200,160,60,0.5) !important;
 }
+.tile.touch-pulse {
+animation: tilePulse 0.3s ease forwards;
+}
+@keyframes tilePulse {
+0%   { filter: brightness(1); }
+50%  { filter: brightness(1.6); }
+100% { filter: brightness(1); }
+}
 .tile.drag-hover {
 transform: scale(1.12) !important;
 border: 2px solid #f0d080 !important;
@@ -629,13 +637,11 @@ display:flex; align-items:center; justify-content:center;
 .pile.deck.p2-deck.draw-exhausted .pile-cost-diamond { background:#0a0404; border-color:#1e0808; opacity:0.35; }
 
 .hand-scroll {
-display: flex; gap: 5px; overflow-x: auto;
--webkit-overflow-scrolling: touch; scrollbar-width: none;
+display: flex; gap: 5px; overflow-x: hidden;
 flex: 1; align-items: flex-start;
 -webkit-user-select: none; user-select: none;
 -webkit-touch-callout: none;
 }
-.hand-scroll::-webkit-scrollbar { display: none; }
 
 /* Hand cards */
 .card {
@@ -870,6 +876,7 @@ color: #2a1e0a; font-size: 18px;
 }
 .hand-draw-tile {
 width: 68px; aspect-ratio: 5/7; flex-shrink: 0;
+transition: width 0.25s ease;
 border-radius: 4px; border: 1px solid #1e2a4a;
 background: linear-gradient(160deg,#101428,#080c1c);
 display: flex; flex-direction: column;
@@ -902,7 +909,7 @@ align-items: center; justify-content: space-between;
 padding: 6px 4px; text-align: center;
 color: #a08050; cursor: pointer; position: relative;
 box-shadow: inset 0 1px 0 rgba(180,140,60,0.08), 1px 2px 4px rgba(0,0,0,0.5);
-transition: border-color 0.15s, transform 0.15s;
+transition: border-color 0.15s, transform 0.15s, width 0.25s ease;
 }
 .card.selected {
 border-color: #c8a060;
@@ -1973,6 +1980,7 @@ pointer-events: none;
           tile.dataset.col=ci;
           tile.dataset.player=rowDef.player;
           if(zone!=='centre') tile.addEventListener('click', ()=>onTileTap(tileId));
+          if(zone!=='centre') tile.addEventListener('touchstart', e=>onBoardTileTouchStart(e,tileId), {passive:true});
           if(zone==='centre') tile.addEventListener('click', ()=>{
             if(state.selectedHandCard?.type==='Power') executePowerCard(lane);
             else showLaneEffectOverlay(lane, tile);
@@ -2042,11 +2050,19 @@ pointer-events: none;
     renderHand();
   }
 
-  const MAX_HAND = 8;
+  const MAX_HAND = 6;
   function renderHand() {
     const p=state.players[state.activePlayer];
     const scroll=document.getElementById('hand-scroll');
     scroll.innerHTML='';
+    const showDraw = p.hand.length < MAX_HAND && !p.drawnThisRound;
+    const totalSlots = p.hand.length + (showDraw ? 1 : 0);
+    const availW = window.innerWidth - 24;
+    const gap = 5;
+    const cardW = totalSlots <= 5
+      ? Math.floor((availW - gap * 4) / 5)
+      : Math.floor((availW - gap * 5) / 6);
+    scroll.style.justifyContent = totalSlots <= 5 ? 'center' : 'flex-start';
     p.hand.forEach(card=>{
       const canAfford=p.resources>=card.cost;
       const isSelected=state.selectedHandCard?.uid===card.uid;
@@ -2054,6 +2070,7 @@ pointer-events: none;
       const col = p.color;
       el.className=`card ${col}-card${isSelected?' selected':''}${!canAfford?' unavailable':''}`;
       el.dataset.uid = card.uid;
+      el.style.width = cardW + 'px';
       el.innerHTML = (card.type||'').trim() === 'Power'
         ? `<div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#1a1020;border:1.5px solid #8a40c0;display:flex;align-items:center;justify-content:center;font-size:9px;z-index:1;">⚡</div>
            <div class="card-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;text-align:center">${card.name}</div>
@@ -2075,17 +2092,20 @@ pointer-events: none;
           tryHide(`art/${card.artId}.jpeg`);
         }
       }
-      el.addEventListener('touchstart', e=>onHandCardTouchStart(e,card,el), {passive:true});
+      el.addEventListener('touchstart', e=>onHandCardTouchStart(e,card,el), {passive:false});
       el.addEventListener('click',()=>onHandCardTap(card));
       scroll.appendChild(el);
     });
-    // Draw tile — always at end of hand
-    const canDraw = p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound;
-    const drawTile = document.createElement('div');
-    drawTile.className = `hand-draw-tile${canDraw ? ' can-draw' : ''}${p.drawnThisRound ? ' draw-exhausted' : ''}${p.color === 'p2' ? ' p2-draw' : ''}`;
-    drawTile.innerHTML = `<div class="draw-tile-count">${p.deck.length}</div><div class="draw-tile-label">Draw</div><div class="draw-tile-cost">cost 1</div>`;
-    if (canDraw) drawTile.addEventListener('click', () => drawAction());
-    scroll.appendChild(drawTile);
+    // Draw tile — only shown when hand not full
+    if (showDraw) {
+      const canDraw = p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound;
+      const drawTile = document.createElement('div');
+      drawTile.className = `hand-draw-tile${canDraw ? ' can-draw' : ''}${p.drawnThisRound ? ' draw-exhausted' : ''}${p.color === 'p2' ? ' p2-draw' : ''}`;
+      drawTile.style.width = cardW + 'px';
+      drawTile.innerHTML = `<div class="draw-tile-count">${p.deck.length}</div><div class="draw-tile-label">Draw</div><div class="draw-tile-cost">cost 1</div>`;
+      if (canDraw) drawTile.addEventListener('click', () => drawAction());
+      scroll.appendChild(drawTile);
+    }
     // Update inspector card visual if a hand card is selected
     if (state.selectedHandCard) {
       const p = state.players[state.activePlayer];
@@ -2125,6 +2145,7 @@ pointer-events: none;
 
   function onHandCardTouchStart(e, card, sourceEl) {
     if (e.touches.length > 1) return;
+    e.preventDefault(); // seize touch — no scroll or pan from this point
     cancelDragState();
     const t = e.touches[0];
     // Visual "ready" — slight scale on touch
@@ -2158,7 +2179,7 @@ pointer-events: none;
     Object.assign(ghost.style, {
       position:'fixed', pointerEvents:'none', zIndex:'999',
       width:'68px', aspectRatio:'5/7',
-      left: x - 34 + 'px', top: y - 34 + 'px',
+      left: x - 34 + 'px', top: y - 90 + 'px',
       transform:'scale(1.15)', opacity:'0.92',
       transition:'transform 0.1s ease',
       borderRadius:'4px',
@@ -2187,7 +2208,7 @@ pointer-events: none;
     }
     e.preventDefault();
     dragState.ghostEl.style.left = t.clientX - 34 + 'px';
-    dragState.ghostEl.style.top  = t.clientY - 34 + 'px';
+    dragState.ghostEl.style.top  = t.clientY - 90 + 'px';
     clearDragHover();
     const under = document.elementFromPoint(t.clientX, t.clientY);
     const tile = under?.closest('[data-id]');
@@ -2582,6 +2603,44 @@ pointer-events: none;
     ov.addEventListener('click', e => { if(e.target===ov) ov.remove(); });
   }
 
+  // ── BOARD TILE LONG PRESS ──
+  let _tileTouchTimer = null;
+  let _tileTouchMoved = false;
+
+  function onBoardTileTouchStart(e, tileId) {
+    if (e.touches.length > 1) return;
+    if (!state.board[tileId]) return; // only for tiles with units
+    const t = e.touches[0];
+    const startX = t.clientX, startY = t.clientY;
+    _tileTouchMoved = false;
+    // Visual pulse
+    const el = document.querySelector(`[data-id="${tileId}"]`);
+    if (el) { el.classList.remove('touch-pulse'); void el.offsetWidth; el.classList.add('touch-pulse'); }
+    clearTimeout(_tileTouchTimer);
+    _tileTouchTimer = setTimeout(() => {
+      if (!_tileTouchMoved) {
+        navigator.vibrate?.(15);
+        const unit = state.board[tileId];
+        if (unit) openProfile(unit, 'board', tileId);
+      }
+    }, 500);
+    const onMove = e2 => {
+      const t2 = e2.touches[0];
+      if (Math.hypot(t2.clientX - startX, t2.clientY - startY) > 8) {
+        _tileTouchMoved = true;
+        clearTimeout(_tileTouchTimer);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend', onEnd);
+      }
+    };
+    const onEnd = () => {
+      clearTimeout(_tileTouchTimer);
+      document.removeEventListener('touchmove', onMove);
+    };
+    document.addEventListener('touchmove', onMove, {passive:true});
+    document.addEventListener('touchend', onEnd, {once:true});
+  }
+
   function onTileTap(tileId) {
     const tile=document.querySelector(`[data-id="${tileId}"]`);
     if(!tile) return;
@@ -2611,18 +2670,11 @@ pointer-events: none;
       return;
     }
 
-    // Tapping a tile with a unit — show profile, or activate on second tap
+    // Tapping a tile with a unit — pulse only (profile opens on long press)
     if(state.board[tileId]){
       const unit = state.board[tileId];
       const lane = unitLane(tileId);
       if(lane) snapToLane(lane);
-      const isOwn = unit.owner === state.activePlayer;
-      // Second tap on already-selected own unactivated unit = activate
-      if(isOwn && state.selectedBoardTile===tileId && unit.actionsLeft===null) {
-        activateUnit();
-        return;
-      }
-      openProfile(unit,'board',tileId);
       return;
     }
 
