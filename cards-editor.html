@@ -338,10 +338,23 @@ body {
     <div class="io-status" id="csv-copy-status">Copied to clipboard</div>
   </div>
   <div class="io-section">
+    <div class="io-label">Export / Import JSON</div>
+    <div class="io-sub">Copy all cards, decks and lanes as JSON. Paste on another device to transfer.</div>
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <button class="io-btn export" style="flex:1" onclick="exportToClipboard()">⬇ Copy JSON</button>
+      <button class="io-btn export" style="flex:1" onclick="downloadJSON()">⬇ Download JSON</button>
+      <div class="io-status" id="copy-status">Copied!</div>
+    </div>
+    <textarea id="import-paste" style="width:100%;height:80px;background:#0a0806;border:1px solid #2a1e0a;border-radius:3px;color:#c8a060;font-family:monospace;font-size:9px;padding:6px;resize:none;outline:none;margin-top:6px" placeholder='Paste JSON here to import…'></textarea>
+    <button class="io-btn import" style="margin-top:6px;width:100%" onclick="importFromPaste()">⬆ Import JSON</button>
+    <div class="io-status" id="io-status">Imported successfully</div>
+  </div>
+  <div class="io-section">
     <div class="io-label">Storage</div>
     <div class="io-sub">Tap a key to clear it.</div>
     <div id="storage-keys"></div>
   </div>
+</div>
 </div>
 <div class="overlay" id="overlay" onclick="closeForm(); closeLaneForm()"></div>
 
@@ -860,6 +873,21 @@ function importCSV() {
     st.classList.add('show');
     setTimeout(() => st.classList.remove('show'), 2500);
   } catch(e) { alert('CSV parse error: ' + e.message); }
+}
+
+function downloadJSON() {
+  const data = {
+    grim_card_repo: repo,
+    grim_lane_deck: laneDeck,
+    grim_deck_p1: decks[1],
+    grim_deck_p2: decks[2]
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'revenant-cards.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 function exportToClipboard() {
