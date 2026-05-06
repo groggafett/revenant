@@ -10,7 +10,7 @@
 <title>Card Game</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
     /* ── PLAYERS ── */
@@ -44,66 +44,78 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --fs-xs: 11px;
+    --fs-sm: 16px;
+    --fs-md: 24px;
+    --fs-lg: 32px;
+    --fs-xl: 40px;
+    --card-sm-w: 40px; --card-sm-h: 56px;
+    --card-md-w: 75px; --card-md-h: 105px;
+    --card-lg-w: 80px; --card-lg-h: 112px;
+    --panel-section-h: 117px;
+    --panel-pad: 6px;
+  }
   body {
     background: #1a1610;
     color: #c8a96e;
-    font-family: 'Cinzel', Georgia, serif;
+    font-family: 'Spectral', Georgia, serif;
     height: 100dvh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
   }
 
 /* ── TOP BAR ── */
 .top-bar {
 position: fixed; top: 0; left: 0; right: 0;
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 6px 10px;
-background: transparent;
-border-bottom: none;
-z-index: 20; gap: 8px;
+display: flex; align-items: center; justify-content: space-between;
+padding: 4px 8px; background: transparent; border-bottom: none;
+z-index: 20; gap: 6px;
 }
-.player-side { display: flex; align-items: center; gap: 8px; flex: 1; }
+.player-side { display: flex; align-items: center; gap: 4px; flex: 1; }
 .player-side.right { flex-direction: row-reverse; }
 .avatar {
-width: 46px; height: 46px; border-radius: 50%;
+width: 32px; height: 32px; border-radius: 50%;
 background: #1a1410; border: 2px solid #5a4520;
 display: flex; align-items: center; justify-content: center;
-font-size: 22px; flex-shrink: 0;
+font-size: var(--fs-xs); flex-shrink: 0;
 }
-.avatar.p1 { border-color: var(--p1-dark); box-shadow: 0 0 10px rgba(40,80,160,0.4); }
-.avatar.p2 { border-color: var(--p2-dark); box-shadow: 0 0 10px rgba(160,20,20,0.4); }
-.score-num { font-size: 30px; font-weight: 900; line-height: 1; text-shadow: 0 0 12px currentColor; }
+.avatar.p1 { border-color: var(--p1-dark); box-shadow: 0 0 8px rgba(40,80,160,0.4); }
+.avatar.p2 { border-color: var(--p2-dark); box-shadow: 0 0 8px rgba(160,20,20,0.4); }
+.score-num { font-size: var(--fs-xl); font-weight: 900; line-height: 1; text-shadow: 0 0 12px currentColor; }
 .res-badge {
-font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
-color: #c8a060; opacity: 0.8; line-height: 1;
-display: flex; align-items: center; gap: 2px;
+width: 18px; height: 18px; flex-shrink: 0;
+background: #8a5010; border: 1px solid #c08020;
+border-radius: 2px; transform: rotate(45deg);
+display: flex; align-items: center; justify-content: center;
+font-size: 10px; font-weight: 900; color: #f0d080;
+box-shadow: 0 0 4px rgba(200,160,60,0.3);
 }
-.res-badge::before { content: '◆'; font-size: 7px; }
+.res-badge span { transform: rotate(-45deg); display: block; line-height: 1; }
+.res-badge::before { display: none; }
 .p1-col { color: var(--p1); }
 .p2-col { color: var(--p2); }
 .turn-block {
-text-align: center;
+text-align: center; display: flex; flex-direction: column; align-items: center;
 background: linear-gradient(180deg, #1e1a10 0%, #141008 100%);
-border-radius: 6px; padding: 5px 8px;
-border: 1px solid #4a3818; flex-shrink: 0; min-width: 0;
+border-radius: 4px; padding: 3px 8px;
+border: 1px solid #4a3818; flex-shrink: 0; width: fit-content; cursor: pointer;
 }
-.save-btns { display: flex; gap: 3px; justify-content: center; margin-top: 3px; flex-wrap: wrap; }
-.turn-label { font-size: 7px; text-transform: uppercase; letter-spacing: 0.2em; color: #7a6030; }
-.turn-num   { font-size: 14px; font-weight: 700; color: #c8a060; }
-.turn-whose { font-size: 7px; color: #5a4828; letter-spacing: 0.1em; }
-.save-btn {
-font-family: ‘Cinzel’, Georgia, serif; font-size: 6px; font-weight: 700;
-letter-spacing: 0.08em; text-transform: uppercase;
-padding: 2px 5px; border-radius: 2px; cursor: pointer;
-border: 1px solid #3a2a10; background: #1a1408; color: #5a4828;
-transition: border-color 0.15s, color 0.15s;
-}
-.save-btn:active { border-color: #c8a060; color: #c8a060; }
-.save-btn.danger { border-color: #3a1010; color: #603030; }
-.save-btn.danger:active { border-color: #cc3030; color: #cc3030; }
+.turn-block:active { border-color: #c8a060; }
+.turn-num { font-size: var(--fs-md); font-weight: 900; color: #c8a060; line-height: 1; }
+.turn-label { display: none; }
+.turn-whose { display: none; }
+.menu-icon { display: none; }
+.save-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #1a1408; border: 1px solid #3a2a10; border-radius: 4px; z-index: 100; min-width: 100px; overflow: hidden; }
+.save-menu.open { display: block; }
+.save-menu-item { font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 12px; cursor: pointer; color: #5a4828; border-bottom: 1px solid #2a1e0a; }
+.save-menu-item:last-child { border-bottom: none; }
+.save-menu-item:active { background: #2a1e0a; color: #c8a060; }
+.save-menu-item.danger { color: #603030; }
+.save-menu-item.danger:active { color: #cc3030; }
 
 /* ── BOARD ── */
 .board-outer {
@@ -128,7 +140,7 @@ align-items: stretch;
 }
 .lane {
 flex: 1; display: flex; flex-direction: column;
-gap: 20px; padding: 0 6px;
+gap: 12px; padding: 0 6px;
 background: transparent;
 justify-content: center;
 }
@@ -171,15 +183,15 @@ background: rgba(160,30,30,0.5);
 .centre::after { display: none; }
 .tile-label {
 position: relative; z-index: 1;
-font-size: 5px; text-transform: uppercase;
+font-size: var(--fs-xs); text-transform: uppercase;
 letter-spacing: 0.06em; color: rgba(180,140,60,0.2);
 text-align: center; line-height: 1.4;
 }
 .tile-symbol { position: absolute; z-index: 1; pointer-events: none; }
-.deploy-p1 .tile-symbol { color: rgba(74,120,216,0.7); font-size: 17px; }
-.deploy-p2 .tile-symbol { color: rgba(200,48,48,0.7); font-size: 17px; }
-.control-zone .tile-symbol { color: rgba(100,180,60,0.8); font-size: 15px; text-shadow: 0 0 6px rgba(80,200,40,0.4); }
-.centre .tile-symbol { color: rgba(180,100,30,0.85); font-size: 20px; text-shadow: 0 0 8px rgba(180,100,30,0.45); }
+.deploy-p1 .tile-symbol { color: rgba(74,120,216,0.7); font-size: var(--fs-md); }
+.deploy-p2 .tile-symbol { color: rgba(200,48,48,0.7); font-size: var(--fs-md); }
+.control-zone .tile-symbol { color: rgba(100,180,60,0.8); font-size: var(--fs-sm); text-shadow: 0 0 6px rgba(80,200,40,0.4); }
+.centre .tile-symbol { color: rgba(180,100,30,0.85); font-size: var(--fs-md); text-shadow: 0 0 8px rgba(180,100,30,0.45); }
 /* Lane effect tooltip */
 .lane-effect-overlay {
 position: fixed; z-index: 60;
@@ -188,13 +200,13 @@ border: 1px solid #2a5030; border-radius: 6px;
 padding: 10px 12px; min-width: 160px; max-width: 220px;
 box-shadow: 0 0 16px rgba(0,0,0,0.7);
 }
-.leo-title   { font-size: 10px; font-weight: 700; color: #40a878; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 2px; }
-.leo-trigger { font-size: 7px; color: #30784a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
-.leo-desc    { font-size: 9px; color: #5a8868; line-height: 1.5; margin-bottom: 8px; }
-.leo-close   { font-size: 9px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #40a878; background: none; border: 1px solid #1a5030; border-radius: 3px; padding: 3px 8px; cursor: pointer; width: 100%; }
+.leo-title   { font-size: var(--fs-xs); font-weight: 700; color: #40a878; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 2px; }
+.leo-trigger { font-size: var(--fs-xs); color: #30784a; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.leo-desc    { font-size: var(--fs-xs); color: #5a8868; line-height: 1.5; margin-bottom: 8px; }
+.leo-close   { font-size: var(--fs-xs); font-family: 'Spectral', Georgia, serif; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #40a878; background: none; border: 1px solid #1a5030; border-radius: 3px; padding: 3px 8px; cursor: pointer; width: 100%; }
 .lane-effect-badge {
   position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
-  z-index: 2; font-size: 5px; font-weight: 700; letter-spacing: 0.05em;
+  z-index: 2; font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.05em;
   text-transform: uppercase; white-space: nowrap; max-width: 90%;
   overflow: hidden; text-overflow: ellipsis; pointer-events: none;
   color: var(--lane-effect); background: rgba(0,10,5,0.85); border: 1px solid #1a5030;
@@ -252,7 +264,7 @@ background: #0e2208; border: 1px solid var(--hp-positive);
 border-radius: 50%; display: flex; align-items: center; justify-content: center;
 z-index: 1;
 }
-.unit-hp span { font-size: 6px; font-weight: 900; color: var(--hp-positive); line-height: 1; }
+.unit-hp span { font-size: var(--fs-xs); font-weight: 900; color: var(--hp-positive); line-height: 1; }
 .unit-hp.p1-hp { border-color: var(--p1); background: #080e1e; }
 .unit-hp.p1-hp span { color: var(--p1); }
 .unit-hp.p2-hp { border-color: var(--p2); background: #1e0808; }
@@ -260,7 +272,7 @@ z-index: 1;
 /* Name — centre */
 .unit-name {
 position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-font-size: 5px; font-weight: 700; line-height: 1.2; color: #d4b870;
+font-size: var(--fs-xs); font-weight: 700; line-height: 1.2; color: #d4b870;
 width: 90%; text-align: center;
 }
 /* Large card overlay */
@@ -278,26 +290,26 @@ margin-bottom: 14px;
 }
 .card-zoom-art.p1-unit { border-color: #4a78d8; box-shadow: 0 0 20px rgba(74,120,216,0.4); }
 .card-zoom-art.p2-unit { border-color: #cc3030; box-shadow: 0 0 20px rgba(204,48,48,0.4); }
-.card-zoom-name { font-size: 16px; font-weight: 900; font-family:'Cinzel',Georgia,serif; color:#c8a060; letter-spacing:0.1em; margin-bottom:3px; }
-.card-zoom-weapon { font-size: 9px; color:#5a4828; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:10px; }
-.card-zoom-faction { font-size:14px; margin-right:6px; }
+.card-zoom-name { font-size: var(--fs-sm); font-weight: 900; font-family:'Spectral',Georgia,serif; color:#c8a060; letter-spacing:0.1em; margin-bottom:3px; }
+.card-zoom-weapon { font-size: var(--fs-xs); color:#5a4828; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:10px; }
+.card-zoom-faction { font-size: var(--fs-sm); margin-right:6px; }
 .card-zoom-flavour {
 width:100%; max-width:260px; background:#0a0806; border:1px solid #1a1408;
-border-radius:4px; padding:8px 10px; font-size:9px; color:#7a6848;
+border-radius:4px; padding:8px 10px; font-size: var(--fs-xs); color:#7a6848;
 line-height:1.6; text-align:center; font-style:italic;
 }
 .card-zoom-close {
-margin-top:16px; font-family:'Cinzel',Georgia,serif; font-size:9px;
+margin-top:16px; font-family:'Spectral',Georgia,serif; font-size: var(--fs-xs);
 color:#3a2a10; text-transform:uppercase; letter-spacing:0.15em; cursor:pointer;
 }
 /* Name — middle */
-.unit-name { font-size: 5px; font-weight: 700; line-height: 1.2; color: #d4b870; }
+.unit-name { font-size: var(--fs-xs); font-weight: 700; line-height: 1.2; color: #d4b870; }
 /* Lightning action pips on board unit */
 .unit-actions {
 display: flex; gap: 2px; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .unit-pip {
-font-size: 9px; line-height: 1; color: #f0c020;
+font-size: var(--fs-xs); line-height: 1; color: #f0c020;
 text-shadow: 0 0 5px rgba(240,192,32,0.8);
 transition: opacity 0.15s, color 0.15s;
 }
@@ -306,7 +318,7 @@ transition: opacity 0.15s, color 0.15s;
 .unit-skull {
 position: absolute; inset: 0; z-index: 2;
 display: flex; align-items: center; justify-content: center;
-font-size: 16px; opacity: 0.5;
+font-size: var(--fs-sm); opacity: 0.5;
 pointer-events: none;
 }
 /* Small rune diamond for unactivated state */
@@ -328,7 +340,7 @@ background: rgba(0,0,0,0.6);
 border-radius: 3px;
 }
 .confirm-btn span {
-font-size: 18px; color: #40d020;
+font-size: var(--fs-md); color: #40d020;
 text-shadow: 0 0 8px rgba(60,220,30,0.8);
 }
 
@@ -337,88 +349,152 @@ text-shadow: 0 0 8px rgba(60,220,30,0.8);
 .player-bar {
 position: fixed; bottom: 0; left: 0; right: 0;
 z-index: 20; overflow: visible;
-padding-bottom: env(safe-area-inset-bottom);
+display: flex; flex-direction: column;
+background: linear-gradient(0deg, rgba(13,11,8,0.96) 0%, rgba(20,16,8,0.96) 100%);
+box-shadow: 0 -4px 16px rgba(0,0,0,0.4);
 }
-.player-bar.p1-active .hub-row { border-top-color: var(--p1-dark); background: linear-gradient(0deg,rgba(8,12,20,0.92) 0%,rgba(14,16,32,0.92) 100%); }
-.player-bar.p2-active .hub-row { border-top-color: var(--p2-dark); background: linear-gradient(0deg,rgba(20,8,8,0.92) 0%,rgba(32,8,8,0.92) 100%); }
+.player-bar.p1-active { background: linear-gradient(0deg,rgba(8,12,20,0.96) 0%,rgba(14,16,32,0.96) 100%); }
+.player-bar.p1-active .hub-row::before { border-top-color: var(--p1-dark); }
+.player-bar.p2-active { background: linear-gradient(0deg,rgba(20,8,8,0.96) 0%,rgba(32,8,8,0.96) 100%); }
+.player-bar.p2-active .hub-row::before { border-top-color: var(--p2-dark); }
 
 /* Hub row — always visible */
 .hub-row {
 display: flex; align-items: center;
-padding: 8px 12px 10px; gap: 8px;
+height: calc(52px + env(safe-area-inset-bottom));
+padding: 0 8px calc(env(safe-area-inset-bottom)); gap: 8px;
 justify-content: space-between;
 user-select: none;
 position: relative;
-background: linear-gradient(0deg, rgba(13,11,8,0.92) 0%, rgba(20,16,8,0.92) 100%);
+
+}
+.hub-row::before {
+content: ''; position: absolute;
+bottom: calc(4px + env(safe-area-inset-bottom) + 22px); left: 0; right: 0;
 border-top: 2px solid rgba(58,42,16,0.6);
-box-shadow: 0 -4px 16px rgba(0,0,0,0.4);
+pointer-events: none;
 }
-.hub-name {
-font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-flex-shrink: 0;
-background: #0e0c08; border: 1px solid #3a2a10;
-border-radius: 4px; padding: 7px 10px;
-min-width: 70px; text-align: center;
+.hub-unit-info {
+display: flex; flex-direction: column; gap: 1px;
+min-width: 0; overflow: hidden; width: 100%;
 }
-.hub-name.p1-col { color: var(--p1); border-color: var(--p1-dark); }
-.hub-name.p2-col { color: var(--p2); border-color: var(--p2-dark); }
+.hub-unit-row1 { display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
+.hub-unit-icon { font-size: var(--fs-sm); flex-shrink: 0; line-height: 1; }
+.hub-pass-btn {
+display: none; font-family: 'Spectral', Georgia, serif;
+font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+color: #5a4828; background: #100c06; border: 1px solid #2a1e0a; border-radius: 4px;
+padding: 8px 12px; cursor: pointer; white-space: nowrap;
+}
+.hub-pass-btn.show { display: block; }
+.hub-pass-btn:active { border-color: #c8a060; color: #c8a060; }
+.hub-stat-badges { display: flex; align-items: center; gap: 3px; padding: 0 6px; }
+.hub-stat-badge {
+width: 40px; height: 40px; flex-shrink: 0;
+display: flex; align-items: center; justify-content: center;
+font-size: 24px; font-weight: 800; font-family: 'Spectral', Georgia, serif;
+line-height: 1; color: #fff;
+}
+.badge-hp   { border-radius: 50%; border: 2px solid var(--p1); background: rgba(74,120,216,0.2); color: var(--p1); }
+.badge-move { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: rgba(80,160,80,0.25); color: #80c080; }
+.badge-save { border-radius: 2px; border: 2px solid #c87030; background: rgba(200,112,48,0.2); color: #c87030; }
+.badge-hp.p2-badge { border-color: var(--p2); background: rgba(200,48,48,0.2); color: var(--p2); }
+.hub-unit-weapon { font-size: var(--fs-xs); color: #5a4828; letter-spacing: 0.05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hub-btn {
+display: flex; align-items: center; justify-content: space-between;
+width: 130px; flex-shrink: 0; padding: 6px 10px; gap: 8px;
+font-family: 'Spectral', Georgia, serif; font-weight: 700;
+letter-spacing: 0.08em; text-transform: uppercase;
+border-radius: 4px; cursor: pointer; color: #7a6030;
+transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+background: #1a1408; border: 1px solid #3a2a10;
+}
+.hub-btn-main { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.hub-btn-label { font-size: var(--fs-sm); font-weight: 900; white-space: nowrap; }
+.hub-btn-sub { font-size: var(--fs-xs); opacity: 0.7; white-space: nowrap; }
+.hub-btn-cost {
+width: 28px; height: 28px; flex-shrink: 0;
+border-radius: 3px; transform: rotate(45deg);
+display: flex; align-items: center; justify-content: center;
+}
+.hub-btn-cost span { transform: rotate(-45deg); display: block; font-size: var(--fs-md); font-weight: 900; line-height: 1; }
+.hub-btn-opp { font-size: var(--fs-xs); color: #2a5a2a; flex-shrink: 0; }
+.hub-btn-opp.opp-passed { color: var(--p2); }
+/* Pass state */
+.hub-btn.state-pass {
+background: #1a1408; border: 1px solid #3a2a10; color: #7a6030;
+}
+.hub-btn.state-pass:active { color: #c8a060; border-color: #5a4020; }
+/* Dimmed state */
+.hub-btn.state-dim {
+background: #0e0c08; border: 1px solid #1e160a; color: #2a2010;
+pointer-events: none;
+}
+.hub-btn.state-dim .hub-btn-cost { background: #1a1008; border: 1px solid #2a1e0a; }
+.hub-btn.state-dim .hub-btn-cost span { color: #2a2010; }
+/* Active/glow state */
+.hub-btn.state-active {
+background: #1a1408; border: 1px solid #c8a060; color: #f0d080;
+animation: confirm-pulse 0.8s ease-in-out infinite;
+}
+.hub-btn.state-active:active { background: #2a2010; }
+.hub-btn.state-active .hub-btn-cost { background: #8a5010; border: 2px solid #c08020; }
+.hub-btn.state-active .hub-btn-cost span { color: #f0d080; }
 .hub-center {
-position: absolute; left: 50%; top: 50%;
-transform: translateX(-50%) translateY(-50%);
+position: absolute; left: 50%; bottom: calc(4px + env(safe-area-inset-bottom));
+transform: translateX(-50%);
 display: flex; align-items: center;
 pointer-events: all;
 z-index: 2;
 }
 .res-cost-preview {
 position: absolute; left: calc(50% + 32px);
-font-size: 14px; font-weight: 700; color: #c87030;
-font-family: ‘Cinzel’, Georgia, serif;
+font-size: var(--fs-sm); font-weight: 700; color: #c87030;
+font-family: ‘Spectral’, Georgia, serif;
 letter-spacing: 0.05em; white-space: nowrap;
 }
 .res-cost-preview.show { opacity: 1; }
 .hub-toggle { display: none; }
-.hub-left { flex-shrink: 0; display: flex; align-items: center; }
-.hub-right { flex-shrink: 0; display: flex; align-items: center; }
-.hub-cancel {
-font-family: 'Cinzel', Georgia, serif; font-size: 9px; font-weight: 700;
-letter-spacing: 0.08em; text-transform: uppercase;
-background: #0e0c08; border: 1px solid #3a1010; border-radius: 4px;
-color: #803030; padding: 7px 10px; cursor: pointer;
-}
-.hub-cancel:active { color: #c04040; border-color: #c04040; }
-.hub-cta {
-font-family: 'Cinzel', Georgia, serif; font-size: 9px; font-weight: 700;
-letter-spacing: 0.08em; text-transform: uppercase;
-background: #1a1408; border: 1px solid #c8a060; border-radius: 4px;
-color: #f0d080; padding: 7px 10px; cursor: pointer;
-display: flex; flex-direction: column; align-items: center; gap: 1px;
-min-width: 70px;
-animation: confirm-pulse 0.8s ease-in-out infinite;
-}
-.hub-cta-label { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; }
-.hub-cta-cost  { font-size: 8px; color: #c87030; letter-spacing: 0.05em; }
-.hub-cta:active { background: #2a2010; }
+.hub-left { flex-shrink: 0; display: flex; align-items: center; min-width: 0; overflow: hidden; max-width: calc(50% - 22px); }
+.hub-right { flex-shrink: 0; display: flex; align-items: center; max-width: calc(50% - 22px); overflow: hidden; justify-content: flex-end; }
+/* Activated state — buttons fill 2/3, name fills 1/3 */
+.hub-row.activated { padding-right: 0; gap: 0; }
+.hub-row.activated .hub-left { flex: 1; max-width: calc(100vw / 3); padding-left: 8px; overflow: hidden; }
+.hub-row.activated .hub-right { width: calc(100vw * 2 / 3); max-width: calc(100vw * 2 / 3); flex-shrink: 0; overflow: hidden; height: 100%; align-items: stretch; padding: 0; }
 /* Unit action buttons — shown during activation */
 .hub-actions {
-display: none; align-items: center; justify-content: center;
-gap: 8px; position: absolute; left: 50%; transform: translateX(-50%);
-pointer-events: all;
+display: none; align-items: stretch;
+flex: 1; height: 100%; overflow: hidden;
 }
 .hub-actions.active { display: flex; }
 .act-btn {
-display: flex; flex-direction: column; align-items: center; gap: 2px;
-background: #0e0c08; border: 1px solid #2a1e0a;
-border-radius: 6px; padding: 6px 10px; cursor: pointer;
-font-family: 'Cinzel', Georgia, serif; color: #5a4828;
-transition: border-color 0.15s, color 0.15s, background 0.15s;
-min-width: 44px;
+flex: 1; transform: skewX(-18deg);
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+gap: 2px; padding: 0; border: none; border-right: 1px solid rgba(0,0,0,0.25);
+cursor: pointer; font-family: 'Spectral', Georgia, serif;
+font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+transition: filter 0.12s, box-shadow 0.12s;
 }
-.act-btn .act-icon { font-size: 16px; line-height: 1; }
-.act-btn .act-label { font-size: 6px; letter-spacing: 0.1em; text-transform: uppercase; }
-.act-btn.act-available { border-color: #3a2e10; color: #a08050; }
-.act-btn.act-selected { border-color: #c8a060; color: #f0d080; background: #1a1408; box-shadow: 0 0 8px rgba(200,160,60,0.3); }
-.act-btn.act-unavailable { opacity: 0.25; pointer-events: none; }
-.act-btn:active { background: #1a1408; }
+.act-btn:active { filter: brightness(1.3); }
+.act-btn .act-icon {
+transform: skewX(18deg);
+font-size: 18px; line-height: 1; display: block;
+}
+.act-btn .act-label {
+transform: skewX(18deg);
+font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; line-height: 1;
+}
+/* Per-button colour identity — dim by default */
+#act-btn-move    { background: rgba(74,120,216,0.2);  color: rgba(120,160,255,0.6); }
+#act-btn-attack  { background: rgba(200,48,48,0.2);   color: rgba(255,120,120,0.6); }
+#act-btn-ability { background: rgba(146,84,220,0.2);  color: rgba(200,150,255,0.6); }
+#act-btn-skip    { background: rgba(20,16,8,0.6);     color: rgba(90,72,40,0.7); border-right: none; }
+/* Selected — full colour, glow border, glow text */
+#act-btn-move.act-selected    { background: var(--p1); color: #fff; box-shadow: inset 0 0 0 2px rgba(160,200,255,0.8), 0 0 14px rgba(74,120,216,0.7); text-shadow: 0 0 8px rgba(160,200,255,0.9); }
+#act-btn-attack.act-selected  { background: var(--p2); color: #fff; box-shadow: inset 0 0 0 2px rgba(255,160,160,0.8), 0 0 14px rgba(200,48,48,0.7); text-shadow: 0 0 8px rgba(255,160,160,0.9); }
+#act-btn-ability.act-selected { background: var(--faction-shadows); color: #fff; box-shadow: inset 0 0 0 2px rgba(210,170,255,0.8), 0 0 14px rgba(146,84,220,0.7); text-shadow: 0 0 8px rgba(210,170,255,0.9); }
+/* Available (not selected) — uses default dim colours above */
+.act-btn.act-unavailable { opacity: 0.18; pointer-events: none; }
 .res-diamond-wrap {
 transform: none;
 display: flex; align-items: center; justify-content: center; position: relative; pointer-events: all;
@@ -426,7 +502,7 @@ display: flex; align-items: center; justify-content: center; position: relative;
 
 /* Resource diamond — larger in hub */
 .res-diamond {
-width: 44px; height: 44px; flex-shrink: 0;
+width: 56px; height: 56px; flex-shrink: 0;
 background: #8a5010; border: 2px solid #c08020;
 border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
@@ -435,7 +511,7 @@ position: relative;
 }
 .res-diamond span {
 transform: rotate(-45deg);
-font-size: 17px; font-weight: 900; color: #f0d080; line-height: 1;
+font-size: 40px; font-weight: 900; color: #f0d080; line-height: 1;
 }
 .res-diamond.depleted { background: #5a2010; border-color: #803010; box-shadow: none; }
 .res-diamond.depleted span { color: #c04040; }
@@ -450,10 +526,10 @@ font-size: 17px; font-weight: 900; color: #f0d080; line-height: 1;
 .res-gain {
 position: absolute; top: -20px; left: 50%;
 transform: translateX(-50%);
-font-size: 9px; font-weight: 700; color: #f0d080;
+font-size: var(--fs-xs); font-weight: 700; color: #f0d080;
 pointer-events: none; white-space: nowrap;
 animation: floatUp 1.4s ease forwards;
-font-family: ‘Cinzel’, Georgia, serif;
+font-family: ‘Spectral’, Georgia, serif;
 }
 @keyframes floatUp {
 0%   { opacity:1; transform:translateX(-50%) translateY(0); }
@@ -461,42 +537,24 @@ font-family: ‘Cinzel’, Georgia, serif;
 }
 
 /* Pass widget — two-sided */
-.pass-widget {
-display: flex; align-items: stretch;
-border: 1px solid #3a2a10; border-radius: 4px;
-overflow: hidden; flex-shrink: 0;
-font-family: ‘Cinzel’, Georgia, serif;
-font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
-text-transform: uppercase;
-}
-.pass-mine {
-padding: 8px 12px; cursor: pointer;
-background: #1a1408; color: #7a6030;
-transition: background 0.15s, color 0.15s;
-display: flex; align-items: center; gap: 4px;
-}
-.pass-mine:active { background: #2a2010; color: #c8a060; }
-.pass-mine.passed { background: #0a0a14; color: var(--p1-dark); border-color: var(--p1-dark); }
-.pass-divider { width: 1px; background: #3a2a10; flex-shrink: 0; }
-.pass-opp {
-padding: 8px 10px;
-background: #0e1a0e; color: #2a5a2a;
-display: flex; align-items: center; gap: 3px;
-transition: color 0.15s, background 0.15s;
-}
-.pass-opp.passed { background: #200808; color: var(--p2); }
 
 /* Inspector — expandable below hub row */
 .inspector {
 overflow: hidden; max-height: 0;
-transition: max-height 0.25s ease;
+transition: max-height 0.25s ease, height 0.25s ease;
+border-top: 1px solid #2a1e0a;
+margin-bottom: 4px;
 }
-.inspector.open { max-height: 280px; overflow-y: auto; }
+.inspector.open { 
+height: var(--panel-section-h); max-height: var(--panel-section-h); overflow: hidden;
+padding: 0;
+}
 
 /* Inspector deck view */
 .inspector-deck {
-display: flex; align-items: center;
-padding: 6px 8px 10px; gap: 6px;
+display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end;
+height: var(--panel-section-h); padding: var(--panel-pad) 8px var(--panel-pad); gap: 0;
+box-sizing: border-box;
 }
 .inspector-card-view {
 display: none;
@@ -510,24 +568,57 @@ content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
 background: rgba(0,0,0,0.65); z-index: 0;
 }
 .inspector-card-view.active { display: flex; }
+.prof-stat-col { display: none; }
+.stat-shape {
+display: flex; align-items: center; justify-content: center;
+font-size: 11px; font-weight: 900; line-height: 1;
+width: 22px; height: 22px; flex-shrink: 0;
+position: absolute; z-index: 3;
+}
+.stat-circle {
+border-radius: 50%;
+border: 1.5px solid currentColor;
+top: 4px; left: 4px;
+}
+.stat-circle.p1-stat { color: var(--p1); background: rgba(74,120,216,0.25); }
+.stat-circle.p2-stat { color: var(--p2); background: rgba(200,48,48,0.25); }
+.stat-square {
+border-radius: 2px;
+border: 1.5px solid #c87030; color: #c87030;
+background: rgba(200,112,48,0.2);
+top: 4px; right: 4px;
+}
+.stat-triangle {
+clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+background: rgba(100,160,100,0.35);
+border: none; color: #60a060;
+bottom: 4px; left: 50%; transform: translateX(-50%);
+}
+.stat-triangle span {
+display: flex; align-items: flex-end; justify-content: center;
+width: 100%; height: 100%; padding-bottom: 3px;
+color: #80c080; font-size: 10px; font-weight: 900;
+}
 .inspector-card-view.strip-mode {
 position: relative; top: auto; left: auto; right: auto; bottom: auto;
-flex-direction: row; align-items: flex-start;
+flex-direction: row; align-items: flex-end;
 background: none; z-index: auto;
-padding: 4px 6px; gap: 5px;
+padding: 4px 8px; gap: 5px;
+height: var(--panel-section-h); box-sizing: border-box;
 }
 .inspector-card-view.strip-mode::before { display: none; }
 .inspector-card-view.strip-mode .prof-card-visual {
-width: 86px; margin-top: 0;
+width: var(--card-md-w); height: var(--card-md-h); margin-top: 0;
 box-shadow: inset 0 1px 0 rgba(180,140,60,0.08);
 }
 .inspector-card-view.strip-mode .prof-right-col {
-width: auto; flex: 1;
-background: none; border: none; border-radius: 0; padding: 0;
+width: auto; flex: 1; position: relative;
+background: none; border: none; border-radius: 0; padding: 2px 0;
+display: flex; flex-direction: column; gap: 3px;
 }
 .prof-close-abs {
 position: absolute; top: 5px; right: 6px;
-font-size: 14px; color: #5a4828; cursor: pointer; line-height: 1; z-index: 5;
+font-size: var(--fs-sm); color: #5a4828; cursor: pointer; line-height: 1; z-index: 5;
 padding: 2px 4px;
 }
 .prof-close-abs:active { color: #c8a060; }
@@ -542,8 +633,8 @@ display: flex; flex-direction: column; align-items: center; justify-content: cen
 background: #0a0806; border: 1px solid #2a1e0a; border-radius: 4px;
 padding: 3px 2px; flex: 1;
 }
-.core-stat-icon { font-size: 8px; line-height: 1; margin-bottom: 1px; }
-.core-stat-val  { font-size: 9px; font-weight: 700; color: #c8a060; line-height: 1; }
+.core-stat-icon { font-size: var(--fs-xs); line-height: 1; margin-bottom: 1px; }
+.core-stat-val  { font-size: var(--fs-xs); font-weight: 700; color: #c8a060; line-height: 1; }
 .core-stat-val.hp-val   { color: var(--hp-positive); }
 .core-stat-val.save-val { color: #c87030; }
 .core-stat-val.move-val { color: var(--p1); }
@@ -581,7 +672,7 @@ border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
 box-shadow: 0 0 6px rgba(180,120,0,0.4);
 }
-.prof-cv-diamond span { transform: rotate(-45deg); font-size: 11px; font-weight: 900; color: #f0d080; line-height: 1; }
+.prof-cv-diamond span { transform: rotate(-45deg); font-size: var(--fs-xs); font-weight: 900; color: #f0d080; line-height: 1; }
 /* Activated diamond — dims, shows stars inside */
 .prof-cv-diamond.diamond-activated {
 background: #1a1408; border-color: #3a2a10; box-shadow: none;
@@ -589,7 +680,7 @@ background: #1a1408; border-color: #3a2a10; box-shadow: none;
 .prof-cv-diamond.diamond-activated .diamond-cost { display: none; }
 .prof-cv-diamond.diamond-activated .diamond-pips { display: flex; }
 .prof-cv-label {
-font-size: 6px; font-weight: 700; letter-spacing: 0.12em;
+font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.12em;
 text-transform: uppercase; color: #7a6030; margin-top: 5px;
 }
 .prof-cv-label.lbl-deploy   { color: #c8a060; }
@@ -599,7 +690,7 @@ text-transform: uppercase; color: #7a6030; margin-top: 5px;
 display: flex; gap: 3px; align-items: center; justify-content: center; margin-top: 4px;
 }
 .prof-cv-pip {
-font-size: 12px; line-height: 1; color: #f0c020;
+font-size: var(--fs-xs); line-height: 1; color: #f0c020;
 text-shadow: 0 0 6px rgba(240,192,32,0.8);
 transition: opacity 0.15s, color 0.15s;
 }
@@ -616,23 +707,24 @@ position: relative; z-index: 1;
 flex: 1; display: flex; align-items: center; gap: 4px;
 padding: 3px 0; min-height: 0;
 }
-.prof-faction-icon { font-size: 20px; flex-shrink: 0; line-height: 1; align-self: stretch; display: flex; align-items: center; }
+.prof-faction-icon { font-size: var(--fs-md); flex-shrink: 0; line-height: 1; align-self: stretch; display: flex; align-items: center; }
 .prof-name-block { flex: 1; min-width: 0; flex-shrink: 1; }
 .prof-name-txt {
-font-size: 11px; font-weight: 700; color: #c8a060; line-height: 1.2;
+font-size: var(--fs-xs); font-weight: 700; color: #c8a060; line-height: 1.2;
 text-transform: capitalize; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.prof-weapon-txt { font-size: 10px; color: #5a4828; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.prof-hp-stat   { font-size: 12px; font-weight: 700; color: var(--hp-positive); flex-shrink: 0; margin-left: 4px; }
-.prof-save-stat { font-size: 12px; font-weight: 700; color: #c87030; flex-shrink: 0; margin-left: 2px; }
+.prof-weapon-txt { font-size: var(--fs-xs); color: #5a4828; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prof-hp-stat   { font-size: var(--fs-xs); font-weight: 700; color: var(--hp-positive); flex-shrink: 0; margin-left: 4px; }
+.prof-hp-stat span, .prof-save-stat span { font-size: var(--fs-md); }
+.prof-save-stat { font-size: var(--fs-xs); font-weight: 700; color: #c87030; flex-shrink: 0; margin-left: 2px; }
 .prof-end-btn {
-font-family: 'Cinzel', Georgia, serif; font-size: 7px; font-weight: 700;
+font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
 letter-spacing: 0.08em; text-transform: uppercase; color: #7a6030;
 background: #1a1410; border: 1px solid #3a2a10; border-radius: 3px;
 padding: 2px 5px; cursor: pointer; flex-shrink: 0;
 }
 .prof-end-btn:active { color: #c8a060; border-color: #5a4020; }
-.prof-name-close { font-size: 13px; color: #5a4828; cursor: pointer; flex-shrink: 0; padding: 0 2px; line-height: 1; }
+.prof-name-close { font-size: var(--fs-xs); color: #5a4828; cursor: pointer; position: absolute; top: 6px; right: 6px; padding: 2px 4px; line-height: 1; z-index: 5; }
 .prof-name-close:active { color: #c8a060; }
 
 /* Card visual pulse when selectable/activatable */
@@ -647,15 +739,15 @@ padding: 2px 5px; cursor: pointer; flex-shrink: 0;
 display: flex; align-items: stretch; gap: 4px; width: 100%; flex: 1;
 }
 .prof-move-pill {
-font-family: 'Cinzel', Georgia, serif; font-size: 12px; font-weight: 700;
+font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
 border-radius: 3px; cursor: pointer; width: 68px; flex-shrink: 0;
 background: #1e1a12; border: 1px solid #3a2e18; color: #7a6030;
 padding: 4px 4px; display: flex; align-items: center; justify-content: center; gap: 3px;
 transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
 }
-.prof-attack-pill {
-font-family: 'Cinzel', Georgia, serif; font-size: 12px; font-weight: 700;
-border-radius: 3px; cursor: pointer; flex: 1;
+.prof-attack-pill { width: 100%; height: 38px; flex-shrink: 0;
+font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
+border-radius: 3px; cursor: pointer;
 background: #1e1a12; border: 1px solid #3a2e18; color: #7a6030;
 padding: 4px 3px; display: flex; align-items: center; justify-content: center; gap: 2px;
 transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
@@ -671,10 +763,32 @@ transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
 .prof-move-pill:disabled, .prof-attack-pill:disabled { cursor: default; }
 .prof-move-pill.immobile { opacity: 0.25; cursor: default; }
 /* Pill columns */
+.prof-cv-faction {
+position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
+width: 32px; height: 32px; z-index: 3;
+display: flex; align-items: center; justify-content: center;
+font-size: 20px; line-height: 1;
+background: rgba(0,0,0,0.5); border-radius: 50%;
+border: 1px solid rgba(200,160,60,0.3);
+}
+.pill-header { display: flex; height: 16px; width: 100%; }
+.pill-hdr-seg { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #5a4828; }
+.pill-seg-icon { font-size: 20px; }
 .pill-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex: 1; }
-.pill-row-icon { font-size: 12px; line-height: 1; }
-.pill-row-val  { font-size: 12px; font-weight: 700; line-height: 1; }
-.pill-star     { font-size: 12px; flex-shrink: 0; }
+.pill-row-icon { font-size: var(--fs-xs); line-height: 1; }
+.pill-row-val  { font-size: var(--fs-md); font-weight: 700; line-height: 1; }
+.pill-star     { font-size: var(--fs-xs); flex-shrink: 0; }
+.pill-seg {
+flex: 1; display: flex; align-items: center; justify-content: center;
+font-size: 24px; font-weight: 700; line-height: 1;
+border-left: 1px solid #3a2e18;
+}
+.pill-seg:first-child { border-left: none; }
+.pill-seg-stat {
+flex-direction: column; gap: 1px; padding: 2px 0;
+}
+.pill-icon { font-size: 16px; line-height: 1; opacity: 0.7; }
+.pill-val  { font-size: 24px; font-weight: 800; line-height: 1; font-family: 'Spectral', Georgia, serif; }
 
 .pile {
 width: 44px; flex-shrink: 0; border-radius: 4px;
@@ -685,12 +799,12 @@ aspect-ratio: 5/7;
 }
 .pile.deck      { background: linear-gradient(160deg,#101428,#080c1c); border-color:#1e2a4a; color:#4060c0; width:58px; justify-content:space-between; padding:6px 4px; }
 .pile.graveyard { background: linear-gradient(160deg,#0e0e0e,#060606); border-color:#2a2a2a; color:#505050; }
-.pile .pile-count { font-size: 11px; font-weight: 700; line-height: 1; }
-.pile.deck .pile-count { font-size: 16px; font-weight:700; color:#4060c0; opacity:0.7; }
-.pile .pile-lbl   { font-size: 5px; opacity: 0.5; text-transform: uppercase; letter-spacing: 0.08em; }
+.pile .pile-count { font-size: var(--fs-xs); font-weight: 700; line-height: 1; }
+.pile.deck .pile-count { font-size: var(--fs-sm); font-weight:700; color:#4060c0; opacity:0.7; }
+.pile .pile-lbl   { font-size: var(--fs-xs); opacity: 0.5; text-transform: uppercase; letter-spacing: 0.08em; }
 .pile.deck.can-draw { cursor: pointer; }
 .pile-draw-label {
-font-size: 13px; font-weight: 700; font-family:'Cinzel',Georgia,serif;
+font-size: var(--fs-sm); font-weight: 700; font-family:'Spectral',Georgia,serif;
 color: #2a3a60; text-transform: uppercase; letter-spacing: 0.08em;
 }
 .pile.deck.can-draw .pile-draw-label { color: #c8a060; }
@@ -699,7 +813,7 @@ width:18px; height:18px; background:#0a1020; border:1px solid #2a3a60;
 border-radius:2px; transform:rotate(45deg);
 display:flex; align-items:center; justify-content:center;
 }
-.pile-cost-diamond span { transform:rotate(-45deg); font-size:8px; font-weight:900; color:#4060c0; line-height:1; }
+.pile-cost-diamond span { transform:rotate(-45deg); font-size: var(--fs-xs); font-weight:900; color:#4060c0; line-height:1; }
 .pile.deck.can-draw .pile-cost-diamond { border-color:#c08020; background:#2a1e08; }
 .pile.deck.can-draw .pile-cost-diamond span { color:#f0d080; }
 
@@ -718,7 +832,8 @@ display:flex; align-items:center; justify-content:center;
 
 .hand-scroll {
 display: flex; gap: 5px; overflow-x: hidden;
-flex: 1; align-items: flex-start;
+flex: 1; align-items: flex-end;
+padding: 0 8px;
 -webkit-user-select: none; user-select: none;
 -webkit-touch-callout: none;
 }
@@ -754,7 +869,7 @@ display: flex; align-items: center; justify-content: center;
 box-shadow: 0 0 4px rgba(110,216,74,0.35);
 z-index: 1;
 }
-.card-hp span { font-size: 7px; font-weight: 900; color: var(--hp-positive); line-height: 1; }
+.card-hp span { font-size: var(--fs-sm); font-weight: 900; color: var(--hp-positive); line-height: 1; }
 .card-hp.p1-hp { border-color: var(--p1); background: #080e1e; box-shadow: 0 0 4px rgba(74,120,216,0.3); }
 .card-hp.p1-hp span { color: var(--p1); }
 .card-hp.p2-hp { border-color: var(--p2); background: #1e0808; box-shadow: 0 0 4px rgba(204,48,48,0.3); }
@@ -763,7 +878,7 @@ z-index: 1;
 /* Name — centre */
 .card-name {
 position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-font-size: 6px; font-weight: 700; color: #c8a060; line-height: 1.3; padding: 0 2px;
+font-size: var(--fs-xs); font-weight: 700; color: #c8a060; line-height: 1.3; padding: 0 2px;
 width: 90%; text-align: center;
 }
 
@@ -777,15 +892,15 @@ display: flex; align-items: center; justify-content: center;
 box-shadow: 0 0 4px rgba(180,120,0,0.4);
 z-index: 1;
 }
-.card-cost span { transform: rotate(-45deg); font-size: 8px; font-weight: 900; color: #f0d080; line-height: 1; }
-.card-cost span { transform: rotate(-45deg); font-size: 7px; font-weight: 900; color: #f0d080; line-height: 1; }
+.card-cost span { transform: rotate(-45deg); font-size: var(--fs-sm); font-weight: 900; color: #f0d080; line-height: 1; }
+.card-cost span { transform: rotate(-45deg); font-size: var(--fs-sm); font-weight: 900; color: #f0d080; line-height: 1; }
 
 /* Inspector card view — profile contents */
 .profile-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .profile-title { flex: 1; min-width: 0; }
-.profile-name { font-size: 13px; font-weight: 700; color: #c8a060; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.profile-type { font-size: 7px; color: #5a4828; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1px; }
-.profile-close { font-size: 16px; color: #5a4828; cursor: pointer; flex-shrink: 0; padding: 0 4px; line-height: 1; }
+.profile-name { font-size: var(--fs-sm); font-weight: 700; color: #c8a060; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-type { font-size: var(--fs-xs); color: #5a4828; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 1px; }
+.profile-close { font-size: var(--fs-sm); color: #5a4828; cursor: pointer; flex-shrink: 0; padding: 0 4px; line-height: 1; }
 .stat-row {
 display: flex; gap: 0;
 background: #0a0806; border: 1px solid #2a1e0a;
@@ -793,17 +908,18 @@ border-radius: 4px; overflow: hidden; margin-bottom: 4px;
 }
 .sstat { flex: 1; text-align: center; padding: 4px 2px; border-right: 1px solid #2a1e0a; }
 .sstat:last-child { border-right: none; }
-.sstat-val { font-size: 12px; font-weight: 700; color: #c8a060; line-height: 1; }
-.sstat-lbl { font-size: 6px; color: #5a4828; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
+.sstat-val { font-size: var(--fs-xs); font-weight: 700; color: #c8a060; line-height: 1; }
+.sstat-lbl { font-size: var(--fs-xs); color: #5a4828; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
 .sstat-val.hp   { color: var(--hp-positive); }
 .sstat-val.mov  { color: var(--p1); }
 .sstat-val.save { color: #c87030; }
 .special-box {
-width: 100%; flex: 1;
+width: 100%;
+height: 64px; flex-shrink: 0;
 background: #0a0806; border: 1px solid #1a1408;
-border-radius: 3px; padding: 3px 5px;
-font-size: 11px; color: #7a6030; line-height: 1.4;
-overflow-y: auto; box-sizing: border-box;
+border-radius: 3px; padding: 4px 6px;
+font-size: 11px; font-family: 'Spectral', Georgia, serif; color: #a08050; line-height: 1.4;
+overflow: hidden; box-sizing: border-box;
 }
 
 
@@ -818,7 +934,7 @@ background: #8a5010; border: 2px solid #c08020;
 border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
 }
-.btn-diamond span { transform: rotate(-45deg); font-size: 11px; font-weight: 900; color: #f0d080; line-height: 1; }
+.btn-diamond span { transform: rotate(-45deg); font-size: var(--fs-xs); font-weight: 900; color: #f0d080; line-height: 1; }
 .btn-diamond.act-2 { background: #8a5010; border-color: #c08020; }
 .btn-diamond.act-1 { background: linear-gradient(135deg, #8a5010 50%, #1a1408 50%); border-color: #6a4010; }
 .btn-diamond.act-0 { background: #1a1408; border-color: #3a2010; }
@@ -827,8 +943,8 @@ display: flex; align-items: center; justify-content: center;
 .action-btns-centre { display: flex; gap: 5px; }
 .action-btn-end { margin-left: auto; border-color: #3a2a10 !important; color: #5a4828 !important; }
 .action-btn {
-font-family: ‘Cinzel’, Georgia, serif;
-font-size: 8px; font-weight: 700; letter-spacing: 0.1em;
+font-family: ‘Spectral’, Georgia, serif;
+font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.1em;
 text-transform: uppercase; padding: 4px 8px;
 border-radius: 3px; cursor: pointer;
 border: 1px solid #3a2a10; background: #1a1410; color: #7a6030;
@@ -838,8 +954,8 @@ transition: border-color 0.15s, color 0.15s, background 0.15s;
 .action-btn.active-attack { border-color: var(--p2); color: var(--p2); background: #200808; }
 .action-btn:disabled { opacity: 0.3; cursor: default; }
 .activate-btn {
-width: 100%; font-family: ‘Cinzel’, Georgia, serif;
-font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+width: 100%; font-family: ‘Spectral’, Georgia, serif;
+font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.15em;
 text-transform: uppercase; color: #c8a060;
 background: linear-gradient(160deg, #2a2010 0%, #1a1408 100%);
 border: 1px solid #5a4020; border-radius: 4px;
@@ -859,10 +975,11 @@ padding: 6px; cursor: pointer; margin-bottom: 4px;
 .inspector-card-view.power-card .prof-hp-stat    { display:none; }
 .inspector-card-view.power-card .prof-save-stat  { display:none; }
 .inspector-card-view.power-card #prof-row-actions { display:none; }
-.inspector-card-view.power-card .special-box { max-height:none; font-size:9px; color:#7a6848; }
+.inspector-card-view.power-card .prof-stat-col   { display:none; }
+.inspector-card-view.power-card .special-box { max-height:none; font-size: var(--fs-xs); color:#7a6848; }
 /* Dice roll float */
 .dice-float {
-position:fixed; font-size:11px; font-weight:900; font-family:'Cinzel',Georgia,serif;
+position:fixed; font-size: var(--fs-xs); font-weight:900; font-family:'Spectral',Georgia,serif;
 pointer-events:none; z-index:200; transform:translateY(-50%);
 animation: dmg-rise 1s ease-out forwards;
 }
@@ -885,8 +1002,8 @@ box-shadow: 0 0 40px rgba(0,0,0,0.9);
 .turn-toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 .turn-toast.p1 { border-color: var(--p1-dark); box-shadow: 0 0 24px rgba(48,72,128,0.5); }
 .turn-toast.p2 { border-color: var(--p2-dark); box-shadow: 0 0 24px rgba(128,24,24,0.5); }
-.toast-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.2em; color: #5a4828; margin-bottom: 4px; }
-.toast-name  { font-size: 16px; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; }
+.toast-label { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.2em; color: #5a4828; margin-bottom: 4px; }
+.toast-name  { font-size: var(--fs-sm); font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase; }
 .toast-name.p1 { color: var(--p1); text-shadow: 0 0 12px rgba(74,120,216,0.6); }
 .toast-name.p2 { color: var(--p2); text-shadow: 0 0 12px rgba(200,48,48,0.6); }
 
@@ -901,19 +1018,19 @@ opacity: 0; transition: opacity 0.3s;
 }
 .req-overlay.show { opacity: 1; pointer-events: all; }
 .req-overlay.auto-dismiss { pointer-events: none; }
-.req-title { font-size: 32px; font-weight: 900; color: #c8a060; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 0 20px rgba(200,160,60,0.5); }
-.req-sub   { font-size: 18px; font-weight: 700; color: #c8a060; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px; }
-.req-who   { font-size: 20px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 12px; }
+.req-title { font-size: var(--fs-lg); font-weight: 900; color: #c8a060; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 0 20px rgba(200,160,60,0.5); }
+.req-sub   { font-size: var(--fs-md); font-weight: 700; color: #c8a060; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px; }
+.req-who   { font-size: var(--fs-md); font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 12px; }
 .req-who.p1 { color: var(--p1); text-shadow: 0 0 12px rgba(74,120,216,0.5); }
 .req-who.p2 { color: var(--p2); text-shadow: 0 0 12px rgba(200,48,48,0.5); }
 .req-icons { display: flex; gap: 20px; margin-top: 16px; align-items: center; justify-content: center; }
-.req-icon  { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #7a6030; letter-spacing: 0.1em; text-transform: uppercase; font-family: ‘Cinzel’, Georgia, serif; }
+.req-icon  { display: flex; align-items: center; gap: 7px; font-size: var(--fs-xs); color: #7a6030; letter-spacing: 0.1em; text-transform: uppercase; font-family: ‘Spectral’, Georgia, serif; }
 .req-icon .diamond { width: 20px; height: 20px; background: #8a5010; border: 1px solid #c08020; border-radius: 2px; transform: rotate(45deg); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.req-icon .diamond span { transform: rotate(-45deg); font-size: 9px; font-weight: 900; color: #f0d080; }
+.req-icon .diamond span { transform: rotate(-45deg); font-size: var(--fs-xs); font-weight: 900; color: #f0d080; }
 .req-icon .card-icon { width: 14px; height: 18px; background: #1a1610; border: 1px solid #4a3818; border-radius: 2px; display: inline-block; flex-shrink: 0; }
 .req-begin {
 margin-top: 16px;
-font-family: ‘Cinzel’, Georgia, serif; font-size: 11px; font-weight: 700;
+font-family: ‘Spectral’, Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
 letter-spacing: 0.2em; text-transform: uppercase;
 color: #c8a060; background: linear-gradient(160deg, #2a2010 0%, #1a1408 100%);
 border: 1px solid #c08020; border-radius: 4px;
@@ -933,7 +1050,7 @@ border: 1px solid #c08020; background: #8a5010;
 .act-indicator.enemy-spent { background: transparent; border-color: #2a1e0a; opacity: 0.3; }
 
 
-.hub-toggle  { font-size: 10px; color: #5a4828; flex-shrink: 0; }
+.hub-toggle  { font-size: var(--fs-xs); color: #5a4828; flex-shrink: 0; }
 .tray-inner {
 padding: 6px 10px 12px; display: flex;
 gap: 8px; align-items: flex-start;
@@ -943,29 +1060,28 @@ border-top: 1px solid #2a1e0a;
 .col-divider { width: 1px; background: #2a1e0a; align-self: stretch; flex-shrink: 0; }
 #pile-deck, #pile-graveyard { display: none; }
 .hand-scroll {
-display: flex; gap: 5px; overflow-x: auto;
--webkit-overflow-scrolling: touch; scrollbar-width: none;
-flex: 1; align-items: flex-start;
+display: flex; overflow: hidden;
+flex: 1; align-items: flex-end; justify-content: center;
+width: 100%; padding: 0 6px;
 }
 .hand-scroll::-webkit-scrollbar { display: none; }
 .card-empty {
 width: 68px; aspect-ratio: 5/7; flex-shrink: 0;
 border-radius: 4px; border: 1px dashed #2a1e0a;
 display: flex; align-items: center; justify-content: center;
-color: #2a1e0a; font-size: 18px;
+color: #2a1e0a; font-size: var(--fs-md);
 }
 .hand-draw-tile {
-width: 68px; aspect-ratio: 5/7; flex-shrink: 0;
-transition: width 0.25s ease;
+width: var(--card-md-w); height: var(--card-md-h); flex-shrink: 0;
 border-radius: 4px; border: 1px solid #1e2a4a;
 background: linear-gradient(160deg,#101428,#080c1c);
 display: flex; flex-direction: column;
 align-items: center; justify-content: space-around;
 color: #304080; padding: 6px 4px; cursor: default;
 }
-.hand-draw-tile .draw-tile-count { font-size: 18px; font-weight: 700; line-height: 1; }
-.hand-draw-tile .draw-tile-label { font-size: 7px; text-transform: uppercase; letter-spacing: 0.1em; }
-.hand-draw-tile .draw-tile-cost { font-size: 9px; opacity: 0.6; }
+.hand-draw-tile .draw-tile-count { font-size: var(--fs-md); font-weight: 700; line-height: 1; }
+.hand-draw-tile .draw-tile-label { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: 0.1em; }
+.hand-draw-tile .draw-tile-cost { font-size: var(--fs-xs); opacity: 0.6; }
 .hand-draw-tile.can-draw { border-color: #2a3a6a; cursor: pointer; }
 .hand-draw-tile.can-draw .draw-tile-label { color: #c8a060; }
 .hand-draw-tile.can-draw .draw-tile-count { color: #6080c0; }
@@ -981,7 +1097,7 @@ color: #304080; padding: 6px 4px; cursor: default;
 .card {
 -webkit-user-select: none; user-select: none;
 -webkit-touch-callout: none;
-width: 68px; aspect-ratio: 5/7; flex-shrink: 0;
+width: var(--card-md-w); height: var(--card-md-h); flex-shrink: 0;
 border-radius: 4px; border: 1px solid #2a1e0a;
 background: linear-gradient(160deg,#1a1610,#100c08);
 display: flex; flex-direction: column;
@@ -991,6 +1107,7 @@ color: #a08050; cursor: pointer; position: relative;
 box-shadow: inset 0 1px 0 rgba(180,140,60,0.08), 1px 2px 4px rgba(0,0,0,0.5);
 transition: border-color 0.15s, transform 0.15s, width 0.25s ease;
 }
+.card.card-sm { width: var(--card-sm-w); height: var(--card-sm-h); }
 .card.selected {
 border-color: #c8a060;
 box-shadow: 0 0 10px rgba(200,160,60,0.5);
@@ -1007,10 +1124,10 @@ border-radius: 50%;
 display: flex; align-items: center; justify-content: center;
 box-shadow: 0 0 5px rgba(110,216,74,0.35);
 }
-.card-hp span { font-size: 8px; font-weight: 900; color: var(--hp-positive); line-height: 1; }
+.card-hp span { font-size: var(--fs-sm); font-weight: 900; color: var(--hp-positive); line-height: 1; }
 
 /* Name — middle */
-.card-name { font-size: 7px; font-weight: 700; color: #c8a060; line-height: 1.3; padding: 0 2px; }
+.card-name { font-size: var(--fs-sm); font-weight: 700; color: #c8a060; line-height: 1.3; padding: 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 
 /* Cost diamond — bottom centre */
 .card-cost {
@@ -1020,12 +1137,12 @@ border-radius: 2px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
 box-shadow: 0 0 4px rgba(180,120,0,0.4);
 }
-.card-cost span { transform: rotate(-45deg); font-size: 8px; font-weight: 900; color: #f0d080; line-height: 1; }
+.card-cost span { transform: rotate(-45deg); font-size: var(--fs-sm); font-weight: 900; color: #f0d080; line-height: 1; }
 
 /* ── PROFILE PANEL — compact bottom strip, no overlay ── */
 /* ── PLAYER COLOUR AFFILIATION ── */
 .unit-on-tile.p2-unit { border-color: #5a1818; background: linear-gradient(160deg,#341010 0%,#200808 100%); }
-font-size: 8px; font-weight: 700; letter-spacing: 0.1em;
+font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.1em;
 text-transform: uppercase; padding: 4px 8px;
 border-radius: 3px; cursor: pointer;
 border: 1px solid #3a2a10; background: #1a1410; color: #7a6030;
@@ -1037,8 +1154,8 @@ transition: border-color 0.15s, color 0.15s, background 0.15s;
 
 /* Activate button */
 .activate-btn {
-width: 100%; font-family: ‘Cinzel’, Georgia, serif;
-font-size: 9px; font-weight: 700; letter-spacing: 0.15em;
+width: 100%; font-family: ‘Spectral’, Georgia, serif;
+font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.15em;
 text-transform: uppercase; color: #c8a060;
 background: linear-gradient(160deg, #2a2010 0%, #1a1408 100%);
 border: 1px solid #5a4020; border-radius: 4px;
@@ -1082,8 +1199,9 @@ box-shadow: 0 0 10px rgba(200,160,60,0.7) !important;
 
 /* Move highlight */
 .tile.highlight-move { border: 2px solid var(--p1) !important; box-shadow: 0 0 10px rgba(74,120,216,0.5) !important; }
+.move-longpress-tick { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size: var(--fs-md); color:#4a78d8; font-weight:900; pointer-events:none; z-index:5; }
 .tile.highlight-move.dim-move { opacity: 0.35; box-shadow: none !important; }
-.move-src-icon { position: absolute; top: 2px; left: 3px; z-index: 4; font-size: 10px; color: var(--p1); text-shadow: 0 0 8px rgba(74,120,216,0.9); pointer-events: none; line-height: 1; }
+.move-src-icon { position: absolute; top: 2px; left: 3px; z-index: 4; font-size: var(--fs-xs); color: var(--p1); text-shadow: 0 0 8px rgba(74,120,216,0.9); pointer-events: none; line-height: 1; }
 
 /* Attack highlight */
 .tile.highlight-attack { border: 2px solid #883030 !important; box-shadow: 0 0 8px rgba(160,48,48,0.3) !important; }
@@ -1093,8 +1211,8 @@ box-shadow: 0 0 10px rgba(200,160,60,0.7) !important;
 .tile.highlight-ability::before { background: linear-gradient(160deg, #1a1028 0%, #100820 100%) !important; }
 /* Ability button — full row, purple tinted like move/attack pills */
 .ability-btn {
-width: 100%; display: flex; align-items: center; gap: 4px;
-font-family: 'Cinzel', Georgia, serif; font-size: 12px; font-weight: 700;
+width: 100%; height: 100%; flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
 color: #7a6030; border: 1px solid #3a2e18; background: #1e1a12;
 border-radius: 3px; padding: 3px 6px; cursor: pointer; text-align: left;
 transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
@@ -1118,8 +1236,8 @@ background: rgba(146,84,220,0.3); box-shadow: 0 0 10px rgba(146,84,220,0.6);
 .battle-overlay { position:fixed; inset:0; z-index:150; background:rgba(0,0,0,0.92); overflow-y:auto; display:flex; flex-direction:column; align-items:center; padding:14px 10px 20px; gap:10px; opacity:0; transition:opacity 0.2s; }
 .battle-overlay.show { opacity:1; }
 .battle-header { display:flex; align-items:center; justify-content:space-between; width:100%; }
-.battle-heading { font-size:8px; text-transform:uppercase; letter-spacing:0.25em; color:#5a4828; font-family:‘Cinzel’,serif; }
-.battle-close { font-size:18px; color:#5a4828; cursor:pointer; padding:4px 8px; line-height:1; }
+.battle-heading { font-size: var(--fs-xs); text-transform:uppercase; letter-spacing:0.25em; color:#5a4828; font-family:‘Spectral’,serif; }
+.battle-close { font-size: var(--fs-md); color:#5a4828; cursor:pointer; padding:4px 8px; line-height:1; }
 .battle-cards { display:flex; align-items:stretch; gap:6px; width:100%; }
 .battle-card { flex:1; border-radius:5px; overflow:hidden; border:2px solid; display:flex; flex-direction:column; min-width:0; }
 .battle-card.p1-tint { border-color:#304880; }
@@ -1127,54 +1245,54 @@ background: rgba(146,84,220,0.3); box-shadow: 0 0 10px rgba(146,84,220,0.6);
 .bcard-art { height:80px; position:relative; padding:6px; display:flex; flex-direction:column; justify-content:space-between; }
 .battle-card.p1-tint .bcard-art { background:linear-gradient(160deg,#101428,#1a2040,#0c1020); }
 .battle-card.p2-tint .bcard-art { background:linear-gradient(160deg,#2a0808,#1e0606,#140404); }
-.bcard-hp { font-size:10px; font-weight:900; color:var(--hp-positive); font-family:‘Cinzel’,serif; line-height:1; }
+.bcard-hp { font-size: var(--fs-xs); font-weight:900; color:var(--hp-positive); font-family:‘Spectral’,serif; line-height:1; }
 .bcard-cost-badge { position:absolute; top:5px; right:5px; width:18px; height:18px; background:#8a5010; border:1.5px solid #c08020; border-radius:2px; transform:rotate(45deg); display:flex; align-items:center; justify-content:center; }
-.bcard-cost-badge span { transform:rotate(-45deg); font-size:8px; font-weight:900; color:#f0d080; }
+.bcard-cost-badge span { transform:rotate(-45deg); font-size: var(--fs-xs); font-weight:900; color:#f0d080; }
 .bcard-badges { display:flex; gap:3px; }
-.bcard-badge { font-size:7px; font-weight:700; color:#c8a060; background:rgba(0,0,0,0.65); padding:2px 4px; border-radius:2px; font-family:‘Cinzel’,serif; }
+.bcard-badge { font-size: var(--fs-xs); font-weight:700; color:#c8a060; background:rgba(0,0,0,0.65); padding:2px 4px; border-radius:2px; font-family:‘Spectral’,serif; }
 .bcard-info { padding:4px 6px 2px; background:#0a0806; border-top:1px solid rgba(255,255,255,0.04); }
-.bcard-type { font-size:5px; text-transform:uppercase; letter-spacing:0.1em; color:#5a4828; }
-.bcard-name { font-size:9px; font-weight:700; color:#c8a060; line-height:1.2; }
-.bcard-weapon { font-size:6px; color:#7a6030; margin-top:1px; }
+.bcard-type { font-size: var(--fs-xs); text-transform:uppercase; letter-spacing:0.1em; color:#5a4828; }
+.bcard-name { font-size: var(--fs-xs); font-weight:700; color:#c8a060; line-height:1.2; }
+.bcard-weapon { font-size: var(--fs-xs); color:#7a6030; margin-top:1px; }
 .bcard-stats { display:flex; background:#060604; border-top:1px solid #1a1408; }
 .bstat { flex:1; text-align:center; padding:3px 1px; border-right:1px solid #1a1408; }
 .bstat:last-child { border-right:none; }
-.bstat-val { font-size:8px; font-weight:700; color:#c8a060; }
-.bstat-lbl { font-size:5px; text-transform:uppercase; color:#4a3020; letter-spacing:0.04em; }
-.bcard-special { padding:3px 5px; font-size:5.5px; color:#7a6030; line-height:1.4; background:#0a0806; border-top:1px solid #1a1408; }
+.bstat-val { font-size: var(--fs-xs); font-weight:700; color:#c8a060; }
+.bstat-lbl { font-size: var(--fs-xs); text-transform:uppercase; color:#4a3020; letter-spacing:0.04em; }
+.bcard-special { padding:3px 5px; font-size: var(--fs-xs); color:#7a6030; line-height:1.4; background:#0a0806; border-top:1px solid #1a1408; }
 .bcard-special-name { color:#c8a060; font-weight:700; }
 .battle-vs { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; flex-shrink:0; padding:0 2px; }
-.battle-vs-icon { font-size:14px; color:#c8a060; }
-.battle-vs-arrow { font-size:10px; color:#5a4828; }
+.battle-vs-icon { font-size: var(--fs-sm); color:#c8a060; }
+.battle-vs-arrow { font-size: var(--fs-xs); color:#5a4828; }
 .battle-cta { width:100%; }
-.battle-attack-btn { width:100%; font-family:‘Cinzel’,Georgia,serif; font-size:11px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#c8a060; background:linear-gradient(160deg,#2a2010,#1a1408); border:1px solid #c08020; border-radius:4px; padding:10px; cursor:pointer; box-shadow:0 0 16px rgba(200,160,60,0.2); }
+.battle-attack-btn { width:100%; font-family:‘Spectral’,Georgia,serif; font-size: var(--fs-xs); font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#c8a060; background:linear-gradient(160deg,#2a2010,#1a1408); border:1px solid #c08020; border-radius:4px; padding:10px; cursor:pointer; box-shadow:0 0 16px rgba(200,160,60,0.2); }
 .battle-resolution { background:#0a0806; border:1px solid #2a1e0a; border-radius:5px; padding:10px 12px; }
-.battle-done-btn { width:100%; font-family:‘Cinzel’,Georgia,serif; font-size:9px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#c8a060; background:linear-gradient(160deg,#1a1810,#100e08); border:1px solid #4a3818; border-radius:4px; padding:8px; cursor:pointer; margin-top:8px; }
+.battle-done-btn { width:100%; font-family:‘Spectral’,Georgia,serif; font-size: var(--fs-xs); font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#c8a060; background:linear-gradient(160deg,#1a1810,#100e08); border:1px solid #4a3818; border-radius:4px; padding:8px; cursor:pointer; margin-top:8px; }
 .battle-card.slain { opacity:0.5; }
 .battle-card.slain .bcard-hp { color:var(--hp-negative); }
 
 /* Combat overlay */
 .combat-overlay { position: fixed; inset: 0; z-index: 150; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.88); opacity: 0; transition: opacity 0.2s; }
 .combat-overlay.show { opacity: 1; }
-.combat-box { background: linear-gradient(160deg,#1e1a12,#141008); border: 2px solid #4a3818; border-radius: 8px; padding: 16px 20px; min-width: 240px; font-family: ‘Cinzel’, Georgia, serif; box-shadow: 0 0 40px rgba(0,0,0,0.9); }
-.combat-title { font-size: 13px; font-weight: 700; color: #c8a060; letter-spacing: 0.1em; text-align: center; }
+.combat-box { background: linear-gradient(160deg,#1e1a12,#141008); border: 2px solid #4a3818; border-radius: 8px; padding: 16px 20px; min-width: 240px; font-family: ‘Spectral’, Georgia, serif; box-shadow: 0 0 40px rgba(0,0,0,0.9); }
+.combat-title { font-size: var(--fs-sm); font-weight: 700; color: #c8a060; letter-spacing: 0.1em; text-align: center; }
 .combat-title.def { color: #cc3030; }
-.combat-vs { font-size: 8px; color: #5a4828; text-align: center; letter-spacing: 0.2em; text-transform: uppercase; margin: 2px 0; }
+.combat-vs { font-size: var(--fs-xs); color: #5a4828; text-align: center; letter-spacing: 0.2em; text-transform: uppercase; margin: 2px 0; }
 .combat-divider { height: 1px; background: linear-gradient(90deg,transparent,rgba(120,80,20,0.4),transparent); margin: 8px 0; }
 .combat-row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
-.combat-lbl { font-size: 8px; color: #7a6030; text-transform: uppercase; letter-spacing: 0.08em; flex: 0 0 auto; min-width: 72px; }
+.combat-lbl { font-size: var(--fs-xs); color: #7a6030; text-transform: uppercase; letter-spacing: 0.08em; flex: 0 0 auto; min-width: 72px; }
 .dice-row { display: flex; gap: 3px; flex-wrap: wrap; flex: 1; }
-.die { width: 16px; height: 16px; background: #1a1610; border: 1px solid #4a3818; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #c8a060; }
+.die { width: 16px; height: 16px; background: #1a1610; border: 1px solid #4a3818; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: var(--fs-xs); font-weight: 700; color: #c8a060; }
 .die.die-hit    { color: var(--outcome-success); border-color: var(--outcome-success); }
 .die.die-miss   { color: var(--outcome-fail);    border-color: #2a2820; }
 .die.die-saved  { color: var(--outcome-success); border-color: var(--outcome-success); }
 .die.die-failed { color: var(--outcome-fatal);   border-color: var(--outcome-fatal); }
-.combat-val { font-size: 10px; font-weight: 700; margin-left: auto; flex-shrink: 0; }
+.combat-val { font-size: var(--fs-xs); font-weight: 700; margin-left: auto; flex-shrink: 0; }
 .combat-val.hits { color: var(--outcome-success); }
 .combat-val.saves { color: var(--outcome-success); }
 .combat-val.dmg { color: var(--outcome-fatal); }
 .combat-val.hp { color: var(--hp-positive); }
-.combat-dismiss { font-size: 7px; color: #3a2a10; text-align: center; text-transform: uppercase; letter-spacing: 0.15em; margin-top: 12px; }
+.combat-dismiss { font-size: var(--fs-xs); color: #3a2a10; text-align: center; text-transform: uppercase; letter-spacing: 0.15em; margin-top: 12px; }
 
 /* ── P2 BOARD FLIP ── */
 #board-flip { position: absolute; inset: 0; }
@@ -1196,8 +1314,8 @@ border-top: 1px solid #2a1e0a;
 z-index: 20;
 }
 .pass-btn {
-font-family: ‘Cinzel’, Georgia, serif;
-font-size: 9px; font-weight: 700;
+font-family: ‘Spectral’, Georgia, serif;
+font-size: var(--fs-xs); font-weight: 700;
 letter-spacing: 0.15em; text-transform: uppercase;
 color: #c8a060; background: linear-gradient(160deg, #2a2010 0%, #1a1408 100%);
 border: 1px solid #5a4020; border-radius: 4px;
@@ -1212,16 +1330,16 @@ box-shadow: 0 0 12px rgba(200,160,60,0.4);
 /* ── ROUND SCORING ── */
 .score-float {
 position: fixed; z-index: 80; pointer-events: none;
-font-family: ‘Cinzel’, Georgia, serif;
-font-size: 18px; font-weight: 900;
+font-family: ‘Spectral’, Georgia, serif;
+font-size: var(--fs-md); font-weight: 900;
 text-shadow: 0 0 10px currentColor;
 transform: translate(-50%, -50%);
 animation: scorePop 1.1s ease forwards;
 }
 .dmg-float {
 position: fixed; z-index: 80; pointer-events: none;
-font-family: 'Cinzel', Georgia, serif;
-font-size: 14px; font-weight: 900; color: var(--hp-negative);
+font-family: 'Spectral', Georgia, serif;
+font-size: var(--fs-sm); font-weight: 900; color: var(--hp-negative);
 text-shadow: 0 0 8px rgba(200,48,48,0.8);
 transform: translate(-50%, -50%);
 animation: scorePop 1.1s ease forwards;
@@ -1240,8 +1358,8 @@ display: flex; align-items: center; justify-content: center;
 }
 .scoring-overlay.show { background: rgba(0,0,0,0.84); pointer-events: all; }
 .scoring-complete-label {
-font-family: ‘Cinzel’, Georgia, serif;
-font-size: 11px; font-weight: 700;
+font-family: ‘Spectral’, Georgia, serif;
+font-size: var(--fs-xs); font-weight: 700;
 letter-spacing: 0.3em; text-transform: uppercase;
 color: #c8a060; opacity: 0; transition: opacity 0.4s 0.3s;
 }
@@ -1249,13 +1367,15 @@ color: #c8a060; opacity: 0; transition: opacity 0.4s 0.3s;
 .turn-wait {
 position: fixed; top: 50%; left: 50%;
 transform: translate(-50%, -50%);
-font-size: 32px; z-index: 90;
+font-size: var(--fs-lg); z-index: 90;
 opacity: 0; pointer-events: none;
 transition: opacity 0.2s;
 }
 .turn-wait.show { opacity: 1; }
 #ui-lock {
   display: none; position: fixed; inset: 0; z-index: 35;
+  background: rgba(0,0,0,0.45);
+  transition: none;
 }
 .round-end-overlay {
 position: fixed; inset: 0; z-index: 50;
@@ -1267,9 +1387,9 @@ pointer-events: none;
 }
 .round-end-overlay.show { opacity: 1; pointer-events: all; }
 .round-end-overlay.dim  { background: rgba(0,0,0,0.42); pointer-events: none; }
-.round-end-title { font-family: ‘Cinzel’,serif; font-size: 24px; font-weight: 900; color: #c8a060; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 0 20px rgba(200,160,60,0.5); }
-.round-end-sub   { font-family: ‘Cinzel’,serif; font-size: 12px; color: #7a6030; letter-spacing: 0.2em; text-transform: uppercase; }
-.round-end-btn   { font-family: ‘Cinzel’,serif; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #c8a060; background: linear-gradient(160deg,#2a2010,#1a1408); border: 1px solid #c08020; border-radius: 4px; padding: 10px 28px; cursor: pointer; box-shadow: 0 0 16px rgba(200,160,60,0.3); margin-top: 8px; }
+.round-end-title { font-family: ‘Spectral’,serif; font-size: var(--fs-md); font-weight: 900; color: #c8a060; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 0 20px rgba(200,160,60,0.5); }
+.round-end-sub   { font-family: ‘Spectral’,serif; font-size: var(--fs-xs); color: #7a6030; letter-spacing: 0.2em; text-transform: uppercase; }
+.round-end-btn   { font-family: ‘Spectral’,serif; font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #c8a060; background: linear-gradient(160deg,#2a2010,#1a1408); border: 1px solid #c08020; border-radius: 4px; padding: 10px 28px; cursor: pointer; box-shadow: 0 0 16px rgba(200,160,60,0.3); margin-top: 8px; }
 </style>
 
 </head>
@@ -1291,7 +1411,8 @@ pointer-events: none;
   <div class="req-sub">Two players. Five rounds. Most points wins.</div>
   <div class="req-who" id="start-sub"></div>
   <button class="req-begin" onclick="beginGame()">Begin Battle ▶</button>
-  <div onclick="skipToGame()" style="margin-top:10px;font-size:8px;color:#3a2a10;cursor:pointer;font-family:Cinzel,serif;letter-spacing:0.1em;text-transform:uppercase">Skip Intro</div>
+  <button id="quick-load-btn" onclick="quickLoad()" style="display:none;margin-top:10px;font-family:Spectral,Georgia,serif;font-size:var(--fs-xs);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#1a1408,#100c04);border:1px solid #5a3a10;border-radius:4px;padding:8px 24px;cursor:pointer;">Continue ▶</button>
+  <div onclick="skipToGame()" style="margin-top:10px;font-size:var(--fs-xs);color:#3a2a10;cursor:pointer;font-family:Spectral,serif;letter-spacing:0.1em;text-transform:uppercase">Skip Intro</div>
 </div>
 
 <!-- REQUISITION OVERLAY -->
@@ -1313,22 +1434,20 @@ pointer-events: none;
   <div class="player-side left active" id="side-p1">
     <div class="avatar p1">⚔</div>
     <div class="score-num p1-col" id="score-p1">0</div>
-    <span class="res-badge" id="res-badge-p1">3</span>
+    <div class="res-badge" id="res-badge-p1"><span>3</span></div>
   </div>
-  <div class="turn-block">
-    <div class="turn-label">Turn</div>
-    <div class="turn-num" id="turn-num">1 / 5</div>
-    <div class="turn-whose" id="turn-whose">P1's Turn</div>
-    <div class="save-btns">
-      <button class="save-btn" onclick="saveGame()">Save</button>
-      <button class="save-btn" onclick="loadGame()">Load</button>
-      <button class="save-btn danger" onclick="resetGame()">Reset</button>
+  <div class="turn-block" style="position:relative;" onclick="document.getElementById('save-menu').classList.toggle('open')">
+    <div class="turn-num" id="turn-num">1/5</div>
+    <div class="save-menu" id="save-menu">
+      <div class="save-menu-item" onclick="saveGame();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Save</div>
+      <div class="save-menu-item" onclick="loadGame();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Load</div>
+      <div class="save-menu-item danger" onclick="resetGame();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Reset</div>
     </div>
   </div>
   <div class="player-side right inactive" id="side-p2">
     <div class="avatar p2">☠</div>
     <div class="score-num p2-col" id="score-p2">0</div>
-    <span class="res-badge" id="res-badge-p2">3</span>
+    <div class="res-badge" id="res-badge-p2"><span>3</span></div>
   </div>
 </div>
 
@@ -1392,76 +1511,53 @@ pointer-events: none;
       </div>
     </div>
     <div class="inspector-card-view" id="inspector-card-view" onclick="closeProfile()">
-      <!-- Col 1: card visual — tappable when unactivated -->
-      <div class="prof-card-visual" id="prof-card-visual" onclick="event.stopPropagation();onCardVisualTap()">
-        <div class="prof-cv-bottom">
+      <!-- Col 0: card visual — tappable when unactivated -->
+      <div class="prof-card-visual" id="prof-card-visual" onclick="event.stopPropagation();openCardZoom(profileCard)">
+        <div class="prof-cv-faction" id="prof-cv-faction"></div>
+        <div class="prof-cv-bottom" id="prof-cv-bottom">
           <div class="prof-cv-diamond" id="prof-cv-diamond">
-            <span class="diamond-cost" id="prof-cost" style="transform:rotate(-45deg);font-size:11px;font-weight:900;color:#f0d080;line-height:1">3</span>
+            <span class="diamond-cost" id="prof-cost" style="transform:rotate(-45deg);font-size:var(--fs-xs);font-weight:900;color:#f0d080;line-height:1">3</span>
             <span class="diamond-pips" style="display:none;transform:rotate(-45deg);gap:2px;align-items:center">
-              <span id="d-pip-1" style="font-size:8px;color:#f0c020;text-shadow:0 0 4px rgba(240,192,32,0.8)">✦</span>
-              <span id="d-pip-2" style="font-size:8px;color:#f0c020;text-shadow:0 0 4px rgba(240,192,32,0.8)">✦</span>
+              <span id="d-pip-1" style="font-size:var(--fs-xs);color:#f0c020;text-shadow:0 0 4px rgba(240,192,32,0.8)">✦</span>
+              <span id="d-pip-2" style="font-size:var(--fs-xs);color:#f0c020;text-shadow:0 0 4px rgba(240,192,32,0.8)">✦</span>
             </span>
           </div>
-          <div class="prof-cv-label lbl-deploy" id="prof-cv-label">DEPLOY</div>
+          <div class="prof-cv-label" id="prof-cv-label" style="font-size:var(--fs-sm)">🔍</div>
           <div class="prof-cv-pips" id="prof-cv-pips" style="display:none">
             <span class="prof-cv-pip" id="prof-pip-1">✦</span>
             <span class="prof-cv-pip" id="prof-pip-2">✦</span>
           </div>
         </div>
       </div>
-      <!-- Col 2: right content -->
+      <!-- Col 1: right content -->
       <div class="prof-right-col" onclick="event.stopPropagation()">
-        <!-- Row 1: unit profile -->
-        <div class="prof-row">
-          <span class="prof-faction-icon" id="prof-faction-icon"></span>
-          <div class="prof-name-block">
-            <div class="prof-name-txt" id="prof-name">Unit Name</div>
-            <div class="prof-weapon-txt" id="prof-weapon-name">weapon</div>
-          </div>
-          <span class="prof-hp-stat">❤ <span id="prof-cv-hp">8</span></span>
-          <span class="prof-save-stat">🛡 <span id="prof-cv-save">4+</span></span>
-          <button class="prof-end-btn" id="btn-end" style="display:none" onclick="endUnit()">End</button>
-          <span class="prof-name-close" onclick="closeProfile()">✕</span>
+        <!-- Hidden stat elements kept for JS compatibility -->
+        <span class="prof-faction-icon" id="prof-faction-icon" style="display:none"></span>
+        <div style="display:none">
+          <div id="prof-name"></div>
+          <div id="prof-weapon-name"></div>
+          <span id="prof-cv-hp"></span>
+          <span id="prof-cv-save"></span>
+          <button id="btn-end" onclick="endUnit()"></button>
         </div>
-        <!-- Row 2: action pills -->
-        <div class="prof-row" id="prof-row-actions">
+        <!-- Attack row -->
+        <div id="prof-row-actions">
           <div class="prof-stat-bar">
-            <button class="prof-move-pill" id="btn-move" onclick="selectAction('move')">
-              <span class="pill-star">✦</span>
-              <div class="pill-col">
-                <span class="pill-row-icon">⏩</span>
-                <span class="pill-row-val" id="prof-move">1</span>
-              </div>
-            </button>
-            <button class="prof-attack-pill" id="btn-attack" onclick="selectAction('attack')">
-              <span class="pill-star">✦</span>
-              <div class="pill-col">
-                <span class="pill-row-icon">⚔</span>
-                <span class="pill-row-val" id="prof-range">1</span>
-              </div>
-              <div class="pill-col">
-                <span class="pill-row-icon">🎲</span>
-                <span class="pill-row-val" id="prof-atk">5</span>
-              </div>
-              <div class="pill-col">
-                <span class="pill-row-icon">🎯</span>
-                <span class="pill-row-val" id="prof-hit">4+</span>
-              </div>
-              <div class="pill-col">
-                <span class="pill-row-icon">⛨</span>
-                <span class="pill-row-val">−<span id="prof-ap">1</span></span>
-              </div>
-              <div class="pill-col">
-                <span class="pill-row-icon">☠</span>
-                <span class="pill-row-val" id="prof-dmg">1</span>
-              </div>
-            </button>
+            <button id="btn-move" onclick="selectAction('move')" style="display:none"><span id="prof-move"></span></button>
+            <div class="pill-wrap">
+              <button class="prof-attack-pill" id="btn-attack" onclick="selectAction('attack')">
+                <div class="pill-seg pill-seg-icon">⚔</div>
+                <div class="pill-seg pill-seg-stat"><span class="pill-icon">⚔</span><span class="pill-val" id="prof-range">1</span></div>
+                <div class="pill-seg pill-seg-stat"><span class="pill-icon">🎲</span><span class="pill-val" id="prof-atk">5</span></div>
+                <div class="pill-seg pill-seg-stat"><span class="pill-icon">🎯</span><span class="pill-val" id="prof-hit">4+</span></div>
+                <div class="pill-seg pill-seg-stat"><span class="pill-icon">🛡</span><span class="pill-val">−<span id="prof-ap">1</span></span></div>
+                <div class="pill-seg pill-seg-stat"><span class="pill-icon">💀</span><span class="pill-val" id="prof-dmg">1</span></div>
+              </button>
+            </div>
           </div>
         </div>
-        <!-- Row 3: ability -->
-        <div class="prof-row">
-          <div class="special-box" id="prof-special"></div>
-        </div>
+        <!-- Ability row -->
+        <div class="special-box" id="prof-special"></div>
       </div>
     </div>
 
@@ -1470,19 +1566,33 @@ pointer-events: none;
   <div class="hub-row" id="hub-row">
     <!-- Left slot: player name or cancel -->
     <div class="hub-left">
-      <div class="hub-name p1-col" id="hub-name">Player I</div>
-      <button class="hub-cancel" id="hub-cancel" style="display:none" onclick="onHubCancel()">✕ Cancel</button>
+      <div class="hub-unit-info" id="hub-unit-info" style="display:none">
+        <div class="hub-unit-row1">
+          <span class="hub-unit-icon" id="hub-unit-icon"></span>
+          <div class="hub-unit-name" id="hub-unit-name"></div>
+        </div>
+        <div class="hub-unit-weapon" id="hub-unit-weapon"></div>
+      </div>
+      <div class="hub-stat-badges" id="hub-stat-badges" style="display:none">
+        <div class="hub-stat-badge badge-hp" id="badge-hp"><span id="badge-hp-val">8</span></div>
+        <div class="hub-stat-badge badge-move" id="badge-move"><span id="badge-move-val">2</span></div>
+        <div class="hub-stat-badge badge-save" id="badge-save"><span id="badge-save-val">4+</span></div>
+      </div>
+      <button class="hub-pass-btn" id="hub-pass-btn" onclick="passAction()">Pass ▶</button>
     </div>
-    <!-- Centre slot: diamond or action buttons -->
+    <!-- Centre slot: diamond -->
     <div class="hub-center">
       <div class="res-diamond-wrap" id="hub-diamond-wrap">
         <div class="res-diamond" id="hub-res-diamond">
           <span id="hub-res">5</span>
         </div>
       </div>
+    </div>
+    <!-- Right slot: action buttons (activated) or CTA button -->
+    <div class="hub-right">
       <div class="hub-actions" id="hub-actions">
         <button class="act-btn" id="act-btn-move" onclick="selectAction('move')">
-          <span class="act-icon">⏩</span>
+          <span class="act-icon">➤</span>
           <span class="act-label">Move</span>
         </button>
         <button class="act-btn" id="act-btn-attack" onclick="selectAction('attack')">
@@ -1494,21 +1604,18 @@ pointer-events: none;
           <span class="act-label">Ability</span>
         </button>
         <button class="act-btn" id="act-btn-skip" onclick="skipAction()">
-          <span class="act-icon">⊘</span>
           <span class="act-label">Skip</span>
         </button>
       </div>
-    </div>
-    <!-- Right slot: CTA button or pass widget -->
-    <div class="hub-right">
-      <div class="pass-widget" id="pass-widget">
-        <div class="pass-mine" id="pass-mine" onclick="passAction()">Pass ▶</div>
-        <div class="pass-divider"></div>
-        <div class="pass-opp" id="pass-opp">Opp ●</div>
-      </div>
-      <button class="hub-cta" id="hub-cta" style="display:none" onclick="onHubCta()">
-        <span class="hub-cta-label" id="hub-cta-label">Deploy</span>
-        <span class="hub-cta-cost" id="hub-cta-cost"></span>
+      <button class="hub-btn" id="hub-btn" onclick="onHubBtn()">
+        <div class="hub-btn-main">
+          <span class="hub-btn-label" id="hub-btn-label">Pass</span>
+          <span class="hub-btn-sub" id="hub-btn-sub">▶</span>
+        </div>
+        <span class="hub-btn-opp" id="hub-btn-opp" style="display:none">●</span>
+        <div class="hub-btn-cost" id="hub-btn-cost" style="display:none">
+          <span id="hub-btn-cost-val"></span>
+        </div>
       </button>
     </div>
   </div>
@@ -1517,14 +1624,14 @@ pointer-events: none;
 <script>
 window.onerror = (msg, src, line, col, err) => {
   const d = document.createElement('div');
-  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#800;color:#fff;font-size:11px;padding:6px 8px;font-family:monospace;white-space:pre-wrap;';
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#800;color:#fff;font-size:var(--fs-xs);padding:6px 8px;font-family:monospace;white-space:pre-wrap;';
   d.textContent = `ERR: ${msg}\nLine ${line}:${col}\n${err?.stack||''}`;
   document.body.appendChild(d);
   setTimeout(()=>d.remove(), 8000);
 };
 window.addEventListener('unhandledrejection', e => {
   const d = document.createElement('div');
-  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#860;color:#fff;font-size:11px;padding:6px 8px;font-family:monospace;white-space:pre-wrap;';
+  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#860;color:#fff;font-size:var(--fs-xs);padding:6px 8px;font-family:monospace;white-space:pre-wrap;';
   d.textContent = 'PROMISE: ' + (e.reason?.message||e.reason||'unknown') + '\n' + (e.reason?.stack||'');
   document.body.appendChild(d);
   setTimeout(()=>d.remove(), 8000);
@@ -1778,7 +1885,11 @@ window.addEventListener('unhandledrejection', e => {
     document.getElementById('inspector').classList.add('open');
     renderHub();
     fitBoard();
-    beginGame();
+    // Show splash — check for existing save
+    const hasSave = !!localStorage.getItem('grim_save');
+    const continueBtn = document.getElementById('quick-load-btn');
+    if (continueBtn) continueBtn.style.display = hasSave ? '' : 'none';
+    requestAnimationFrame(() => document.getElementById('start-overlay').classList.add('show'));
   }
 
   function drawLaneEffects(deck) {
@@ -1817,17 +1928,17 @@ window.addEventListener('unhandledrejection', e => {
   function showDevSetup() {
     const ov = document.createElement('div');
     ov.id = 'dev-setup-overlay';
-    ov.style.cssText = 'position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:24px 16px 36px;gap:14px;font-family:Cinzel,Georgia,serif;box-sizing:border-box;';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:50;background:rgba(0,0,0,0.95);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;padding:24px 16px 36px;gap:14px;font-family:Spectral,Georgia,serif;box-sizing:border-box;';
     document.body.appendChild(ov);
 
     function makeLaneCard(lane) {
       const fx = state.laneEffects[lane];
       const label = lane === 'A' ? 'I' : 'II';
       return `<div onclick="devCycleLane('${lane}')" style="flex:1;background:#0e1a12;border:1px solid #1a5030;border-radius:6px;padding:10px;cursor:pointer;box-sizing:border-box;">
-        <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:5px;">Lane ${label} &nbsp;↺</div>
-        <div style="font-size:9px;color:#40a878;font-weight:700;margin-bottom:2px;">${fx ? fx.name : '—'}</div>
-        <div style="font-size:7px;color:#3a6848;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">${fx ? fx.trigger.replace(/_/g,' ') : ''}</div>
-        <div style="font-size:7px;color:#5a8868;line-height:1.5;">${fx ? fx.description : ''}</div>
+        <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:5px;">Lane ${label} &nbsp;↺</div>
+        <div style="font-size:var(--fs-xs);color:#40a878;font-weight:700;margin-bottom:2px;">${fx ? fx.name : '—'}</div>
+        <div style="font-size:var(--fs-xs);color:#3a6848;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">${fx ? fx.trigger.replace(/_/g,' ') : ''}</div>
+        <div style="font-size:var(--fs-xs);color:#5a8868;line-height:1.5;">${fx ? fx.description : ''}</div>
       </div>`;
     }
 
@@ -1847,32 +1958,32 @@ window.addEventListener('unhandledrejection', e => {
         tryHide(`art/${card.artId}.jpeg`);
       }, 0);
       return `<div id="${uid}" onclick="devSwapCard(${player},${idx})" style="position:relative;width:52px;aspect-ratio:5/7;flex-shrink:0;border-radius:4px;border:1px solid #2a1e0a;background:linear-gradient(160deg,#1a1610,#100c08);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:5px 3px;cursor:pointer;box-sizing:border-box;${art}">
-        <div style="position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:${hpBg};border:1px solid ${hpCol};display:flex;align-items:center;justify-content:center;font-size:7px;color:${hpCol};font-weight:700;z-index:1;">${card.hp ?? ''}</div>
-        <div class="sc-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:6px;font-weight:700;color:#c8a060;line-height:1.3;width:90%;text-align:center;">${card.name}</div>
+        <div style="position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:${hpBg};border:1px solid ${hpCol};display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);color:${hpCol};font-weight:700;z-index:1;">${card.hp ?? ''}</div>
+        <div class="sc-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:var(--fs-xs);font-weight:700;color:#c8a060;line-height:1.3;width:90%;text-align:center;">${card.name}</div>
         <div style="position:absolute;bottom:4px;left:50%;margin-left:-9px;width:18px;height:18px;background:#2a1408;border:1px solid #c08020;border-radius:2px;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;z-index:1;">
-          <span style="transform:rotate(-45deg);font-size:8px;font-weight:900;color:#f0d080;line-height:1;">${card.cost}</span>
+          <span style="transform:rotate(-45deg);font-size:var(--fs-xs);font-weight:900;color:#f0d080;line-height:1;">${card.cost}</span>
         </div>
       </div>`;
     }
 
     function renderOverlay() {
       ov.innerHTML = `
-        <div style="font-size:22px;font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(200,160,60,0.4);">Battle Setup</div>
-        <div style="font-size:7px;color:#3a2a10;letter-spacing:0.2em;text-transform:uppercase;margin-top:-8px;">Dev Mode · Tap to change</div>
+        <div style="font-size:var(--fs-md);font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(200,160,60,0.4);">Battle Setup</div>
+        <div style="font-size:var(--fs-xs);color:#3a2a10;letter-spacing:0.2em;text-transform:uppercase;margin-top:-8px;">Dev Mode · Tap to change</div>
 
-        <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;">Lane Effects</div>
+        <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;">Lane Effects</div>
         <div style="display:flex;gap:8px;width:100%;">
           ${makeLaneCard('A')}
           ${makeLaneCard('B')}
         </div>
 
-        <div style="font-size:7px;color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player I — Starting Hand</div>
+        <div style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player I — Starting Hand</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i)).join('')}</div>
 
-        <div style="font-size:7px;color:#cc3030;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player II — Starting Hand</div>
+        <div style="font-size:var(--fs-xs);color:#cc3030;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player II — Starting Hand</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[2].hand.map((_,i)=>makeHandCard(2,i)).join('')}</div>
 
-        <button onclick="devSetupBegin()" style="margin-top:16px;font-family:Cinzel,Georgia,serif;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#2a2010,#1a1408);border:1px solid #c08020;border-radius:4px;padding:10px 28px;cursor:pointer;box-shadow:0 0 16px rgba(200,160,60,0.3);">Begin Battle ▶</button>
+        <button onclick="devSetupBegin()" style="margin-top:16px;font-family:Spectral,Georgia,serif;font-size:var(--fs-xs);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#2a2010,#1a1408);border:1px solid #c08020;border-radius:4px;padding:10px 28px;cursor:pointer;box-shadow:0 0 16px rgba(200,160,60,0.3);">Begin Battle ▶</button>
       `;
     }
 
@@ -1902,30 +2013,30 @@ window.addEventListener('unhandledrejection', e => {
       renderHub();
 
       ov.innerHTML = `
-        <div style="font-size:22px;font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(200,160,60,0.4);">Battle Begins</div>
-        <div style="font-size:11px;color:#7a6030;letter-spacing:0.15em;text-transform:uppercase;margin-top:-6px;">Round 1 of ${state.maxRounds}</div>
+        <div style="font-size:var(--fs-md);font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(200,160,60,0.4);">Battle Begins</div>
+        <div style="font-size:var(--fs-xs);color:#7a6030;letter-spacing:0.15em;text-transform:uppercase;margin-top:-6px;">Round 1 of ${state.maxRounds}</div>
 
         <div style="display:flex;gap:16px;margin-top:12px;">
           <div style="text-align:center">
-            <div style="font-size:7px;color:#4a78d8;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">Player I</div>
-            <div style="font-size:28px;font-weight:900;color:#c8a060;">+${gain}</div>
-            <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.08em;">Resources</div>
+            <div style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">Player I</div>
+            <div style="font-size:var(--fs-lg);font-weight:900;color:#c8a060;">+${gain}</div>
+            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.08em;">Resources</div>
           </div>
           <div style="width:1px;background:#1a1408;"></div>
           <div style="text-align:center">
-            <div style="font-size:7px;color:#cc3030;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">Player II</div>
-            <div style="font-size:28px;font-weight:900;color:#c8a060;">+${gain}</div>
-            <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.08em;">Resources</div>
+            <div style="font-size:var(--fs-xs);color:#cc3030;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">Player II</div>
+            <div style="font-size:var(--fs-lg);font-weight:900;color:#c8a060;">+${gain}</div>
+            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.08em;">Resources</div>
           </div>
         </div>
 
-        <div style="font-size:7px;color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:14px;">Player I — Starting Hand</div>
+        <div style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:14px;">Player I — Starting Hand</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i)).join('')}</div>
 
-        <div style="font-size:7px;color:#cc3030;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:8px;">Player II — Starting Hand</div>
+        <div style="font-size:var(--fs-xs);color:#cc3030;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:8px;">Player II — Starting Hand</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[2].hand.map((_,i)=>makeHandCard(2,i)).join('')}</div>
 
-        <button onclick="devBattleBegin()" style="margin-top:16px;font-family:Cinzel,Georgia,serif;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#2a2010,#1a1408);border:1px solid #c08020;border-radius:4px;padding:10px 28px;cursor:pointer;box-shadow:0 0 16px rgba(200,160,60,0.3);">Begin ▶</button>
+        <button onclick="devBattleBegin()" style="margin-top:16px;font-family:Spectral,Georgia,serif;font-size:var(--fs-xs);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#2a2010,#1a1408);border:1px solid #c08020;border-radius:4px;padding:10px 28px;cursor:pointer;box-shadow:0 0 16px rgba(200,160,60,0.3);">Begin ▶</button>
       `;
     };
 
@@ -2132,9 +2243,9 @@ window.addEventListener('unhandledrejection', e => {
     // Scores + round always update
     document.getElementById('score-p1').textContent=state.players[1].score;
     document.getElementById('score-p2').textContent=state.players[2].score;
-    document.getElementById('res-badge-p1').textContent=state.players[1].resources;
-    document.getElementById('res-badge-p2').textContent=state.players[2].resources;
-    document.getElementById('turn-num').textContent=`${state.round} / ${state.maxRounds}`;
+    document.getElementById('res-badge-p1').querySelector('span').textContent=state.players[1].resources;
+    document.getElementById('res-badge-p2').querySelector('span').textContent=state.players[2].resources;
+    document.getElementById('turn-num').textContent=`${state.round}/${state.maxRounds}`;
 
     if(state.phase==='scoring') {
       document.getElementById('side-p1').className='player-side left active';
@@ -2148,8 +2259,7 @@ window.addEventListener('unhandledrejection', e => {
     const p=state.players[state.activePlayer];
     const opp=state.players[state.activePlayer===1?2:1];
     const col=p.color;
-    document.getElementById('hub-name').textContent=p.name;
-    document.getElementById('hub-name').className=`hub-name ${col}-col`;
+    // hub-name replaced by hub-unit-info
     document.getElementById('hub-res').textContent=p.resources;
     document.getElementById('player-bar').className=`player-bar ${col}-active`;
     const inspector=document.getElementById('inspector');
@@ -2163,44 +2273,52 @@ window.addEventListener('unhandledrejection', e => {
     deckPile.classList.toggle('can-draw',canDraw);
     deckPile.classList.toggle('draw-exhausted',p.drawnThisRound);
     deckPile.onclick=canDraw?()=>drawAction():null;
-    // Pass widget
-    const myPassed=state.players[state.activePlayer].passed;
-    const oppPassed=opp.passed;
-    const passEl=document.getElementById('pass-mine');
-    passEl.textContent=myPassed?'Passed ✓':'Pass ▶';
-    passEl.classList.toggle('passed',myPassed);
-    const oppEl=document.getElementById('pass-opp');
-    oppEl.textContent=oppPassed?'☠ Passed':'Opp ●';
-    oppEl.classList.toggle('passed',oppPassed);
+    // Pass widget — update pass button label if already passed
+    const myPassed = state.players[state.activePlayer].passed;
+    const oppPassed = opp.passed;
+    const passBtn = document.getElementById('hub-pass-btn');
+    if (passBtn) passBtn.textContent = myPassed ? 'Passed ✓' : 'Pass ▶';
+    // Ensure default bar state is set correctly
+    if (state._ctaAction === 'pass' || state._ctaAction === 'draw' || !state._ctaAction) {
+      setBarState('default');
+    }
     // Top bar sides
     document.getElementById('side-p1').className=`player-side left ${state.activePlayer===1?'active':'inactive'}`;
     document.getElementById('side-p2').className=`player-side right ${state.activePlayer===2?'active':'inactive'}`;
     renderHand();
   }
 
-  const MAX_HAND = 6;
+  const MAX_HAND = 7;
   function renderHand() {
-    const p=state.players[state.activePlayer];
-    const scroll=document.getElementById('hand-scroll');
-    scroll.innerHTML='';
-    const showDraw = p.hand.length < MAX_HAND && !p.drawnThisRound;
-    const totalSlots = p.hand.length + (showDraw ? 1 : 0);
-    const availW = window.innerWidth - 24;
-    const gap = 5;
-    const cardW = totalSlots <= 5
-      ? Math.floor((availW - gap * 4) / 5)
-      : Math.floor((availW - gap * 5) / 6);
-    scroll.style.justifyContent = totalSlots <= 5 ? 'center' : 'flex-start';
+    const p = state.players[state.activePlayer];
+    const scroll = document.getElementById('hand-scroll');
+    scroll.innerHTML = '';
+    const count = p.hand.length;
+    let cw, ch;
+    if (count >= 7)      { cw = 50; ch = 70; }
+    else if (count >= 6) { cw = 60; ch = 84; }
+    else                 { cw = 70; ch = 98; }
+    const existingLabel = document.getElementById('hand-full-label');
+    if (existingLabel) existingLabel.remove();
+    if (count >= 7) {
+      const lbl = document.createElement('div');
+      lbl.id = 'hand-full-label';
+      lbl.textContent = 'Hand Full';
+      lbl.style.cssText = 'font-size:10px;font-family:Spectral,Georgia,serif;color:#5a4828;letter-spacing:0.15em;text-transform:uppercase;text-align:center;padding:2px 0;flex-shrink:0;width:100%;';
+      scroll.parentElement.insertBefore(lbl, scroll);
+    }
+    scroll.style.justifyContent = count >= 5 ? 'space-evenly' : 'center';
+    scroll.style.alignItems = 'flex-end';
+    scroll.style.gap = count >= 5 ? '0' : '4px';
     p.hand.forEach(card=>{
       const canAfford=p.resources>=card.cost;
       const isSelected=state.selectedHandCard?.uid===card.uid;
       const el=document.createElement('div');
       const col = p.color;
-      el.className=`card ${col}-card${isSelected?' selected':''}${!canAfford?' unavailable':''}`;
+      el.className=`card ${col}-card${isSelected?' selected':''}${!canAfford?' unavailable':''}`;el.style.width=cw+'px';el.style.height=ch+'px';el.style.flexShrink='0';
       el.dataset.uid = card.uid;
-      el.style.width = cardW + 'px';
       el.innerHTML = (card.type||'').trim() === 'Power'
-        ? `<div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#1a1020;border:1.5px solid #8a40c0;display:flex;align-items:center;justify-content:center;font-size:9px;z-index:1;">⚡</div>
+        ? `<div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#1a1020;border:1.5px solid #8a40c0;display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);z-index:1;">⚡</div>
            <div class="card-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;text-align:center">${card.name}</div>
            <div class="card-cost"><span>${card.cost}</span></div>`
         : `<div class="card-hp ${col}-hp"><span>${card.hp ?? ''}</span></div>
@@ -2224,16 +2342,7 @@ window.addEventListener('unhandledrejection', e => {
       el.addEventListener('click',()=>onHandCardTap(card));
       scroll.appendChild(el);
     });
-    // Draw tile — only shown when hand not full
-    if (showDraw) {
-      const canDraw = p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound;
-      const drawTile = document.createElement('div');
-      drawTile.className = `hand-draw-tile${canDraw ? ' can-draw' : ''}${p.drawnThisRound ? ' draw-exhausted' : ''}${p.color === 'p2' ? ' p2-draw' : ''}`;
-      drawTile.style.width = cardW + 'px';
-      drawTile.innerHTML = `<div class="draw-tile-count">${p.deck.length}</div><div class="draw-tile-label">Draw</div><div class="draw-tile-cost">cost 1</div>`;
-      if (canDraw) drawTile.addEventListener('click', () => drawAction());
-      scroll.appendChild(drawTile);
-    }
+
     // Update inspector card visual if a hand card is selected
     if (state.selectedHandCard) {
       const p = state.players[state.activePlayer];
@@ -2782,32 +2891,21 @@ window.addEventListener('unhandledrejection', e => {
 
   function onBoardTileTouchStart(e, tileId) {
     if (e.touches.length > 1) return;
-    if (!state.board[tileId]) return; // only for tiles with units
+    if (!state.board[tileId]) return;
     const t = e.touches[0];
     const startX = t.clientX, startY = t.clientY;
     _tileTouchMoved = false;
-    // Visual pulse
     const el = document.querySelector(`[data-id="${tileId}"]`);
     if (el) { el.classList.remove('touch-pulse'); void el.offsetWidth; el.classList.add('touch-pulse'); }
-    clearTimeout(_tileTouchTimer);
-    _tileTouchTimer = setTimeout(() => {
-      if (!_tileTouchMoved) {
-        try{navigator.vibrate?.(15);}catch(e){}
-        const unit = state.board[tileId];
-        if (unit) openProfile(unit, 'board', tileId);
-      }
-    }, 300);
     const onMove = e2 => {
       const t2 = e2.touches[0];
       if (Math.hypot(t2.clientX - startX, t2.clientY - startY) > 8) {
         _tileTouchMoved = true;
-        clearTimeout(_tileTouchTimer);
         document.removeEventListener('touchmove', onMove);
         document.removeEventListener('touchend', onEnd);
       }
     };
     const onEnd = () => {
-      clearTimeout(_tileTouchTimer);
       document.removeEventListener('touchmove', onMove);
     };
     document.addEventListener('touchmove', onMove, {passive:true});
@@ -2855,12 +2953,15 @@ window.addEventListener('unhandledrejection', e => {
       if(lane) snapToLane(lane);
       const isOwn = unit.owner === state.activePlayer;
       const p = state.players[state.activePlayer];
+      if (!isOwn) {
+        // Enemy unit — straight to zoom modal
+        openCardZoom(unit);
+        return;
+      }
       const canActivate = isOwn && unit.actionsLeft === null && p.resources >= 1 && !state.activeUnit;
       if (canActivate) {
         openProfile(unit, 'board', tileId);
         setBarState('pending', { label:'Activate', cost:1, action:'activate' });
-      } else if (isOwn && state.activeUnit?.card?.uid === unit.uid) {
-        // Tapping active unit — do nothing, already activated
       } else {
         openProfile(unit, 'board', tileId);
       }
@@ -2877,8 +2978,11 @@ window.addEventListener('unhandledrejection', e => {
     // Tapping empty non-relevant tile while action is active — clear action
     if(state.activeAction){ state.activeAction=null; clearHighlights(); return; }
 
-    // Deploy flow
-    if(state.selectedHandCard && tile.classList.contains('highlight-deploy')){
+    // Deploy flow — blocked for Power cards
+    if(!state.selectedHandCard && profileContext==='hand' && profileCard && tile.classList.contains('highlight-deploy') && (profileCard.type||'').trim() !== 'Power'){
+      selectHandCard(profileCard);
+    }
+    if(state.selectedHandCard && (state.selectedHandCard.type||'').trim() !== 'Power' && tile.classList.contains('highlight-deploy')){
       if(state.pendingTile===tileId){ clearConfirm(); state.pendingTile=null; return; }
       clearConfirm(); state.pendingTile=tileId; showConfirm(tileId);
     }
@@ -2927,12 +3031,27 @@ window.addEventListener('unhandledrejection', e => {
     const tile=document.querySelector(`[data-id="${tileId}"]`);
     if(!tile) return;
     tile.classList.add('confirm-tile');
-    const cost = state.selectedHandCard?.cost ?? 0;
+    // Keep hand visible during pending deploy (only if inspector not open)
+    if (!document.getElementById('inspector-card-view').classList.contains('active')) {
+      document.getElementById('inspector-deck').style.display = '';
+    }
+    // Show card preview on tile
+    const card = state.selectedHandCard;
+    if (card) {
+      const col = state.players[state.activePlayer].color;
+      const preview = document.createElement('div');
+      preview.className = `unit-on-tile ${col}-unit pending-deploy-preview`;
+      preview.style.cssText = 'opacity:0.7;';
+      preview.innerHTML = `<div class="unit-name-on-tile" style="font-size:var(--fs-xs);line-height:1.2;text-align:center;padding:2px;">${card.name}</div>`;
+      tile.appendChild(preview);
+    }
+    const cost = card?.cost ?? 0;
     setBarState('pending', { label:'Deploy', cost, action:'deploy' });
   }
 
   function clearConfirm() {
     document.querySelectorAll('.confirm-tile').forEach(t=>t.classList.remove('confirm-tile'));
+    document.querySelectorAll('.pending-deploy-preview').forEach(e=>e.remove());
     const btn=document.getElementById('confirm-btn');
     if(btn) btn.remove();
     if (!state.activeUnit) setBarState('default');
@@ -3033,9 +3152,32 @@ window.addEventListener('unhandledrejection', e => {
     document.getElementById('prof-cost').textContent = (context === 'board') ? '1' : card.cost;
     document.getElementById('prof-cv-hp').textContent = card.hp ?? '';
     document.getElementById('prof-cv-save').textContent = card.save ?? '';
+    // Stat shapes removed — stats shown in hub badges instead
+    const cvFaction = document.getElementById('prof-cv-faction');
+    if (cvFaction) cvFaction.textContent = FACTION_ICONS[card.faction] || '';
+    // Hub-left: always show stat badges
+    const badges   = document.getElementById('hub-stat-badges');
+    const unitInfo = document.getElementById('hub-unit-info');
+    const cardTypeEarly = (card.type||'').trim();
+    if (badges) {
+      const col = context==='board' && card.owner ? (card.owner===1?'p1':'p2') : (state.activePlayer===1?'p1':'p2');
+      document.getElementById('badge-hp-val').textContent   = card.hp ?? '';
+      document.getElementById('badge-move-val').textContent = card.move ?? '';
+      document.getElementById('badge-save-val').textContent = card.save ?? '';
+      document.getElementById('badge-hp').className = 'hub-stat-badge badge-hp' + (col==='p2'?' p2-badge':'');
+      badges.style.display = cardTypeEarly === 'Power' ? 'none' : '';
+    }
+    if (unitInfo) unitInfo.style.display = 'none';
     document.getElementById('prof-name').textContent=card.name;
     document.getElementById('prof-weapon-name').textContent = card.weapon?.name ?? '';
     document.getElementById('prof-faction-icon').textContent=FACTION_ICONS[card.faction]||'';
+    // Show unit info in bottom bar — hidden, badges used instead
+    const uInfo = document.getElementById('hub-unit-info');
+    if (uInfo) {
+      document.getElementById('hub-unit-icon').textContent = FACTION_ICONS[card.faction] ?? '';
+      document.getElementById('hub-unit-name').textContent = card.name ?? '';
+      document.getElementById('hub-unit-weapon').textContent = card.weapon?.name ? '⚔ ' + card.weapon.name : '';
+    }
     document.getElementById('prof-move').textContent = card.move == null ? '' : card.move===-1 ? '—' : card.move;
     document.getElementById('prof-range').textContent = card.weapon?.range == null ? '' : displayRange(card.weapon.range);
     document.getElementById('prof-atk').textContent = card.weapon?.attacks ?? '';
@@ -3054,7 +3196,7 @@ window.addEventListener('unhandledrejection', e => {
     const isEnemy     = context==='board' && card.owner && card.owner!==state.activePlayer;
     const isBoard     = context==='board';
 
-    const ab = card.ability;
+    const ab = card.ability || CARDS.find(c => c.id === card.id)?.ability;
     const isActiveUnit = isOwnUnit && state.activeUnit?.card?.uid === card.uid;
     const canUseAbility = isActiveUnit && ab && (state.activeUnit.card.actionsLeft ?? 0) >= ab.apCost;
     const isAbilityActive = state.activeAction === 'ability';
@@ -3074,7 +3216,7 @@ window.addEventListener('unhandledrejection', e => {
         </button>`;
     } else {
       document.getElementById('prof-special').innerHTML =
-        `<span class="special-name">${abilityName}:</span> ${abilityDesc}`;
+        '<span style="opacity:0.2;font-style:italic">No special ability — this unit relies on strength of arms and discipline alone.</span>';
     }
     const visual      = document.getElementById('prof-card-visual');
     const ownerCol    = isBoard && card.owner ? (card.owner===1?'p1':'p2') : (state.activePlayer===1?'p1':'p2');
@@ -3098,23 +3240,13 @@ window.addEventListener('unhandledrejection', e => {
     const pip2  = document.getElementById('prof-pip-2');
 
     if (!isBoard) {
-      const reg = cardType==='Power' ? POWER_REGISTRY[card.effect] : null;
-      const isInstant = reg?.subtype === 'instant';
-      label.textContent = isInstant ? 'CAST' : 'DEPLOY';
-      label.className='prof-cv-label lbl-deploy-active';
-      label.style.display=''; pips.style.display='none';
-      // Wire visual tap to castPowerCard for instant
-      if(isInstant) visual.onclick = () => {
-        if(state.selectedHandCard?.uid === card.uid) castPowerCard(card);
-      };
+      // Hide cost diamond/label — card visual is just art + magnifier tap
+      const cvBottom = document.getElementById('prof-cv-bottom');
+      if (cvBottom) cvBottom.style.display = 'none';
     } else if (card.actionsLeft===null) {
-      label.textContent='ACTIVATE'; label.className='prof-cv-label lbl-deploy-active';
-      label.style.display=''; pips.style.display='none';
+      label.style.display='none'; pips.style.display='none';
     } else if (card.actionsLeft > 0) {
-      label.style.display='none'; pips.style.display='flex';
-      pip1.style.display='';
-      pip1.className=card.actionsLeft >= 2 ? 'prof-cv-pip' : 'prof-cv-pip pip-used';
-      pip2.className=card.actionsLeft >= 1 ? 'prof-cv-pip' : 'prof-cv-pip pip-used';
+      label.style.display='none'; pips.style.display='none';
     } else {
       label.style.display='none'; pips.style.display='none';
     }
@@ -3158,10 +3290,33 @@ window.addEventListener('unhandledrejection', e => {
       diamond.classList.remove('diamond-activated');
     }
 
-    document.getElementById('inspector-deck').style.display='none';
-    const isStrip = !!state.activeUnit || context === 'hand' || opts?.strip;
+    const isStrip = !opts?.modal && (!!state.activeUnit || context === 'hand' || context === 'board');
+    // Hand and inspector are mutually exclusive
+    document.getElementById('inspector-deck').style.display = 'none'; // inspector replaces hand
+    // Show deploy zones when browsing a hand card
+    if (context === 'hand') {
+      const canAfford = state.players[state.activePlayer].resources >= card.cost;
+      if (cardType === 'Power') {
+        if (canAfford) setBarState('pending', { label: 'Cast', cost: card.cost, action: 'cast' });
+        else setBarState('dim', { label: 'Cast', cost: card.cost });
+      } else {
+        if (canAfford) setBarState('pending', { label: 'Deploy', cost: card.cost, action: 'pre-deploy' });
+        else setBarState('dim', { label: 'Deploy', cost: card.cost });
+      }
+    }
+    if (isStrip && context === 'board') {
+      // Tap on board unit — show strip, set pending activate if eligible
+      const p2 = state.players[state.activePlayer];
+      const isOwn = tileId && state.board[tileId]?.owner === state.activePlayer;
+      const canAct = isOwn && card.actionsLeft === null && p2.resources >= 1 && !state.activeUnit;
+      if (canAct) setBarState('pending', { label:'Activate', cost:1, action:'activate' });
+    }
+    const cvBottom = document.getElementById('prof-cv-bottom');
+    if (cvBottom) cvBottom.style.display = 'none';
+    // Ensure deck is hidden — setBarState('pending') may have re-shown it
+    document.getElementById('inspector-deck').style.display = 'none';
     const cv = document.getElementById('inspector-card-view');
-    cv.className = 'inspector-card-view active' + (isStrip ? ' strip-mode' : '');
+    cv.className = 'inspector-card-view active' + (isStrip ? ' strip-mode' : '') + (cardType === 'Power' ? ' power-card' : '');
     document.getElementById('inspector').classList.add('open');
   }
 
@@ -3170,9 +3325,13 @@ window.addEventListener('unhandledrejection', e => {
     state.selectedBoardTile = null;
     setResPulse(false);
     document.getElementById('inspector-card-view').className='inspector-card-view';
-    // Only restore deck view if not in activated state
-    if (!state.activeUnit) {
-      document.getElementById('inspector-deck').style.display='flex';
+    const uInfo = document.getElementById('hub-unit-info');
+    if (uInfo) uInfo.style.display = 'none';
+        if (!state.activeUnit) {
+      highlightDeployTiles(false);
+      setBarState('default');
+      // Restore hand view
+      document.getElementById('inspector-deck').style.display='';
     }
   }
 
@@ -3340,10 +3499,10 @@ window.addEventListener('unhandledrejection', e => {
     }
     // Clear move/attack state
     state.activeAction = 'ability';
-    state.activeAbility = unit.ability;
+    state.activeAbility = unit.ability || CARDS.find(c => c.id === unit.id)?.ability;
     const btn = document.querySelector('.ability-btn');
     if (btn) btn.className = 'ability-btn ability-active';
-    const targets = getAbilityTargets(unit.ability, state.activeUnit.tileId);
+    const targets = getAbilityTargets(state.activeAbility, state.activeUnit.tileId);
     targets.forEach(tid => {
       document.querySelector(`[data-id="${tid}"]`)?.classList.add('highlight-ability');
     });
@@ -3580,46 +3739,82 @@ window.addEventListener('unhandledrejection', e => {
     endUnit();
   }
 
+  function setHubBtn(btnState, label, sub, cost, showOpp) {
+    const btn = document.getElementById('hub-btn');
+    const lbl = document.getElementById('hub-btn-label');
+    const subEl = document.getElementById('hub-btn-sub');
+    const costWrap = document.getElementById('hub-btn-cost');
+    const costVal = document.getElementById('hub-btn-cost-val');
+    const oppEl = document.getElementById('hub-btn-opp');
+    btn.className = 'hub-btn ' + btnState;
+    lbl.textContent = label || '';
+    subEl.textContent = sub || '';
+    if (cost != null) {
+      costVal.textContent = `−${cost}`;
+      costWrap.style.display = 'flex';
+    } else {
+      costWrap.style.display = 'none';
+    }
+    if (oppEl) oppEl.style.display = showOpp ? '' : 'none';
+  }
+
+  function onHubBtn() {
+    if (state._ctaAction === 'pre-deploy') {
+      selectHandCard(profileCard);
+      state._ctaAction = 'deploy';
+    }
+    else if (state._ctaAction === 'deploy' && state.pendingTile) executeDeployTo(state.pendingTile);
+    else if (state._ctaAction === 'activate') activateUnit();
+    else if (state._ctaAction === 'cast') { state.selectedHandCard = profileCard; castPowerCard(profileCard); }
+    else if (state._ctaAction === 'draw') drawAction();
+    else if (state._ctaAction === 'pass') passAction();
+  }
+
   function setBarState(state_name, opts={}) {
     const deck    = document.getElementById('inspector-deck');
-    const pass    = document.getElementById('pass-widget');
-    const diamond = document.getElementById('hub-diamond-wrap');
-    const actions = document.getElementById('hub-actions');
-    const cancel  = document.getElementById('hub-cancel');
-    const hubName = document.getElementById('hub-name');
-    const cta     = document.getElementById('hub-cta');
-    const ctaLbl  = document.getElementById('hub-cta-label');
-    const ctaCost = document.getElementById('hub-cta-cost');
+    const diamond  = document.getElementById('hub-diamond-wrap');
+    const actions  = document.getElementById('hub-actions');
+    const btn      = document.getElementById('hub-btn');
+    const hubRow   = document.getElementById('hub-row');
+    const passBtn  = document.getElementById('hub-pass-btn');
+    const badges   = document.getElementById('hub-stat-badges');
 
-    // Reset all first
+    // Reset
+    const inspectorOpen = document.getElementById('inspector-card-view').classList.contains('active');
     deck.style.display    = 'none';
-    pass.style.display    = 'none';
     diamond.style.display = 'none';
     actions.classList.remove('active');
-    cancel.style.display  = 'none';
-    hubName.style.display = '';
-    cta.style.display     = 'none';
+    btn.style.display     = '';
+    hubRow.classList.remove('activated');
+    if (passBtn) passBtn.classList.remove('show');
 
     if (state_name === 'default') {
-      deck.style.display    = '';
+      if (!inspectorOpen) deck.style.display = '';
       diamond.style.display = '';
-      pass.style.display    = '';
+      if (passBtn) passBtn.classList.add('show');
+      if (badges) badges.style.display = 'none';
+      const p = state.players[state.activePlayer];
+      const canDraw = p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound && p.hand.length < MAX_HAND;
+      setHubBtn(canDraw ? 'state-active' : 'state-dim', 'Draw', '', 1);
+      state._ctaAction = 'draw';
 
     } else if (state_name === 'pending') {
-      // Pending spend — cancel left, diamond centre, CTA right
-      deck.style.display    = '';  // keep hand visible
+      if (!inspectorOpen) deck.style.display = '';
       diamond.style.display = '';
-      cancel.style.display  = '';
-      hubName.style.display = 'none';
-      cta.style.display     = '';
-      ctaLbl.textContent    = opts.label  || 'Confirm';
-      ctaCost.textContent   = opts.cost   ? `−${opts.cost}` : '';
-      state._ctaAction      = opts.action || null;
+      setHubBtn('state-active', opts.label || 'Confirm', '', opts.cost ?? null);
+      state._ctaAction = opts.action || null;
+
+    } else if (state_name === 'dim') {
+      diamond.style.display = '';
+      setHubBtn('state-dim', opts.label || 'Deploy', '', opts.cost ?? null);
+      state._ctaAction = null;
 
     } else if (state_name === 'activated') {
-      // Activated — name left, actions centre, no right
-      deck.style.display = 'none';
+      deck.style.display    = 'none';
+      btn.style.display     = 'none';
+      diamond.style.display = 'none';
       actions.classList.add('active');
+      hubRow.classList.add('activated');
     }
   }
 
@@ -3645,7 +3840,7 @@ window.addEventListener('unhandledrejection', e => {
     const btnMove    = document.getElementById('act-btn-move');
     const btnAttack  = document.getElementById('act-btn-attack');
     const btnAbility = document.getElementById('act-btn-ability');
-    const btnEnd     = document.getElementById('act-btn-end');
+    const btnEnd     = document.getElementById('act-btn-skip');
 
     // Move
     if (immobile || actions === 0) btnMove.className = 'act-btn act-unavailable';
@@ -3659,7 +3854,7 @@ window.addEventListener('unhandledrejection', e => {
 
     // Ability (only shown if unit has one)
     if (btnAbility.style.display !== 'none') {
-      const ab = unit.ability;
+      const ab = unit.ability || CARDS.find(c => c.id === unit.id)?.ability;
       const canUse = ab && actions >= (ab.apCost || 1);
       if (!canUse)                    btnAbility.className = 'act-btn act-unavailable';
       else if (current === 'ability') btnAbility.className = 'act-btn act-selected';
@@ -3686,7 +3881,6 @@ window.addEventListener('unhandledrejection', e => {
     renderHub();
     showActionBar(unit);
     openProfile(unit,'board',profileTileId);
-    setBarState('activated');
     selectAction('move');
     updateActionBar();
   }
@@ -3707,7 +3901,26 @@ window.addEventListener('unhandledrejection', e => {
     if(!unit||!tid) return;
     if(action==='move'){
       getReachableTiles(tid, unit.move).forEach(id=>{
-        document.querySelector(`[data-id="${id}"]`)?.classList.add('highlight-move');
+        const mt = document.querySelector(`[data-id="${id}"]`);
+        if (!mt) return;
+        mt.classList.add('highlight-move');
+        // Long press (200ms) on move tile = auto-confirm move
+        let _mvTimer = null;
+        mt.addEventListener('touchstart', e=>{
+          if(e.touches.length>1) return;
+          _mvTimer = setTimeout(()=>{
+            if(mt.classList.contains('highlight-move')){
+              // Show brief tick then execute
+              mt.innerHTML += '<div class="move-longpress-tick">✓</div>';
+              setTimeout(()=>{
+                clearMoveConfirm();
+                executeMove(id);
+              }, 150);
+            }
+          }, 200);
+        }, {passive:true});
+        mt.addEventListener('touchend', ()=>clearTimeout(_mvTimer), {once:true});
+        mt.addEventListener('touchmove', ()=>clearTimeout(_mvTimer), {passive:true, once:true});
       });
     } else {
       const enemy=state.activePlayer===1?2:1;
@@ -3818,7 +4031,7 @@ window.addEventListener('unhandledrejection', e => {
     }
     _advancePending = true;
     setUILock(true);
-    document.getElementById('turn-wait').classList.add('show');
+    setTimeout(() => document.getElementById('turn-wait').classList.add('show'), 300);
     setTimeout(advanceTurn, 2000);
   }
 
@@ -3905,22 +4118,22 @@ window.addEventListener('unhandledrejection', e => {
     const fxB = state.laneEffects.B;
     const makeCard = (fx, preview) => fx ? `
       <div style="background:#0e1a12;border:1px solid #1a5030;border-radius:6px;padding:10px 12px;text-align:left;flex:1">
-        <div style="font-size:8px;color:#40a878;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:2px">${fx.name}</div>
-        <div style="font-size:7px;color:#3a6848;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">${fx.trigger.replace(/_/g,' ')}</div>
-        <div style="font-size:8px;color:#5a8868;line-height:1.5">${fx.description}</div>
-        ${preview ? `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #1a3020;font-size:8px;color:#7a8868;line-height:1.5;">${preview}</div>` : ''}
+        <div style="font-size:var(--fs-xs);color:#40a878;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:2px">${fx.name}</div>
+        <div style="font-size:var(--fs-xs);color:#3a6848;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">${fx.trigger.replace(/_/g,' ')}</div>
+        <div style="font-size:var(--fs-xs);color:#5a8868;line-height:1.5">${fx.description}</div>
+        ${preview ? `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #1a3020;font-size:var(--fs-xs);color:#7a8868;line-height:1.5;">${preview}</div>` : ''}
       </div>` : '';
 
     ov.innerHTML = `
-      <div class="round-end-title" style="font-size:18px">Lane Effects Revealed</div>
+      <div class="round-end-title" style="font-size:var(--fs-md)">Lane Effects Revealed</div>
       <div class="round-end-sub" style="margin-bottom:14px">The battlefield stirs…</div>
       <div style="display:flex;gap:8px;width:100%;max-width:340px;margin-bottom:16px">
         <div style="flex:1">
-          <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane I</div>
+          <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane I</div>
           ${makeCard(fxA)}
         </div>
         <div style="flex:1">
-          <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane II</div>
+          <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane II</div>
           ${makeCard(fxB)}
         </div>
       </div>
@@ -3950,15 +4163,15 @@ window.addEventListener('unhandledrejection', e => {
       if(!Object.keys(previews).length) { applyAndContinue(); return; }
 
       ov.innerHTML = `
-        <div class="round-end-title" style="font-size:18px">Lane Effects Revealed</div>
+        <div class="round-end-title" style="font-size:var(--fs-md)">Lane Effects Revealed</div>
         <div class="round-end-sub" style="margin-bottom:14px">The battlefield stirs\u2026</div>
         <div style="display:flex;gap:8px;width:100%;max-width:340px;margin-bottom:16px">
           <div style="flex:1">
-            <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane I</div>
+            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane I</div>
             ${makeCard(fxA, previews['A'])}
           </div>
           <div style="flex:1">
-            <div style="font-size:7px;color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane II</div>
+            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane II</div>
             ${makeCard(fxB, previews['B'])}
           </div>
         </div>
@@ -4033,10 +4246,15 @@ window.addEventListener('unhandledrejection', e => {
 
   function showToastMsg(msg) {
     const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#2a2010;border:1px solid #c8a060;color:#c8a060;font-family:Cinzel,serif;font-size:9px;letter-spacing:0.1em;padding:6px 14px;border-radius:4px;z-index:200;pointer-events:none;opacity:1;transition:opacity 0.4s';
+    el.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#2a2010;border:1px solid #c8a060;color:#c8a060;font-family:Spectral,serif;font-size:var(--fs-xs);letter-spacing:0.1em;padding:6px 14px;border-radius:4px;z-index:200;pointer-events:none;opacity:1;transition:opacity 0.4s';
     el.textContent = msg;
     document.body.appendChild(el);
     setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=>el.remove(), 400); }, 1200);
+  }
+
+  function quickLoad() {
+    document.getElementById('start-overlay').classList.remove('show');
+    loadGame();
   }
 
   function loadGame() {
@@ -4271,6 +4489,15 @@ window.addEventListener('unhandledrejection', e => {
 
   outer.addEventListener('touchstart',e=>{
     if(dragState) return;
+    // Tap board background — close inspector strip if open
+    const icv = document.getElementById('inspector-card-view');
+    if (icv.classList.contains('active') && !state.activeUnit) {
+      const underEl = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (!underEl?.closest('#inspector-card-view') && !underEl?.closest('[data-id]')) {
+        closeProfile();
+        return;
+      }
+    }
     if(e.touches.length===2){isPinching=true;lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
     else if(!isPinching){startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;}
   },{passive:true});
