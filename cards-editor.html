@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Card Editor</title>
+<title>Revenant Card Forge</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -201,11 +201,11 @@ body {
 /* ── LANE EFFECT ROW ── */
 .lane-row {
   background: linear-gradient(160deg, #0e1a12 0%, #090e0a 100%);
-  border: 1px solid #1a3020; border-radius: 4px;
+  border: 1px solid #1a3020; border-radius: 3px;
   padding: 8px 10px; display: flex; align-items: center; gap: 8px;
 }
 .lane-icon {
-  width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+  width: 22px; height: 22px; flex-shrink: 0; border-radius: 3px;
   background: #0a2818; border: 2px solid #30784a;
   display: flex; align-items: center; justify-content: center;
   font-size: 10px;
@@ -247,8 +247,358 @@ body {
 }
 .storage-clear-btn:active { border-color: #cc3030; color: #cc3030; }
 
+
+.rule-pill {
+  display: inline-block; font-size: 7px; color: #c8a060;
+  border: 1px solid #3a2a10; border-radius: 999px;
+  padding: 2px 6px; margin-left: 4px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.rule-pill.elite { color: #d89040; border-color: #704010; }
+.rule-pill.leader { color: #d8c060; border-color: #706020; }
+.deck-rules {
+  background: linear-gradient(160deg, #14120c 0%, #0e0c08 100%);
+  border: 1px solid #2a1e0a; border-radius: 4px;
+  padding: 7px 9px; margin: 6px 0; font-size: 8px; color: #7a6030; line-height: 1.6;
+}
+.deck-rules strong { color: #c8a060; }
+.deck-rules.warn { border-color: #704010; color: #d89040; }
+.checkbox-field {
+  display: flex; align-items: center; gap: 8px;
+  background: #0a0806; border: 1px solid #2a1e0a; border-radius: 3px;
+  padding: 8px; color: #c8a060; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+.checkbox-field input { width: auto; accent-color: #c8a060; }
+
 /* ── EMPTY STATE ── */
 .empty-msg { text-align: center; padding: 24px 16px; color: #3a2e18; font-size: 9px; letter-spacing: 0.1em; }
+
+/* ── REPO FILTERS + HEX TILE VIEW ── */
+.repo-filter-bar {
+  display: flex; gap: 6px; position: sticky; top: 0; z-index: 10;
+  background: linear-gradient(180deg, #0d0b08 0%, rgba(13,11,8,0.92) 100%);
+  padding: 2px 0 8px; flex-shrink: 0;
+}
+.repo-filter {
+  flex: 1; font-family: 'Cinzel', Georgia, serif; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: #5a4828;
+  background: #120e08; border: 1px solid #2a1e0a; border-radius: 3px;
+  padding: 9px 6px; cursor: pointer;
+}
+.repo-filter.active { color: #c8a060; border-color: #c8a060; background: #1a1408; }
+.repo-hex-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 8px;
+  padding-bottom: 12px;
+}
+.card-hex-tile {
+  position: relative; min-height: 112px; padding: 14px 12px 12px; cursor: pointer;
+  background: linear-gradient(155deg, #1b160f 0%, #0d0a06 100%);
+  border: 1px solid #2a1e0a; border-radius: 3px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.45);
+}
+.card-hex-tile:active { transform: translateY(1px); border-color: #c8a060; }
+.card-hex-tile.rarity-hero { border: 2px solid #d8aa35; box-shadow: 0 0 10px rgba(216,170,53,0.16), inset 0 0 0 1px rgba(216,170,53,0.18); }
+.card-hex-tile.rarity-uncommon { border: 2px solid #a8a8a8; box-shadow: 0 0 10px rgba(180,180,180,0.12), inset 0 0 0 1px rgba(210,210,210,0.12); }
+.hex-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.hex-name { font-size: 13px; font-weight: 900; color:#c8a060; line-height:1.25; letter-spacing:0.04em; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.hex-cost {
+  width: 25px; height: 25px; flex-shrink: 0; transform: rotate(45deg);
+  background:#8a5010; border:2px solid #c08020; display:flex; align-items:center; justify-content:center;
+}
+.hex-cost span { transform: rotate(-45deg); font-size:10px; font-weight:900; color:#f0d080; }
+.hex-mid { display:flex; align-items:center; justify-content:center; min-height:32px; }
+.hex-hp {
+  width:34px; height:34px; border-radius:50%; background:#100c08; border:2px solid #6b231d;
+  color:#e0b070; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900;
+}
+.hex-bolt { font-size:30px; color:#9060c8; text-shadow:0 0 8px rgba(144,96,200,0.35); line-height:1; }
+.hex-bottom { display:flex; justify-content:space-between; align-items:center; gap:6px; }
+.hex-type { font-size:9px; color:#7a6030; text-transform:uppercase; letter-spacing:0.12em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.hex-actions { display:flex; gap:4px; flex-shrink:0; }
+.hex-action {
+  width:24px; height:24px; display:flex; align-items:center; justify-content:center;
+  font-family:'Cinzel', Georgia, serif; font-size:12px; font-weight:900; cursor:pointer;
+  background:rgba(8,6,4,0.85); border:1px solid #3a2a10; border-radius:3px; color:#806838;
+}
+.hex-action.edit:active { color:#c8a060; border-color:#c8a060; }
+.hex-action.del:active { color:#cc3030; border-color:#cc3030; }
+
+
+/* ── DECK TILE VIEW ── */
+.deck-filter-bar {
+  display: flex; gap: 6px; position: sticky; top: 0; z-index: 9;
+  background: linear-gradient(180deg, #0d0b08 0%, rgba(13,11,8,0.92) 100%);
+  padding: 6px 0 8px; flex-shrink: 0;
+}
+.deck-filter {
+  flex: 1; font-family: 'Cinzel', Georgia, serif; font-size: 8px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #5a4828;
+  background: #120e08; border: 1px solid #2a1e0a; border-radius: 3px;
+  padding: 8px 4px; cursor: pointer;
+}
+.deck-filter.active { color: #c8a060; border-color: #c8a060; background: #1a1408; }
+.deck-hex-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 8px;
+  padding-bottom: 12px;
+}
+.deck-hex-tile { min-height: 128px; }
+.deck-hex-tile.in-deck {
+  border-color: #50a850;
+  box-shadow: 0 0 12px rgba(80,168,80,0.16), inset 0 0 0 1px rgba(80,168,80,0.18);
+  background: linear-gradient(155deg, #1a1d10 0%, #0b0e06 100%);
+}
+.deck-qty-badge {
+  position:absolute; top:5px; left:50%; transform:translateX(-50%);
+  min-width:24px; height:20px; padding:0 7px; border-radius:3px;
+  background:#102010; border:1px solid #50a850; color:#80d880;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:900; z-index:2;
+}
+.deck-controls {
+  display:flex; align-items:center; justify-content:center; gap:8px; margin-top:2px;
+}
+.deck-tile-btn {
+  width:30px; height:30px; font-family:'Cinzel', Georgia, serif;
+  font-size:17px; font-weight:900; color:#c8a060; cursor:pointer;
+  background:#17120c; border:1px solid #4a3818; border-radius:4px;
+  display:flex; align-items:center; justify-content:center; line-height:1;
+}
+.deck-tile-btn:active { border-color:#c8a060; }
+.deck-tile-btn:disabled { opacity:0.25; cursor:default; border-color:#2a1e0a; color:#4a3818; }
+.deck-tile-qty {
+  min-width:24px; text-align:center; font-size:15px; font-weight:900; color:#c8a060;
+}
+@media (min-width: 520px) { .deck-hex-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+@media (min-width: 520px) { .repo-hex-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+
+/* ── COMPACT DECK GRID PASS ── */
+.deck-hex-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px 6px;
+  padding-bottom: 14px;
+}
+.deck-hex-tile.card-hex-tile {
+  min-height: 104px;
+  padding: 12px 7px 7px;
+  gap: 4px;
+}
+.deck-hex-tile .hex-top { gap: 5px; }
+.deck-hex-tile .hex-name {
+  font-size: 10px;
+  line-height: 1.18;
+  -webkit-line-clamp: 2;
+}
+.deck-hex-tile .hex-cost {
+  width: 20px;
+  height: 20px;
+  border-width: 1px;
+}
+.deck-hex-tile .hex-cost span { font-size: 8px; }
+.deck-hex-tile .hex-mid { min-height: 24px; }
+.deck-hex-tile .hex-hp {
+  width: 26px;
+  height: 26px;
+  font-size: 10px;
+  border-width: 1px;
+}
+.deck-hex-tile .hex-bolt { font-size: 23px; }
+.deck-hex-tile .hex-bottom { gap: 3px; }
+.deck-hex-tile .hex-type {
+  font-size: 7px;
+  letter-spacing: 0.08em;
+}
+.deck-qty-badge {
+  top: 3px;
+  min-width: 20px;
+  height: 16px;
+  padding: 0 5px;
+  font-size: 8px;
+}
+.deck-controls {
+  gap: 5px;
+  margin-top: 1px;
+}
+.deck-tile-btn {
+  width: 24px;
+  height: 24px;
+  font-size: 14px;
+  border-radius: 3px;
+}
+.deck-tile-qty {
+  min-width: 18px;
+  font-size: 12px;
+}
+.deck-rules {
+  padding: 5px 7px;
+  margin: 5px 0;
+  font-size: 7px;
+}
+@media (min-width: 430px) {
+  .deck-hex-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 700px) {
+  .deck-hex-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+/* ── SQUARE TILE POLISH PASS ── */
+.card-hex-tile,
+.deck-hex-tile.card-hex-tile {
+  clip-path: none !important;
+  border-radius: 3px !important;
+}
+.repo-filter,
+.deck-filter,
+.deck-qty-badge {
+  border-radius: 3px !important;
+}
+.hex-name {
+  font-size: 13px;
+  line-height: 1.2;
+}
+.deck-hex-tile .hex-name {
+  font-size: 10px;
+  line-height: 1.15;
+}
+@media (max-width: 380px) {
+  .hex-name { font-size: 12px; }
+  .deck-hex-tile .hex-name { font-size: 9px; }
+}
+
+
+/* ── DECK FAST-TAP PASS: full left/right halves adjust quantity, no edit from deck ── */
+.deck-hex-tile.card-hex-tile {
+  min-height: 126px;
+  padding: 10px 8px 12px;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.deck-hex-tile .deck-stat-corner {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  z-index: 3;
+  pointer-events: none;
+}
+.deck-hex-tile .deck-stat-corner .hex-hp {
+  width: 27px;
+  height: 27px;
+  font-size: 11px;
+  border-width: 1px;
+}
+.deck-hex-tile .deck-stat-corner .hex-bolt {
+  width: 27px;
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+}
+.deck-hex-tile .deck-cost-corner {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  pointer-events: none;
+}
+.deck-hex-tile .deck-name-center {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.08;
+  font-weight: 900;
+  color: #c8a060;
+  letter-spacing: 0.015em;
+  overflow: hidden;
+  padding: 24px 2px 24px;
+  pointer-events: none;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.55);
+}
+.deck-hex-tile .deck-name-center span {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.deck-side-btn {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  border: 0;
+  border-radius: 0;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 0;
+  font-weight: 900;
+  cursor: pointer;
+  color: #c8a060;
+  background: transparent;
+  display: block;
+  z-index: 5;
+  -webkit-tap-highlight-color: rgba(200,160,96,0.18);
+}
+.deck-side-btn.minus { left: 0; }
+.deck-side-btn.plus { right: 0; }
+.deck-side-btn::after {
+  position: absolute;
+  bottom: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: rgba(16,12,8,0.84);
+  border: 1px solid rgba(200,160,96,0.54);
+  color: #f0d080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.28);
+}
+.deck-side-btn.minus::after { content: '−'; left: 8px; }
+.deck-side-btn.plus::after { content: '＋'; right: 8px; }
+.deck-side-btn:active {
+  background: rgba(200,160,96,0.10);
+}
+.deck-side-btn:active::after {
+  border-color: #f0d080;
+  transform: translateY(1px);
+}
+.deck-side-btn:disabled {
+  cursor: default;
+}
+.deck-side-btn:disabled::after {
+  opacity: 0.22;
+  color: #4a3818;
+  border-color: rgba(74,56,24,0.45);
+  background: rgba(16,12,8,0.42);
+}
+.deck-hex-tile .deck-qty-badge {
+  top: auto;
+  bottom: 17px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  pointer-events: none;
+}
+.deck-hex-tile .hex-top,
+.deck-hex-tile .hex-mid,
+.deck-hex-tile .hex-bottom,
+.deck-hex-tile .deck-controls {
+  display: none !important;
+}
+@media (max-width: 380px) {
+  .deck-hex-tile .deck-name-center { font-size: 12px; }
+  .deck-side-btn::after { width: 34px; height: 34px; font-size: 22px; }
+}
+
 </style>
 </head>
 <body>
@@ -277,7 +627,12 @@ body {
 
 <!-- REPOSITORY VIEW -->
 <div class="view active" id="view-repo">
-  <div id="repo-list"></div>
+  <div class="repo-filter-bar" id="repo-filter-bar">
+    <button class="repo-filter active" data-filter="all" onclick="setRepoFilter('all')">All</button>
+    <button class="repo-filter" data-filter="units" onclick="setRepoFilter('units')">Units</button>
+    <button class="repo-filter" data-filter="abilities" onclick="setRepoFilter('abilities')">Abilities</button>
+  </div>
+  <div id="repo-list" class="repo-hex-grid"></div>
 </div>
 
 <!-- DECK P1 VIEW -->
@@ -295,7 +650,13 @@ body {
     </div>
   </div>
   <div class="save-status" id="p1-saved">Saved to localStorage</div>
-  <div id="deck-p1-list"></div>
+  <div class="deck-filter-bar" id="deck-filter-bar-p1">
+    <button class="deck-filter active" data-player="1" data-filter="all" onclick="setDeckFilter(1,'all')">All</button>
+    <button class="deck-filter" data-player="1" data-filter="inDeck" onclick="setDeckFilter(1,'inDeck')">In Deck</button>
+    <button class="deck-filter" data-player="1" data-filter="units" onclick="setDeckFilter(1,'units')">Units</button>
+    <button class="deck-filter" data-player="1" data-filter="abilities" onclick="setDeckFilter(1,'abilities')">Abilities</button>
+  </div>
+  <div id="deck-p1-list" class="deck-hex-grid"></div>
 </div>
 
 <!-- DECK P2 VIEW -->
@@ -313,7 +674,13 @@ body {
     </div>
   </div>
   <div class="save-status" id="p2-saved">Saved to localStorage</div>
-  <div id="deck-p2-list"></div>
+  <div class="deck-filter-bar" id="deck-filter-bar-p2">
+    <button class="deck-filter active" data-player="2" data-filter="all" onclick="setDeckFilter(2,'all')">All</button>
+    <button class="deck-filter" data-player="2" data-filter="inDeck" onclick="setDeckFilter(2,'inDeck')">In Deck</button>
+    <button class="deck-filter" data-player="2" data-filter="units" onclick="setDeckFilter(2,'units')">Units</button>
+    <button class="deck-filter" data-player="2" data-filter="abilities" onclick="setDeckFilter(2,'abilities')">Abilities</button>
+  </div>
+  <div id="deck-p2-list" class="deck-hex-grid"></div>
 </div>
 
 <!-- LANE EFFECTS VIEW -->
@@ -326,9 +693,11 @@ body {
 <div class="view" id="view-io">
   <div class="io-section">
     <div class="io-label">Import Cards from CSV</div>
-    <div class="io-sub">Paste your CSV below and tap Import. This replaces the entire card repo and clears saved decks.</div>
-    <textarea id="csv-paste" style="width:100%;height:120px;background:#0a0806;border:1px solid #2a1e0a;border-radius:3px;color:#c8a060;font-family:monospace;font-size:9px;padding:6px;resize:none;outline:none" placeholder="id,name,variant,display name,type..."></textarea>
-    <button class="io-btn import" style="margin-top:6px;width:100%" onclick="importCSV()">⬆ Import CSV</button>
+    <div class="io-sub">Choose a .csv file from your device, or paste CSV below as a fallback. Importing replaces the entire card repo and clears saved decks.</div>
+    <input id="csv-file-input" type="file" accept=".csv,text/csv" style="display:none" onchange="importCSVFile(event)">
+    <button class="io-btn import" style="margin-top:6px;width:100%" onclick="document.getElementById('csv-file-input').click()">⬆ Import CSV File</button>
+    <textarea id="csv-paste" style="width:100%;height:120px;background:#0a0806;border:1px solid #2a1e0a;border-radius:3px;color:#c8a060;font-family:monospace;font-size:9px;padding:6px;resize:none;outline:none;margin-top:6px" placeholder="Or paste CSV here: id,name,variant,display name,type..."></textarea>
+    <button class="io-btn import" style="margin-top:6px;width:100%" onclick="importCSV()">⬆ Import Pasted CSV</button>
     <div class="io-status" id="csv-import-status">Imported successfully</div>
   </div>
   <div class="io-section">
@@ -382,6 +751,7 @@ body {
         <option value="Common">Common</option>
         <option value="Uncommon">Uncommon</option>
         <option value="Hero">Hero</option>
+        <option value="Leader">Leader</option>
         <option value="Power">Power</option>
       </select>
     </div>
@@ -399,6 +769,24 @@ body {
     </div>
     <div class="field"><label>Cost</label><input id="f-cost" type="number" min="1" max="10" placeholder="3"></div>
   </div>
+
+  <div class="form-section">Rules</div>
+  <div class="field-grid cols3">
+    <div class="field"><label>Role</label>
+      <select id="f-role">
+        <option value="Infantry">Infantry</option>
+        <option value="Cavalry">Cavalry</option>
+        <option value="Monster">Monster</option>
+        <option value="Structure">Structure</option>
+        <option value="Spell">Spell</option>
+        <option value="Relic">Relic</option>
+      </select>
+    </div>
+    <div class="field"><label>Activation</label><input id="f-activation" type="number" min="0" max="10" placeholder="1"></div>
+    <div class="field"><label>Deck Limit</label><input id="f-decklimit" type="number" min="0" max="16" placeholder="Auto"></div>
+  </div>
+  <div class="field-full field"><label>Keywords <span style="color:#3a2e18;font-style:italic">comma separated</span></label><input id="f-keywords" type="text" placeholder="Stalwart, Ambush"></div>
+  <div class="field-full"><label class="checkbox-field"><input id="f-elite" type="checkbox"> Counts as Elite</label></div>
 
   <!-- Dynamic fields — rerendered on type/effect change -->
   <div id="form-dynamic"></div>
@@ -472,23 +860,15 @@ const FACTIONS = {
 };
 
 // ── DEFAULT CARDS ──
-const DEFAULT_CARDS = [
-  { id:'c1', name:'Knight Errant', type:'Uncommon', faction:'order_of_iron', cost:3, hp:8, maxHp:8, move:3, save:'4+',
-    weapon:{name:'Broadsword', range:1, attacks:3, hit:'3+', ap:2, damage:2},
-    special:'Stalwart: This unit may not be pushed back by enemy abilities.' },
-  { id:'c2', name:'Scout', type:'Common', faction:'order_of_iron', cost:2, hp:5, maxHp:5, move:4, save:'5+',
-    weapon:{name:'Short Bow', range:4, attacks:2, hit:'4+', ap:0, damage:1},
-    special:'Vanguard: May be deployed one row forward of the deployment zone.' },
-  { id:'c3', name:'Iron Golem', type:'Uncommon', faction:'order_of_iron', cost:5, hp:14, maxHp:14, move:2, save:'2+',
-    weapon:{name:'Iron Fist', range:1, attacks:4, hit:'3+', ap:3, damage:3},
-    special:'Unyielding: Ignore the first wound suffered each turn.' },
-  { id:'c4', name:'Wretch', type:'Common', faction:'none', cost:1, hp:3, maxHp:3, move:3, save:'6+',
-    weapon:{name:'Crude Club', range:1, attacks:1, hit:'5+', ap:0, damage:1},
-    special:'Expendable: When this unit is slain, draw one card.' },
-  { id:'c5', name:'Dread Knight', type:'Hero', faction:'order_of_flames', cost:4, hp:10, maxHp:10, move:3, save:'3+',
-    weapon:{name:'Cursed Blade', range:1, attacks:3, hit:'3+', ap:2, damage:3},
-    special:'Death Mark: At the start of your turn, deal 1 damage to the nearest enemy unit.' },
-];
+// Intentionally empty: the editor now starts as a blank forge.
+// Imported CSV/JSON data is persisted to localStorage and becomes the working card set for future sessions.
+const DEFAULT_CARDS = [];
+
+function isOldPlaceholderRepo(cards) {
+  if (!Array.isArray(cards) || cards.length !== 5) return false;
+  const oldNames = ['Knight Errant','Scout','Iron Golem','Wretch','Dread Knight'];
+  return oldNames.every(name => cards.some(c => c && c.name === name));
+}
 
 // ── DEFAULT LANE EFFECTS ──
 const DEFAULT_LANE_EFFECTS = [
@@ -506,7 +886,31 @@ let decks    = { 1: {}, 2: {} };
 let editId   = null;
 let editLaneId = null;
 let activeTab  = 'repo';
+let repoFilter = 'all';
+let deckFilters = { 1: 'all', 2: 'all' };
 let _editCard  = null;
+
+const DECK_SIZE = 16;
+const ELITE_CAP = 3;
+const LEADER_CAP = 1;
+const VALID_TYPES = ['Common','Uncommon','Hero','Leader','Power'];
+
+function arrayFromKeywords(value) {
+  if (Array.isArray(value)) return value.map(v => String(v).trim()).filter(Boolean);
+  return String(value || '').split(',').map(v => v.trim()).filter(Boolean);
+}
+
+function defaultDeckLimit(card) {
+  if (!card) return Infinity;
+  if (card.deckLimit !== undefined && card.deckLimit !== null && card.deckLimit !== '') {
+    const n = parseInt(card.deckLimit);
+    return Number.isFinite(n) && n > 0 ? n : Infinity;
+  }
+  if (card.type === 'Leader') return 1;
+  if (card.type === 'Hero') return 1;
+  if (card.type === 'Uncommon') return 3;
+  return Infinity;
+}
 
 // ── EFFECT DEFINITIONS — drives dynamic form fields ──
 const EFFECT_DEFS = {
@@ -610,6 +1014,10 @@ function loadData() {
   try {
     const raw = localStorage.getItem('grim_card_repo');
     repo = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(DEFAULT_CARDS));
+    if (isOldPlaceholderRepo(repo)) {
+      repo = [];
+      localStorage.setItem('grim_card_repo', JSON.stringify(repo));
+    }
   } catch { repo = JSON.parse(JSON.stringify(DEFAULT_CARDS)); }
 
   try {
@@ -629,37 +1037,46 @@ function loadData() {
 }
 
 function normaliseRepo() {
-  const validTypes = ['Common','Uncommon','Hero','Power'];
   repo = repo.map(c => {
     const rawType = (c.type||'Common');
-    // Find matching valid type case-insensitively, stripping all non-alpha
-    const cleanType = validTypes.find(t => t.toLowerCase() === rawType.replace(/[^a-zA-Z]/g,'').toLowerCase()) || 'Common';
+    const cleanType = VALID_TYPES.find(t => t.toLowerCase() === rawType.replace(/[^a-zA-Z]/g,'').toLowerCase()) || 'Common';
     const isPower = cleanType === 'Power';
+    const cleanEffect = c.effect ? String(c.effect).replace(/[^a-z_]/g,'') : null;
+    const role = c.role || (isPower ? 'Spell' : 'Infantry');
     return {
       ...c,
-      type:         cleanType,
-      faction:      (c.faction||'none').replace(/[^\w_]/g,'').trim() || 'none',
-      name:         (c.name||'').trim(),
-      internalName: (c.internalName||'').trim(),
-      variant:      (c.variant||'').trim(),
-      artId:        (c.artId||'').trim(),
-      effect:       c.effect ? c.effect.replace(/[^a-z_]/g,'') : null,
-      hp:           isPower ? null : (c.hp||null),
-      move:         isPower ? null : (c.move!==undefined ? c.move : null),
-      save:         isPower ? null : (c.save||null),
-      weapon:       isPower && (c.effect||'').replace(/[^a-z_]/g,'')!=='damage_lane' ? null : c.weapon,
+      type:           cleanType,
+      faction:        (c.faction||'none').replace(/[^\w_]/g,'').trim() || 'none',
+      name:           (c.name||'').trim(),
+      internalName:   (c.internalName||'').trim(),
+      variant:        (c.variant||'').trim(),
+      artId:          (c.artId||'').trim(),
+      role,
+      activationCost: c.activationCost !== undefined && c.activationCost !== null && c.activationCost !== '' ? parseInt(c.activationCost) : (isPower ? 0 : 1),
+      elite:          !!c.elite || cleanType === 'Hero',
+      keywords:       arrayFromKeywords(c.keywords),
+      deckLimit:      c.deckLimit !== undefined && c.deckLimit !== null && c.deckLimit !== '' ? parseInt(c.deckLimit) : null,
+      effect:         cleanEffect,
+      hp:             isPower ? null : (c.hp||null),
+      move:           isPower ? null : (c.move!==undefined ? c.move : null),
+      save:           isPower ? null : (c.save||null),
+      weapon:         isPower && cleanEffect !== 'damage_lane' ? null : c.weapon,
     };
   });
   saveRepo();
   renderRepo();
   const st = document.getElementById('normalise-status');
-  st.textContent = 'Normalised ' + repo.length + ' cards (' + repo.filter(c=>c.type==='Power').length + ' Power) ✓';
+  st.textContent = 'Normalised ' + repo.length + ' cards (' + repo.filter(c=>c.type==='Leader').length + ' Leaders, ' + repo.filter(c=>c.elite).length + ' Elite) ✓';
   st.classList.add('show');
   setTimeout(() => st.classList.remove('show'), 3000);
 }
 
 function saveRepo() { localStorage.setItem('grim_card_repo', JSON.stringify(repo)); }
 function saveLaneDeck() { localStorage.setItem('grim_lane_deck', JSON.stringify(laneDeck)); }
+
+function confirmAction(message) {
+  return window.confirm(message);
+}
 
 function saveDeck(player) {
   localStorage.setItem(`grim_deck_p${player}`, JSON.stringify(decks[player]));
@@ -756,6 +1173,9 @@ function saveLaneEffect() {
 }
 
 function deleteLaneEffect(id) {
+  const fx = laneDeck.find(l => l.id === id);
+  const label = fx ? fx.name : 'this lane effect';
+  if (!confirmAction('Delete "' + label + '"? This cannot be undone.')) return;
   laneDeck = laneDeck.filter(l => l.id !== id);
   saveLaneDeck();
   renderLane();
@@ -763,7 +1183,7 @@ function deleteLaneEffect(id) {
 
 // ── EXPORT / IMPORT ──
 function exportCSV() {
-  const header = 'id,display_name,internal_name,variant,art_id,type,faction,cost,hp,move,save,weapon_name,range,attacks,hit,ap,damage,special,flavour,effect,value';
+  const header = 'id,display_name,internal_name,variant,art_id,type,faction,cost,activation_cost,role,elite,keywords,deck_limit,hp,move,save,weapon_name,range,attacks,hit,ap,damage,special,flavour,effect,value';
   const rows = repo.map(c => [
     c.id,
     c.name,
@@ -771,7 +1191,8 @@ function exportCSV() {
     c.variant || '',
     c.artId || slugify(c.internalName || c.name),
     c.type, c.faction || 'none',
-    c.cost, c.hp, c.move, c.save,
+    c.cost, c.activationCost ?? '', c.role || '', c.elite ? 'TRUE' : '', arrayFromKeywords(c.keywords).join('|'), c.deckLimit ?? '',
+    c.hp, c.move, c.save,
     c.weapon?.name || '', c.weapon?.range ?? '', c.weapon?.attacks ?? '', c.weapon?.hit || '', c.weapon?.ap ?? '', c.weapon?.damage ?? '',
     (c.special || '').replace(/,/g, ';'),
     (c.flavour || '').replace(/,/g, ';'),
@@ -790,18 +1211,58 @@ function exportCSV() {
   setTimeout(() => st.classList.remove('show'), 2000);
 }
 
+function parseCSVLine(line) {
+  const cols = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    const next = line[i + 1];
+    if (ch === '"' && inQuotes && next === '"') { cur += '"'; i++; continue; }
+    if (ch === '"') { inQuotes = !inQuotes; continue; }
+    if (ch === ',' && !inQuotes) { cols.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  cols.push(cur);
+  return cols;
+}
+
 function importCSV() {
   const raw = document.getElementById('csv-paste').value.trim();
   if (!raw) return;
+  importCSVText(raw, 'pasted CSV');
+}
+
+function importCSVFile(event) {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const raw = String(e.target.result || '').trim();
+    if (!raw) { alert('CSV file is empty'); input.value = ''; return; }
+    importCSVText(raw, file.name || 'CSV file');
+    input.value = ''; // allow importing the same file again later
+  };
+  reader.onerror = function() {
+    alert('Could not read CSV file');
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function importCSVText(raw, sourceLabel) {
+  if (!raw) return;
+  if (!confirmAction('Import ' + (sourceLabel || 'CSV') + ' and replace the current card repo? Saved player decks will also be cleared.')) return;
   try {
     const lines = raw.split('\n').map(l => l.trim().replace(/\r/g,'')).filter(Boolean);
-    const headers = lines[0].split(',').map(h => h.trim().replace(/\r/g,''));
+    const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/\r/g,''));
     const idx = h => headers.indexOf(h);
     const get = (cols, key) => (cols[idx(key)] || '').trim();
     const autoPlus = v => v && !v.includes('+') ? v + '+' : v;
 
     const parsed = lines.slice(1).map((line, i) => {
-      const cols = line.split(',');
+      const cols = parseCSVLine(line);
       // Flexible column getter — tries multiple name variants
       const g = (...keys) => {
         for(const key of keys) {
@@ -810,13 +1271,12 @@ function importCSV() {
         }
         return '';
       };
-      // Special field may contain commas — find its column and join to end
+      // Special field may contain commas — parseCSVLine handles quoted commas properly.
       const specialColIdx = headers.findIndex(h => h.toLowerCase().replace(/[\s_]/g,'') === 'special');
       const flavourColIdx = headers.findIndex(h => h.toLowerCase().replace(/[\s_]/g,'') === 'flavour' || h.toLowerCase().replace(/[\s_]/g,'') === 'flavor');
       let specialRaw = '';
       if(specialColIdx >= 0) {
-        const endIdx = flavourColIdx > specialColIdx ? flavourColIdx : cols.length;
-        specialRaw = cols.slice(specialColIdx, endIdx).join(',').replace(/^"|"$/g,'').replace(/;/g,',').trim();
+        specialRaw = (cols[specialColIdx] || '').replace(/;/g,',').trim();
       }
       const autoPlus = v => v && !v.includes('+') ? v + '+' : v;
       const hpRaw = g('hp');
@@ -841,6 +1301,11 @@ function importCSV() {
         type:         (g('type') || 'Common').trim(),
         faction:      g('faction') || 'none',
         cost:         parseInt(g('cost')) || 1,
+        activationCost: g('activationcost','activation_cost') !== '' ? parseInt(g('activationcost','activation_cost')) : null,
+        role:         g('role') || '',
+        elite:        ['true','yes','1','elite'].includes((g('elite') || '').toLowerCase()),
+        keywords:     (g('keywords') || '').split('|').join(',').split(',').map(k => k.trim()).filter(Boolean),
+        deckLimit:    g('decklimit','deck_limit') !== '' ? parseInt(g('decklimit','deck_limit')) : null,
         hp, maxHp: hp,
         move:         g('move') !== '' ? parseInt(g('move')) : null,
         save:         autoPlus(g('save')) || null,
@@ -870,8 +1335,9 @@ function importCSV() {
     renderStorageKeys();
     if (activeTab === 'repo') renderRepo();
     const st = document.getElementById('csv-import-status');
+    st.textContent = 'Imported ' + parsed.length + ' cards from ' + (sourceLabel || 'CSV') + ' and saved as current card set';
     st.classList.add('show');
-    setTimeout(() => st.classList.remove('show'), 2500);
+    setTimeout(() => st.classList.remove('show'), 3000);
   } catch(e) { alert('CSV parse error: ' + e.message); }
 }
 
@@ -913,6 +1379,7 @@ function exportToClipboard() {
 function importFromPaste() {
   const raw = document.getElementById('import-paste').value.trim();
   if (!raw) return;
+  if (!confirmAction('Import JSON and overwrite any matching saved card/deck/lane data?')) return;
   try {
     const data = JSON.parse(raw);
     if (data.grim_card_repo) { repo     = data.grim_card_repo; saveRepo(); }
@@ -947,81 +1414,191 @@ function renderStorageKeys() {
 }
 
 function clearKey(key) {
+  if (!confirmAction('Clear saved data key "' + key + '"? This cannot be undone.')) return;
   localStorage.removeItem(key);
   loadData();
   renderStorageKeys();
   if (activeTab === 'repo') renderRepo();
   else if (activeTab === 'lane') renderLane();
+  else if (activeTab === 'p1') renderDeck(1);
+  else if (activeTab === 'p2') renderDeck(2);
 }
 
 // ── RENDER REPO ──
+function setRepoFilter(filter) {
+  repoFilter = filter || 'all';
+  document.querySelectorAll('.repo-filter').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === repoFilter);
+  });
+  renderRepo();
+}
+
+function isAbilityCard(card) {
+  return card && String(card.type || '').toLowerCase() === 'power';
+}
+
+function repoFilterLabel() {
+  if (repoFilter === 'units') return 'units';
+  if (repoFilter === 'abilities') return 'abilities';
+  return 'cards';
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function escapeJsString(value) {
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
 function renderRepo() {
   const list = document.getElementById('repo-list');
   list.innerHTML = '';
+  const cards = repo.filter(card => {
+    if (repoFilter === 'units') return !isAbilityCard(card);
+    if (repoFilter === 'abilities') return isAbilityCard(card);
+    return true;
+  });
+
   if (!repo.length) {
-    list.innerHTML = '<div class="empty-msg">No cards yet — add one below</div>';
+    list.innerHTML = '<div class="empty-msg" style="grid-column:1/-1">No cards yet — import a CSV or tap New Card to start forging.</div>';
     return;
   }
-  repo.forEach(card => {
-    const row = document.createElement('div');
-    row.className = 'card-row';
-    row.innerHTML = `
-      <div class="cr-cost"><span>${card.cost}</span></div>
-      <div class="cr-info">
-        <div class="cr-name">${card.name}</div>
-        <div class="cr-type">${(FACTIONS[card.faction]?.icon ? FACTIONS[card.faction].icon+' ' : '')}${card.type}</div>
-        <div class="cr-stats">${card.weapon ? ("HP "+card.hp+" · "+card.weapon.name+" AP"+card.weapon.ap+" D"+card.weapon.damage) : (card.effect||"Power Card")}</div>
+
+  if (!cards.length) {
+    list.innerHTML = '<div class="empty-msg" style="grid-column:1/-1">No ' + repoFilterLabel() + ' match this filter</div>';
+    return;
+  }
+
+  cards.forEach(card => {
+    const tile = document.createElement('div');
+    const rarityClass = card.type === 'Hero' ? ' rarity-hero' : (card.type === 'Uncommon' ? ' rarity-uncommon' : '');
+    const isAbility = isAbilityCard(card);
+    tile.className = 'card-hex-tile' + rarityClass;
+    tile.onclick = () => openForm(card.id);
+    const hpOrBolt = isAbility
+      ? '<div class="hex-bolt">ϟ</div>'
+      : '<div class="hex-hp">' + escapeHtml(card.hp ?? '—') + '</div>';
+    tile.innerHTML = `
+      <div class="hex-top">
+        <div class="hex-name">${escapeHtml(card.name)}</div>
+        <div class="hex-cost"><span>${escapeHtml(card.cost ?? 0)}</span></div>
       </div>
-      <div class="cr-actions">
-        <button class="icon-btn edit" onclick="openForm('${card.id}')">✎</button>
-        <button class="icon-btn del"  onclick="deleteCard('${card.id}')">✕</button>
+      <div class="hex-mid">${hpOrBolt}</div>
+      <div class="hex-bottom">
+        <div class="hex-type">${escapeHtml(card.type || 'Common')}</div>
+        <div class="hex-actions">
+          <button class="hex-action edit" onclick="event.stopPropagation(); openForm('${escapeJsString(card.id)}')">✎</button>
+          <button class="hex-action del" onclick="event.stopPropagation(); deleteCard('${escapeJsString(card.id)}')">✕</button>
+        </div>
       </div>`;
-    list.appendChild(row);
+    list.appendChild(tile);
   });
 }
 
 // ── RENDER DECK ──
-function cardLimit(type) {
-  if (type === 'Hero')     return 1;
-  if (type === 'Uncommon') return 3;
-  return Infinity; // Common
+function cardLimit(card) {
+  return defaultDeckLimit(card);
 }
 
 function deckTotal(player) {
   return Object.values(decks[player]).reduce((a,b)=>a+b, 0);
 }
 
+function deckCards(player) {
+  const cards = [];
+  Object.entries(decks[player]).forEach(([id, qty]) => {
+    const card = repo.find(c => c.id === id);
+    if (card) for (let i=0; i<qty; i++) cards.push(card);
+  });
+  return cards;
+}
+
+function eliteCount(player) { return deckCards(player).filter(c => c.elite).length; }
+function leaderCount(player) { return deckCards(player).filter(c => c.type === 'Leader').length; }
+
+function canAddCard(player, card) {
+  if (!card) return false;
+  const qty = decks[player][card.id] || 0;
+  if (deckTotal(player) >= DECK_SIZE) return false;
+  if (qty >= cardLimit(card)) return false;
+  if (card.elite && eliteCount(player) >= ELITE_CAP) return false;
+  if (card.type === 'Leader' && leaderCount(player) >= LEADER_CAP) return false;
+  return true;
+}
+
+function setDeckFilter(player, filter) {
+  deckFilters[player] = filter || 'all';
+  document.querySelectorAll(`.deck-filter[data-player="${player}"]`).forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === deckFilters[player]);
+  });
+  renderDeck(player);
+}
+
+function deckFilterLabel(filter) {
+  if (filter === 'inDeck') return 'cards in this deck';
+  if (filter === 'units') return 'units';
+  if (filter === 'abilities') return 'abilities';
+  return 'cards';
+}
+
+function filteredDeckRepo(player) {
+  const filter = deckFilters[player] || 'all';
+  return repo.filter(card => {
+    const qty = decks[player][card.id] || 0;
+    if (filter === 'inDeck') return qty > 0;
+    if (filter === 'units') return !isAbilityCard(card);
+    if (filter === 'abilities') return isAbilityCard(card);
+    return true;
+  });
+}
+
 function renderDeck(player) {
   const list  = document.getElementById(`deck-p${player}-list`);
   const count = document.getElementById(`p${player}-count`);
   const total = deckTotal(player);
+  const elites = eliteCount(player);
+  const leaders = leaderCount(player);
   list.innerHTML = '';
 
   count.textContent = total;
-  count.className = `deck-count-num ${player===1?'p1':'p2'}${total>=16?' full':''}`;
+  count.className = `deck-count-num ${player===1?'p1':'p2'}${total>=DECK_SIZE?' full':''}`;
+
+  const rules = document.createElement('div');
+  rules.className = 'deck-rules' + (leaders > LEADER_CAP || elites > ELITE_CAP ? ' warn' : '');
+  rules.style.gridColumn = '1 / -1';
+  rules.innerHTML = `<strong>Rules:</strong> ${total}/${DECK_SIZE} cards · Leaders ${leaders}/${LEADER_CAP} · Elites ${elites}/${ELITE_CAP}`;
+  list.appendChild(rules);
 
   if (!repo.length) {
-    list.innerHTML = '<div class="empty-msg">Add cards to the repository first</div>';
+    list.innerHTML += '<div class="empty-msg" style="grid-column:1/-1">Add cards to the repository first</div>';
     return;
   }
 
-  repo.forEach(card => {
+  const cards = filteredDeckRepo(player);
+  if (!cards.length) {
+    list.innerHTML += '<div class="empty-msg" style="grid-column:1/-1">No ' + deckFilterLabel(deckFilters[player]) + ' match this filter</div>';
+    return;
+  }
+
+  cards.forEach(card => {
     const qty = decks[player][card.id] || 0;
-    const row = document.createElement('div');
-    row.className = 'deck-card-row';
-    const atLimit = total >= 16 || qty >= cardLimit(card.type);
-    row.innerHTML = `
-      <div class="cr-cost"><span>${card.cost}</span></div>
-      <div class="cr-info" style="flex:1;min-width:0">
-        <div class="cr-name">${card.name}</div>
-        <div class="cr-type">${(FACTIONS[card.faction]?.icon ? FACTIONS[card.faction].icon+' ' : '')}${card.type} · HP ${card.hp} · MV ${card.move===-1?'—':card.move+'"'}</div>
-      </div>
-      <div class="dcr-btns">
-        <button class="dcr-btn" onclick="deckAdj(${player},'${card.id}',-1)" ${qty===0?'disabled':''}>−</button>
-        <div class="dcr-count">${qty||''}</div>
-        <button class="dcr-btn" onclick="deckAdj(${player},'${card.id}',1)" ${atLimit?'disabled':''}>＋</button>
-      </div>`;
-    list.appendChild(row);
+    const atLimit = !canAddCard(player, card);
+    const rarityClass = card.type === 'Hero' ? ' rarity-hero' : (card.type === 'Uncommon' ? ' rarity-uncommon' : '');
+    const isAbility = isAbilityCard(card);
+    const tile = document.createElement('div');
+    tile.className = 'card-hex-tile deck-hex-tile' + rarityClass + (qty > 0 ? ' in-deck' : '');
+    const hpOrBolt = isAbility
+      ? '<div class="hex-bolt">ϟ</div>'
+      : '<div class="hex-hp">' + escapeHtml(card.hp ?? '—') + '</div>';
+    tile.innerHTML = `
+      <button class="deck-side-btn minus" onclick="event.stopPropagation(); deckAdj(${player},'${escapeJsString(card.id)}',-1)" ${qty===0?'disabled':''}>−</button>
+      <button class="deck-side-btn plus" onclick="event.stopPropagation(); deckAdj(${player},'${escapeJsString(card.id)}',1)" ${atLimit?'disabled':''}>＋</button>
+      ${qty > 0 ? '<div class="deck-qty-badge">×' + escapeHtml(qty) + '</div>' : ''}
+      <div class="deck-stat-corner">${hpOrBolt}</div>
+      <div class="deck-cost-corner"><div class="hex-cost"><span>${escapeHtml(card.cost ?? 0)}</span></div></div>
+      <div class="deck-name-center"><span>${escapeHtml(card.name)}</span></div>`;
+    list.appendChild(tile);
   });
 }
 
@@ -1029,27 +1606,24 @@ function deckAdj(player, cardId, delta) {
   const card = repo.find(c => c.id === cardId);
   const cur = decks[player][cardId] || 0;
   const newVal = cur + delta;
-  const total = deckTotal(player);
-  if (delta > 0 && total >= 16) return;
-  if (delta > 0 && newVal > cardLimit(card?.type)) return;
+  if (delta > 0 && !canAddCard(player, card)) return;
   if (newVal <= 0) delete decks[player][cardId];
   else decks[player][cardId] = newVal;
   renderDeck(player);
 }
 
 function clearDeck(player) {
+  const total = deckTotal(player);
+  if (total > 0 && !confirmAction('Clear Player ' + player + ' deck (' + total + ' cards)?')) return;
   decks[player] = {};
   renderDeck(player);
 }
 
 function autoFill(player) {
   let total = deckTotal(player);
-  if (total >= 16 || !repo.length) return;
-  while (total < 16) {
-    const available = repo.filter(card => {
-      const qty = decks[player][card.id] || 0;
-      return qty < cardLimit(card.type);
-    });
+  if (total >= DECK_SIZE || !repo.length) return;
+  while (total < DECK_SIZE) {
+    const available = repo.filter(card => canAddCard(player, card));
     if (!available.length) break;
     const card = available[Math.floor(Math.random() * available.length)];
     decks[player][card.id] = (decks[player][card.id] || 0) + 1;
@@ -1080,6 +1654,11 @@ function openForm(id) {
   }
   document.getElementById('f-faction').value  = card?.faction   ?? 'none';
   document.getElementById('f-cost').value     = card?.cost      ?? '';
+  document.getElementById('f-role').value     = card?.role      ?? ((card?.type||'') === 'Power' ? 'Spell' : 'Infantry');
+  document.getElementById('f-activation').value = card?.activationCost ?? ((card?.type||'') === 'Power' ? 0 : 1);
+  document.getElementById('f-decklimit').value  = card?.deckLimit ?? '';
+  document.getElementById('f-keywords').value   = arrayFromKeywords(card?.keywords).join(', ');
+  document.getElementById('f-elite').checked    = !!card?.elite || (card?.type === 'Hero');
   document.getElementById('f-special').value  = card?.special   ?? '';
   document.getElementById('f-flavour').value  = card?.flavour   ?? '';
   const base = slugify(card?.internalName || card?.name || '');
@@ -1133,6 +1712,11 @@ function saveCard() {
     type,
     faction:      gv('f-faction'),
     cost:         parseInt(gv('f-cost'))  || 1,
+    activationCost: gv('f-activation') === '' ? (isPower ? 0 : 1) : parseInt(gv('f-activation')),
+    role:         gv('f-role') || (isPower ? 'Spell' : 'Infantry'),
+    elite:        document.getElementById('f-elite')?.checked || type === 'Hero',
+    keywords:     arrayFromKeywords(gv('f-keywords')),
+    deckLimit:    gv('f-decklimit') === '' ? null : parseInt(gv('f-decklimit')),
     hp,
     maxHp:        hp,
     move:         isPower ? null : (gv('f-move') === '' ? 1 : parseInt(gv('f-move'))),
@@ -1163,6 +1747,12 @@ function saveCard() {
 }
 
 function deleteCard(id) {
+  const card = repo.find(c => c.id === id);
+  const label = card ? card.name : 'this card';
+  const p1Qty = decks[1][id] || 0;
+  const p2Qty = decks[2][id] || 0;
+  const deckWarning = (p1Qty || p2Qty) ? '\n\nThis also removes it from decks: P1 x' + p1Qty + ', P2 x' + p2Qty + '.' : '';
+  if (!confirmAction('Delete "' + label + '" from the repository?' + deckWarning + '\n\nThis cannot be undone.')) return;
   repo = repo.filter(c => c.id !== id);
   // Clean from decks
   [1,2].forEach(p => delete decks[p][id]);
