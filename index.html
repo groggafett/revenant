@@ -2252,6 +2252,73 @@ window.addEventListener('unhandledrejection', e => {
     return (fx && fx.revealed && EFFECT_REGISTRY[fx.effect]) ? fx : null;
   }
 
+
+
+  function cardSlug(value) {
+    return String(value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/&/g, 'and')
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '');
+  }
+
+  function generatedCardIdentity(card) {
+    const base = cardSlug(card?.internalName || card?.name || card?.id || 'card');
+    const variant = cardSlug(card?.variant || '');
+    return variant ? `${base}_${variant}` : base;
+  }
+
+  function normaliseImportedCard(card) {
+    if (!card || typeof card !== 'object') return card;
+    const identity = generatedCardIdentity(card);
+    const weapon = card.weapon && typeof card.weapon === 'object' ? { ...card.weapon } : card.weapon;
+    return {
+      ...card,
+      id: identity,
+      artId: identity,
+      internalName: card.internalName || card.name || identity,
+      type: String(card.type || '').trim(),
+      faction: card.faction || 'universal',
+      maxHp: card.maxHp ?? card.hp,
+      weapon
+    };
+  }
+
+  function normaliseCardRepo(repo) {
+    if (!Array.isArray(repo)) return repo;
+    return repo.map(normaliseImportedCard).filter(Boolean);
+  }
+
+  function cardRefValue(ref) {
+    if (ref && typeof ref === 'object') return ref.id || ref.name || ref.internalName || ref.cardId || ref.cardName || '';
+    return ref;
+  }
+
+  function findCardInRepo(repo, ref) {
+    const raw = cardRefValue(ref);
+    const key = String(raw ?? '').trim().toLowerCase();
+    const slug = cardSlug(raw);
+    return repo.find(r =>
+      String(r.id ?? '').trim().toLowerCase() === key ||
+      String(r.name ?? '').trim().toLowerCase() === key ||
+      String(r.internalName ?? '').trim().toLowerCase() === key ||
+      cardSlug(r.id) === slug ||
+      cardSlug(r.name) === slug ||
+      cardSlug(r.internalName) === slug
+    );
+  }
+
+  function extractCardDataBundle(data) {
+    if (!data || typeof data !== 'object') return null;
+    return {
+      cardRepo: data.cardRepo || data.grim_card_repo || data.cards || data.repo || null,
+      deckP1: data.deckP1 || data.grim_deck_p1 || data.player1Deck || data.p1Deck || null,
+      deckP2: data.deckP2 || data.grim_deck_p2 || data.player2Deck || data.p2Deck || null,
+      laneDeck: data.laneDeck || data.grim_lane_deck || data.laneEffects || null
+    };
+  }
+
   function loadFromStorage() {
     let repo = CARDS;
     let lists = { 1: null, 2: null };
@@ -2259,9 +2326,10 @@ window.addEventListener('unhandledrejection', e => {
     try {
       const r = localStorage.getItem('grim_card_repo');
       if (r) {
-        repo = JSON.parse(r);
-        // Normalise type field — strip whitespace/carriage returns
-        repo.forEach(c => { if(c.type) c.type = c.type.trim(); });
+        repo = normaliseCardRepo(JSON.parse(r));
+        localStorage.setItem('grim_card_repo', JSON.stringify(repo));
+      } else {
+        repo = normaliseCardRepo(repo);
       }
 
       const d1 = localStorage.getItem('grim_deck_p1');
@@ -2276,19 +2344,21 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   function makeDeck(repo=CARDS) {
-    const d = [...repo,...repo,...repo,repo[0]].map((c,i)=>({...c, type:(c.type||'').trim(), uid:`u${i}`}));
+    const cleanRepo = normaliseCardRepo(repo) || CARDS;
+    const d = [...cleanRepo,...cleanRepo,...cleanRepo,cleanRepo[0]].map((c,i)=>({...normaliseImportedCard(c), uid:`u${i}`}));
     for (let i=d.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[d[i],d[j]]=[d[j],d[i]];}
     return d;
   }
 
   function deckFromList(nameList, repo) {
-    if(!Array.isArray(nameList) || !Array.isArray(repo)) return makeDeck();
-    const cards = nameList.map((name,i)=>{
-      const c = repo.find(r=>r.name?.trim().toLowerCase()===name?.trim().toLowerCase());
-      if(!c) console.warn(`Card not found in repo: "${name}"`);
-      return c ? {...c, type:(c.type||'').trim(), uid:`u${i}`} : null;
+    const cleanRepo = normaliseCardRepo(repo) || [];
+    if(!Array.isArray(nameList) || !Array.isArray(cleanRepo)) return makeDeck(cleanRepo);
+    const cards = nameList.map((ref,i)=>{
+      const c = findCardInRepo(cleanRepo, ref);
+      if(!c) console.warn(`Card not found in repo: "${cardRefValue(ref)}"`);
+      return c ? {...normaliseImportedCard(c), uid:`u${i}`} : null;
     }).filter(Boolean);
-    if(!cards.length){ console.warn('Deck list produced no cards — using default deck'); return makeDeck(); }
+    if(!cards.length){ console.warn('Deck list produced no cards — using default deck'); return makeDeck(cleanRepo); }
     for (let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}
     return cards;
   }
@@ -2420,6 +2490,8 @@ window.addEventListener('unhandledrejection', e => {
     const overlay = document.getElementById('start-overlay');
     if (!overlay) return;
     const candidates = [
+      'art/splash.jpeg', 'art/splash.jpg', 'art/splash.png',
+      'art/splash.JPEG', 'art/splash.JPG', 'art/splash.PNG',
       'splash.jpeg', 'splash.jpg', 'splash.png',
       'splash.JPEG', 'splash.JPG', 'splash.PNG'
     ];
@@ -5457,14 +5529,15 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   window.addEventListener('load',()=>requestAnimationFrame(()=>{
-    fetch('cards.json')
+    fetch('cards.json', { cache: 'no-store' })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
-        if (data) {
-          if (data.cardRepo)   localStorage.setItem('grim_card_repo', JSON.stringify(data.cardRepo));
-          if (data.deckP1)     localStorage.setItem('grim_deck_p1',   JSON.stringify(data.deckP1));
-          if (data.deckP2)     localStorage.setItem('grim_deck_p2',   JSON.stringify(data.deckP2));
-          if (data.laneDeck)   localStorage.setItem('grim_lane_deck', JSON.stringify(data.laneDeck));
+        const bundle = extractCardDataBundle(data);
+        if (bundle) {
+          if (bundle.cardRepo) localStorage.setItem('grim_card_repo', JSON.stringify(normaliseCardRepo(bundle.cardRepo)));
+          if (bundle.deckP1)   localStorage.setItem('grim_deck_p1',   JSON.stringify(bundle.deckP1));
+          if (bundle.deckP2)   localStorage.setItem('grim_deck_p2',   JSON.stringify(bundle.deckP2));
+          if (bundle.laneDeck) localStorage.setItem('grim_lane_deck', JSON.stringify(bundle.laneDeck));
         }
       })
       .catch(()=>{})
