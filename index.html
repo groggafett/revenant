@@ -37,7 +37,9 @@
     /* ── STATS ── */
     --hp-positive: #6ed84a;
     --hp-negative: #cc3030;
-    --resources:   #c8a060;
+    --resources:   #d97918; /* warm resin-orange resource */
+    --resources-hi:#f2b35a;
+    --resources-text:#1b0d04;
 
     /* ── LANE EFFECTS ── */
     --lane-effect: #40a878;  /* placeholder */
@@ -75,7 +77,7 @@ display: flex; align-items: center; justify-content: space-between;
 padding: 4px 8px; background: transparent; border-bottom: none;
 z-index: 20; gap: 6px;
 }
-.player-side { display: flex; align-items: center; gap: 4px; flex: 1; }
+.player-side { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
 .player-side.right { flex-direction: row-reverse; }
 .avatar {
 width: 32px; height: 32px; border-radius: 50%;
@@ -85,14 +87,14 @@ font-size: var(--fs-xs); flex-shrink: 0;
 }
 .avatar.p1 { border-color: var(--p1-dark); box-shadow: 0 0 8px rgba(40,80,160,0.4); }
 .avatar.p2 { border-color: var(--p2-dark); box-shadow: 0 0 8px rgba(160,20,20,0.4); }
-.score-num { font-size: var(--fs-xl); font-weight: 900; line-height: 1; text-shadow: 0 0 12px currentColor; }
+.score-num { font-size: var(--fs-xl); font-weight: 900; line-height: 1; text-shadow: 0 0 12px currentColor; min-width: 34px; text-align: center; }
 .res-badge {
-width: 18px; height: 18px; flex-shrink: 0;
-background: #8a5010; border: 1px solid #c08020;
-border-radius: 2px; transform: rotate(45deg);
+width: 28px; height: 28px; flex-shrink: 0;
+background: var(--resources); border: 2px solid var(--resources-hi);
+border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
-font-size: 10px; font-weight: 900; color: #f0d080;
-box-shadow: 0 0 4px rgba(200,160,60,0.3);
+font-size: 17px; font-weight: 900; color: var(--resources-text);
+box-shadow: 0 0 8px rgba(217,121,24,0.45);
 }
 .res-badge span { transform: rotate(-45deg); display: block; line-height: 1; }
 .res-badge::before { display: none; }
@@ -106,7 +108,7 @@ border: 1px solid #4a3818; flex-shrink: 0; width: fit-content; cursor: pointer;
 }
 .turn-block:active { border-color: #c8a060; }
 .turn-num { font-size: var(--fs-md); font-weight: 900; color: #c8a060; line-height: 1; }
-.turn-label { display: none; }
+.turn-label { display: block; font-size: 9px; font-weight: 700; color: #5a4828; letter-spacing: 0.16em; text-transform: uppercase; line-height: 1; margin-bottom: 1px; }
 .turn-whose { display: none; }
 .menu-icon { display: none; }
 .save-menu { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); background: #1a1408; border: 1px solid #3a2a10; border-radius: 4px; z-index: 100; min-width: 100px; overflow: hidden; }
@@ -244,7 +246,7 @@ box-shadow: 0 0 12px rgba(60,180,40,0.6) !important;
 
 /* Unit on tile */
 .unit-on-tile {
-position: absolute; inset: 0; z-index: 2;
+position: absolute; inset: -3px; z-index: 2;
 border-radius: 3px;
 display: flex; flex-direction: column;
 align-items: center; justify-content: flex-end;
@@ -278,30 +280,104 @@ width: 90%; text-align: center;
 /* Large card overlay */
 .card-zoom-overlay {
 position: fixed; inset: 0; z-index: 300;
-background: rgba(0,0,0,0.88);
-display: flex; flex-direction: column; align-items: center; justify-content: center;
-padding: 24px 20px; box-sizing: border-box;
+background: rgba(0,0,0,0.9);
+display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+padding: calc(18px + env(safe-area-inset-top)) 16px calc(22px + env(safe-area-inset-bottom));
+box-sizing: border-box; overflow-y: auto;
+}
+.card-zoom-shell {
+width: min(320px, 92vw); display: flex; flex-direction: column; align-items: center;
+gap: 8px; position: relative;
 }
 .card-zoom-art {
-width: 180px; aspect-ratio: 5/7; border-radius: 8px;
+width: min(240px, 72vw); aspect-ratio: 5/7; border-radius: 10px;
 background: linear-gradient(160deg,#1a1610,#0e0c08) center/cover;
-border: 2px solid #2a1e0a; flex-shrink: 0;
-margin-bottom: 14px;
+border: 2px solid #2a1e0a; flex-shrink: 0; position: relative; overflow: hidden;
+box-shadow: 0 12px 38px rgba(0,0,0,0.8), inset 0 1px 0 rgba(220,180,100,0.12);
+transform-style: preserve-3d;
+transform: perspective(720px) rotateX(0deg) rotateY(0deg) scale(1);
+transition: transform 0.18s ease, box-shadow 0.18s ease;
+touch-action: none;
+will-change: transform;
 }
-.card-zoom-art.p1-unit { border-color: #4a78d8; box-shadow: 0 0 20px rgba(74,120,216,0.4); }
-.card-zoom-art.p2-unit { border-color: #cc3030; box-shadow: 0 0 20px rgba(204,48,48,0.4); }
-.card-zoom-name { font-size: var(--fs-sm); font-weight: 900; font-family:'Spectral',Georgia,serif; color:#c8a060; letter-spacing:0.1em; margin-bottom:3px; }
-.card-zoom-weapon { font-size: var(--fs-xs); color:#5a4828; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:10px; }
-.card-zoom-faction { font-size: var(--fs-sm); margin-right:6px; }
+.card-zoom-art.tilting {
+transition: transform 0.04s linear, box-shadow 0.04s linear;
+box-shadow: 0 18px 46px rgba(0,0,0,0.86), inset 0 1px 0 rgba(255,220,140,0.18);
+}
+.card-zoom-shine {
+position:absolute; inset:-35%; z-index:4; pointer-events:none;
+background: radial-gradient(circle at var(--shine-x,50%) var(--shine-y,35%), rgba(255,240,180,0.28) 0%, rgba(255,220,120,0.10) 20%, rgba(255,255,255,0.00) 48%);
+opacity:0; transition: opacity 0.18s ease;
+mix-blend-mode: screen;
+}
+.card-zoom-art.tilting .card-zoom-shine { opacity:1; }
+.card-zoom-art.p1-unit { border-color: #4a78d8; box-shadow: 0 0 20px rgba(74,120,216,0.36), 0 12px 38px rgba(0,0,0,0.8); }
+.card-zoom-art.p2-unit { border-color: #cc3030; box-shadow: 0 0 20px rgba(204,48,48,0.36), 0 12px 38px rgba(0,0,0,0.8); }
+.card-zoom-close-btn {
+position:absolute; top:8px; right:8px; z-index:8;
+width:28px; height:28px; border-radius:50%;
+display:flex; align-items:center; justify-content:center;
+font-size:18px; line-height:1; color:#c8a060; background:rgba(0,0,0,0.62);
+border:1px solid rgba(200,160,96,0.42); cursor:pointer;
+}
+.card-zoom-cost {
+position:absolute; top:10px; right:10px; z-index:5;
+width:34px; height:34px; border-radius:4px; transform:rotate(45deg);
+background:var(--resources); border:2px solid var(--resources-hi);
+display:flex; align-items:center; justify-content:center;
+box-shadow:0 0 12px rgba(217,121,24,0.5);
+}
+.card-zoom-cost span { transform:rotate(-45deg); font-size:24px; font-weight:900; color:var(--resources-text); line-height:1; }
+.card-zoom-stat-rail {
+position:absolute; left:7px; top:11px; bottom:12px; z-index:5;
+display:flex; flex-direction:column; justify-content:flex-start; gap:8px;
+pointer-events:none;
+}
+.card-zoom-stat {
+width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+font-size:20px; font-weight:900; line-height:1; font-family:'Spectral',Georgia,serif;
+background:rgba(0,0,0,0.68); color:#c8a060; border:2px solid currentColor;
+box-shadow:0 0 8px rgba(0,0,0,0.65);
+}
+.card-zoom-stat.hp { border-radius:50%; }
+.card-zoom-stat.move {
+clip-path:polygon(0% 0%, 100% 50%, 0% 100%); border:none; background:rgba(64,120,72,0.75); color:#c8f0a0;
+padding-right:5px;
+}
+.card-zoom-stat.save { border-radius:4px; color:#c87030; }
+.card-zoom-fallback-name {
+position:absolute; left:42px; right:42px; top:50%; transform:translateY(-50%); z-index:3;
+max-height:58px; overflow:hidden; text-align:center;
+font-size:var(--fs-sm); font-weight:900; line-height:1.15; letter-spacing:0.08em;
+color:#c8a060; text-transform:uppercase;
+text-shadow:0 0 10px rgba(0,0,0,0.95), 0 1px 0 #000;
+pointer-events:none;
+}
+.card-zoom-fallback-name.hidden { display:none; }
+.card-zoom-info { width:100%; display:flex; flex-direction:column; align-items:center; gap:2px; margin-top:2px; }
+.card-zoom-name { font-size: var(--fs-md); font-weight: 900; font-family:'Spectral',Georgia,serif; color:#c8a060; letter-spacing:0.1em; line-height:1.05; text-align:center; }
+.card-zoom-weapon { font-size: var(--fs-xs); color:#7a6030; text-transform:uppercase; letter-spacing:0.12em; margin-bottom:2px; text-align:center; }
+.card-zoom-faction { font-size: var(--fs-md); margin-right:5px; color:#c8a060; }
+.card-zoom-attack-pill {
+width:100%; min-height:40px; display:flex; align-items:center; justify-content:space-between;
+gap:3px; padding:5px 6px; box-sizing:border-box;
+background:#0a0806; border:1px solid #2a1e0a; border-radius:5px;
+}
+.card-zoom-weapon-icon { flex:0 0 26px; font-size:24px; color:#c8a060; display:flex; align-items:center; justify-content:center; }
+.card-zoom-statpair { display:flex; align-items:center; justify-content:center; gap:2px; min-width:0; }
+.card-zoom-statpair .cz-icon { font-size:16px; color:#7a6030; line-height:1; }
+.card-zoom-statpair .cz-val { font-size:22px; font-weight:900; color:#c8a060; line-height:1; font-family:'Spectral',Georgia,serif; }
+.card-zoom-special {
+width:100%; min-height:42px; background:#0a0806; border:1px solid #2a1e0a; border-radius:5px;
+padding:7px 9px; box-sizing:border-box; font-size:var(--fs-xs); color:#a08050; line-height:1.35;
+}
+.card-zoom-special .special-name { color:#c8a060; font-weight:900; text-transform:uppercase; }
 .card-zoom-flavour {
-width:100%; max-width:260px; background:#0a0806; border:1px solid #1a1408;
-border-radius:4px; padding:8px 10px; font-size: var(--fs-xs); color:#7a6848;
-line-height:1.6; text-align:center; font-style:italic;
+width:100%; background:#080706; border:1px solid #1a1408;
+border-radius:5px; padding:8px 10px; font-size: var(--fs-xs); color:#7a6848;
+line-height:1.55; text-align:center; font-style:italic; box-sizing:border-box;
 }
-.card-zoom-close {
-margin-top:16px; font-family:'Spectral',Georgia,serif; font-size: var(--fs-xs);
-color:#3a2a10; text-transform:uppercase; letter-spacing:0.15em; cursor:pointer;
-}
+.card-zoom-close { display:none; }
 /* Name — middle */
 .unit-name { font-size: var(--fs-xs); font-weight: 700; line-height: 1.2; color: #d4b870; }
 /* Lightning action pips on board unit */
@@ -369,10 +445,8 @@ position: relative;
 
 }
 .hub-row::before {
-content: ''; position: absolute;
-bottom: calc(4px + env(safe-area-inset-bottom) + 22px); left: 0; right: 0;
-border-top: 2px solid rgba(58,42,16,0.6);
-pointer-events: none;
+content: none;
+display: none;
 }
 .hub-unit-info {
 display: flex; flex-direction: column; gap: 1px;
@@ -381,13 +455,30 @@ min-width: 0; overflow: hidden; width: 100%;
 .hub-unit-row1 { display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
 .hub-unit-icon { font-size: var(--fs-sm); flex-shrink: 0; line-height: 1; }
 .hub-pass-btn {
-display: none; font-family: 'Spectral', Georgia, serif;
-font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-color: #5a4828; background: #100c06; border: 1px solid #2a1e0a; border-radius: 4px;
-padding: 8px 12px; cursor: pointer; white-space: nowrap;
+display: none; align-items: center; justify-content: space-between; gap: 8px;
+width: 130px; min-height: 40px; flex-shrink: 0;
+font-family: 'Spectral', Georgia, serif;
+font-size: 13px; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase;
+color: #d28a62; background: linear-gradient(160deg,#26100c,#120706);
+border: 1px solid #6a2418; border-radius: 4px;
+padding: 6px 10px; cursor: pointer; white-space: nowrap;
+box-shadow: 0 0 8px rgba(160,36,24,0.18);
+position: relative; overflow: hidden; touch-action: manipulation;
 }
-.hub-pass-btn.show { display: block; }
-.hub-pass-btn:active { border-color: #c8a060; color: #c8a060; }
+.hub-pass-btn::before {
+content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+background: linear-gradient(90deg, rgba(120,0,0,0.55), rgba(210,42,34,0.42));
+pointer-events: none; transition: none; z-index: 0;
+}
+.hub-pass-btn > * { position: relative; z-index: 1; }
+.hub-pass-icon { width: 28px; height: 28px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; line-height: 1; color: #e0a080; text-shadow: 0 0 8px rgba(210,42,34,0.45); }
+.hub-pass-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1; }
+.hub-pass-label { font-size: var(--fs-sm); font-weight: 900; letter-spacing: 0.08em; line-height: 1; }
+.hub-pass-sub { font-size: 10px; color: #9a3828; opacity: 0.9; letter-spacing: 0.08em; line-height: 1; }
+.hub-pass-btn.show { display: flex; }
+.hub-pass-btn.hold-passing::before { width: 100%; transition: width var(--pass-hold-ms, 1.2s) linear; }
+.hub-pass-btn.hold-complete::before { width: 100%; background: rgba(210,42,34,0.55); transition: none; }
+.hub-pass-btn:active { color: #ffd0a8; border-color: #b84630; box-shadow: 0 0 12px rgba(200,48,48,0.35); }
 .hub-stat-badges { display: flex; align-items: center; gap: 3px; padding: 0 6px; }
 .hub-stat-badge {
 width: 40px; height: 40px; flex-shrink: 0;
@@ -396,7 +487,7 @@ font-size: 24px; font-weight: 800; font-family: 'Spectral', Georgia, serif;
 line-height: 1; color: #fff;
 }
 .badge-hp   { border-radius: 50%; border: 2px solid var(--p1); background: rgba(74,120,216,0.2); color: var(--p1); }
-.badge-move { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: rgba(80,160,80,0.25); color: #80c080; }
+.badge-move { clip-path: polygon(0% 0%, 100% 50%, 0% 100%); background: rgba(80,160,80,0.25); color: #80c080; padding-right: 5px; }
 .badge-save { border-radius: 2px; border: 2px solid #c87030; background: rgba(200,112,48,0.2); color: #c87030; }
 .badge-hp.p2-badge { border-color: var(--p2); background: rgba(200,48,48,0.2); color: var(--p2); }
 .hub-unit-weapon { font-size: var(--fs-xs); color: #5a4828; letter-spacing: 0.05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -408,10 +499,19 @@ letter-spacing: 0.08em; text-transform: uppercase;
 border-radius: 4px; cursor: pointer; color: #7a6030;
 transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
 background: #1a1408; border: 1px solid #3a2a10;
+position: relative; overflow: hidden; touch-action: manipulation;
 }
-.hub-btn-main { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.hub-btn-label { font-size: var(--fs-sm); font-weight: 900; white-space: nowrap; }
-.hub-btn-sub { font-size: var(--fs-xs); opacity: 0.7; white-space: nowrap; }
+.hub-btn::before {
+content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+background: linear-gradient(90deg, rgba(217,121,24,0.46), rgba(242,179,90,0.34));
+pointer-events: none; transition: none; z-index: 0;
+}
+.hub-btn.hold-drawing::before { width: 100%; transition: width var(--draw-hold-ms, 1.2s) linear; }
+.hub-btn.hold-complete::before { width: 100%; background: rgba(242,179,90,0.5); transition: none; }
+.hub-btn > * { position: relative; z-index: 1; }
+.hub-btn-main { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-width: 0; flex: 1; line-height: 1; }
+.hub-btn-label { font-size: var(--fs-sm); font-weight: 900; white-space: nowrap; line-height: 1; }
+.hub-btn-sub { font-size: 10px; opacity: 0.72; white-space: nowrap; line-height: 1; letter-spacing: 0.08em; }
 .hub-btn-cost {
 width: 28px; height: 28px; flex-shrink: 0;
 border-radius: 3px; transform: rotate(45deg);
@@ -422,9 +522,14 @@ display: flex; align-items: center; justify-content: center;
 .hub-btn-opp.opp-passed { color: var(--p2); }
 /* Pass state */
 .hub-btn.state-pass {
-background: #1a1408; border: 1px solid #3a2a10; color: #7a6030;
+background: linear-gradient(160deg,#26100c,#120706);
+border: 1px solid #6a2418;
+color: #d28a62;
+box-shadow: 0 0 8px rgba(160,36,24,0.18);
 }
-.hub-btn.state-pass:active { color: #c8a060; border-color: #5a4020; }
+.hub-btn.state-pass .hub-btn-label { font-size: 13px; letter-spacing: 0.04em; }
+.hub-btn.state-pass .hub-btn-sub { color: #9a3828; opacity: 0.9; }
+.hub-btn.state-pass:active { color: #ffd0a8; border-color: #b84630; box-shadow: 0 0 12px rgba(200,48,48,0.35); }
 /* Dimmed state */
 .hub-btn.state-dim {
 background: #0e0c08; border: 1px solid #1e160a; color: #2a2010;
@@ -438,8 +543,25 @@ background: #1a1408; border: 1px solid #c8a060; color: #f0d080;
 animation: confirm-pulse 0.8s ease-in-out infinite;
 }
 .hub-btn.state-active:active { background: #2a2010; }
-.hub-btn.state-active .hub-btn-cost { background: #8a5010; border: 2px solid #c08020; }
-.hub-btn.state-active .hub-btn-cost span { color: #f0d080; }
+.hub-btn.state-active .hub-btn-cost { background: var(--resources); border: 2px solid var(--resources-hi); }
+.hub-btn.state-active .hub-btn-cost span { color: var(--resources-text); }
+.hub-btn.state-pending {
+background: #1a1408; border: 1px solid #c8a060; color: #f0d080;
+box-shadow: 0 0 10px rgba(200,160,60,0.18);
+}
+.hub-btn.state-pending:active { background: #2a2010; }
+.hub-btn.state-pending .hub-btn-cost { background: var(--resources); border: 2px solid var(--resources-hi); }
+.hub-btn.state-pending .hub-btn-cost span { color: var(--resources-text); }
+
+.hub-btn.state-ready {
+background: #1a1408; border: 1px solid #5a4020; color: #c8a060;
+box-shadow: 0 0 8px rgba(200,160,60,0.16);
+}
+.hub-btn.state-ready:active { color: #f0d080; border-color: #c8a060; }
+.hub-btn.state-ready .hub-btn-cost { background: var(--resources); border: 2px solid var(--resources-hi); }
+.hub-btn.state-ready .hub-btn-cost span { color: var(--resources-text); }
+.hub-btn.state-ready .hub-btn-label { font-size: var(--fs-sm); letter-spacing: 0.08em; }
+.hub-btn.state-ready .hub-btn-sub { display: block; color: #7a6030; }
 .hub-center {
 position: absolute; left: 50%; bottom: calc(4px + env(safe-area-inset-bottom));
 transform: translateX(-50%);
@@ -503,15 +625,15 @@ display: flex; align-items: center; justify-content: center; position: relative;
 /* Resource diamond — larger in hub */
 .res-diamond {
 width: 56px; height: 56px; flex-shrink: 0;
-background: #8a5010; border: 2px solid #c08020;
+background: var(--resources); border: 2px solid var(--resources-hi);
 border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
-box-shadow: 0 0 12px rgba(200,160,60,0.4);
+box-shadow: 0 0 12px rgba(217,121,24,0.45);
 position: relative;
 }
 .res-diamond span {
 transform: rotate(-45deg);
-font-size: 40px; font-weight: 900; color: #f0d080; line-height: 1;
+font-size: 40px; font-weight: 900; color: var(--resources-text); line-height: 1;
 }
 .res-diamond.depleted { background: #5a2010; border-color: #803010; box-shadow: none; }
 .res-diamond.depleted span { color: #c04040; }
@@ -667,12 +789,12 @@ display: flex; flex-direction: column; align-items: center; gap: 3px;
 }
 .prof-cv-diamond {
 width: 26px; height: 26px;
-background: #8a5010; border: 2px solid #c08020;
+background: var(--resources); border: 2px solid var(--resources-hi);
 border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
 box-shadow: 0 0 6px rgba(180,120,0,0.4);
 }
-.prof-cv-diamond span { transform: rotate(-45deg); font-size: var(--fs-xs); font-weight: 900; color: #f0d080; line-height: 1; }
+.prof-cv-diamond span { transform: rotate(-45deg); font-size: var(--fs-xs); font-weight: 900; color: var(--resources-text); line-height: 1; }
 /* Activated diamond — dims, shows stars inside */
 .prof-cv-diamond.diamond-activated {
 background: #1a1408; border-color: #3a2a10; box-shadow: none;
@@ -736,8 +858,9 @@ padding: 2px 5px; cursor: pointer; flex-shrink: 0;
 
 /* Action pills */
 .prof-stat-bar {
-display: flex; align-items: stretch; gap: 4px; width: 100%; flex: 1;
+display: flex; align-items: stretch; gap: 0; width: 100%; flex: 1; min-width: 0;
 }
+.pill-wrap { width: 100%; flex: 1; min-width: 0; display: flex; }
 .prof-move-pill {
 font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
 border-radius: 3px; cursor: pointer; width: 68px; flex-shrink: 0;
@@ -745,11 +868,11 @@ background: #1e1a12; border: 1px solid #3a2e18; color: #7a6030;
 padding: 4px 4px; display: flex; align-items: center; justify-content: center; gap: 3px;
 transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
 }
-.prof-attack-pill { width: 100%; height: 38px; flex-shrink: 0;
+.prof-attack-pill { width: 100%; height: 38px; flex: 1 1 auto; min-width: 0;
 font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
 border-radius: 3px; cursor: pointer;
 background: #1e1a12; border: 1px solid #3a2e18; color: #7a6030;
-padding: 4px 3px; display: flex; align-items: center; justify-content: center; gap: 2px;
+padding: 3px 4px; display: flex; align-items: center; justify-content: space-between; gap: 0;
 transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 /* Idle */
@@ -765,30 +888,40 @@ transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
 /* Pill columns */
 .prof-cv-faction {
 position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%);
-width: 32px; height: 32px; z-index: 3;
+width: 34px; height: 34px; z-index: 4;
 display: flex; align-items: center; justify-content: center;
-font-size: 20px; line-height: 1;
-background: rgba(0,0,0,0.5); border-radius: 50%;
-border: 1px solid rgba(200,160,60,0.3);
+font-size: 22px; line-height: 1; color: #c8a060;
+background: rgba(0,0,0,0.68); border-radius: 50%;
+border: 1.5px solid rgba(200,160,60,0.6);
+box-shadow: 0 0 10px rgba(0,0,0,0.55);
 }
+.prof-cv-name {
+position: absolute; left: 6px; right: 6px; top: 50%; transform: translateY(-50%);
+z-index: 3; max-height: 42px; overflow: hidden;
+font-size: var(--fs-xs); font-weight: 900; line-height: 1.25; letter-spacing: 0.06em;
+text-align: center; color: #c8a060; text-transform: uppercase;
+text-shadow: 0 0 8px rgba(0,0,0,0.9), 0 1px 0 rgba(0,0,0,0.9);
+pointer-events: none;
+}
+.prof-cv-name.hidden { display: none; }
 .pill-header { display: flex; height: 16px; width: 100%; }
 .pill-hdr-seg { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #5a4828; }
-.pill-seg-icon { font-size: 20px; }
+.pill-seg-icon { flex: 0 0 26px; font-size: 24px; color: #c8a060; }
 .pill-col { display: flex; flex-direction: column; align-items: center; gap: 1px; flex: 1; }
 .pill-row-icon { font-size: var(--fs-xs); line-height: 1; }
 .pill-row-val  { font-size: var(--fs-md); font-weight: 700; line-height: 1; }
 .pill-star     { font-size: var(--fs-xs); flex-shrink: 0; }
 .pill-seg {
-flex: 1; display: flex; align-items: center; justify-content: center;
+flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center;
 font-size: 24px; font-weight: 700; line-height: 1;
-border-left: 1px solid #3a2e18;
+border-left: 1px solid rgba(58,46,24,0.75);
 }
 .pill-seg:first-child { border-left: none; }
 .pill-seg-stat {
-flex-direction: column; gap: 1px; padding: 2px 0;
+flex-direction: row; gap: 1px; padding: 2px 1px;
 }
-.pill-icon { font-size: 16px; line-height: 1; opacity: 0.7; }
-.pill-val  { font-size: 24px; font-weight: 800; line-height: 1; font-family: 'Spectral', Georgia, serif; }
+.pill-icon { font-size: 16px; line-height: 1; opacity: 0.9; flex-shrink: 0; }
+.pill-val  { font-size: 24px; font-weight: 900; line-height: 1; font-family: 'Spectral', Georgia, serif; white-space: nowrap; }
 
 .pile {
 width: 44px; flex-shrink: 0; border-radius: 4px;
@@ -797,10 +930,10 @@ display: flex; flex-direction: column;
 align-items: center; justify-content: center; gap: 2px;
 aspect-ratio: 5/7;
 }
-.pile.deck      { background: linear-gradient(160deg,#101428,#080c1c); border-color:#1e2a4a; color:#4060c0; width:58px; justify-content:space-between; padding:6px 4px; }
+.pile.deck      { background: linear-gradient(160deg,#101428,#080c1c); border-color:#1e2a4a; color:var(--resources-hi); width:58px; justify-content:space-between; padding:6px 4px; }
 .pile.graveyard { background: linear-gradient(160deg,#0e0e0e,#060606); border-color:#2a2a2a; color:#505050; }
 .pile .pile-count { font-size: var(--fs-xs); font-weight: 700; line-height: 1; }
-.pile.deck .pile-count { font-size: var(--fs-sm); font-weight:700; color:#4060c0; opacity:0.7; }
+.pile.deck .pile-count { font-size: var(--fs-sm); font-weight:700; color:var(--resources-hi); opacity:0.7; }
 .pile .pile-lbl   { font-size: var(--fs-xs); opacity: 0.5; text-transform: uppercase; letter-spacing: 0.08em; }
 .pile.deck.can-draw { cursor: pointer; }
 .pile-draw-label {
@@ -809,13 +942,13 @@ color: #2a3a60; text-transform: uppercase; letter-spacing: 0.08em;
 }
 .pile.deck.can-draw .pile-draw-label { color: #c8a060; }
 .pile-cost-diamond {
-width:18px; height:18px; background:#0a1020; border:1px solid #2a3a60;
+width:18px; height:18px; background:#2a1408; border:1px solid var(--resources-hi);
 border-radius:2px; transform:rotate(45deg);
 display:flex; align-items:center; justify-content:center;
 }
-.pile-cost-diamond span { transform:rotate(-45deg); font-size: var(--fs-xs); font-weight:900; color:#4060c0; line-height:1; }
-.pile.deck.can-draw .pile-cost-diamond { border-color:#c08020; background:#2a1e08; }
-.pile.deck.can-draw .pile-cost-diamond span { color:#f0d080; }
+.pile-cost-diamond span { transform:rotate(-45deg); font-size: var(--fs-xs); font-weight:900; color:var(--resources-hi); line-height:1; }
+.pile.deck.can-draw .pile-cost-diamond { border-color:var(--resources-hi); background:var(--resources); }
+.pile.deck.can-draw .pile-cost-diamond span { color:var(--resources-text); }
 
 .pile.deck.draw-exhausted .pile-draw-label { color:#1a1a1a; }
 .pile.deck.draw-exhausted .pile-cost-diamond { background:#0a0806; border-color:#1e1a10; opacity:0.35; }
@@ -823,11 +956,11 @@ display:flex; align-items:center; justify-content:center;
 .pile.deck.p2-deck { background: linear-gradient(160deg,#281010,#140808); border-color:#3a1010; color:#c03030; }
 .pile.deck.p2-deck .pile-count { color:#c03030; opacity:0.7; }
 .pile.deck.p2-deck .pile-draw-label { color:#3a1010; }
-.pile.deck.p2-deck .pile-cost-diamond { background:#120404; border-color:#3a1010; }
-.pile.deck.p2-deck .pile-cost-diamond span { color:#c03030; }
+.pile.deck.p2-deck .pile-cost-diamond { background:#2a1408; border-color:var(--resources-hi); }
+.pile.deck.p2-deck .pile-cost-diamond span { color:var(--resources-hi); }
 .pile.deck.p2-deck.can-draw .pile-draw-label { color:#cc3030; }
-.pile.deck.p2-deck.can-draw .pile-cost-diamond { border-color:#8a1010; background:#1e0404; }
-.pile.deck.p2-deck.can-draw .pile-cost-diamond span { color:#f08080; }
+.pile.deck.p2-deck.can-draw .pile-cost-diamond { border-color:var(--resources-hi); background:var(--resources); }
+.pile.deck.p2-deck.can-draw .pile-cost-diamond span { color:var(--resources-text); }
 .pile.deck.p2-deck.draw-exhausted .pile-cost-diamond { background:#0a0404; border-color:#1e0808; opacity:0.35; }
 
 .hand-scroll {
@@ -837,6 +970,8 @@ padding: 0 8px;
 -webkit-user-select: none; user-select: none;
 -webkit-touch-callout: none;
 }
+
+.card-name, .unit-name, .bcard-name, .card-zoom-name, .prof-name-txt, .hub-unit-name { text-transform: uppercase; }
 
 /* Hand cards */
 .card {
@@ -853,7 +988,7 @@ transition: border-color 0.15s, transform 0.15s, opacity 0.15s;
 .card.selected { border-color: #c8a060; box-shadow: 0 0 10px rgba(200,160,60,0.5); transform: translateY(-4px); }
 .card.unavailable { opacity: 0.35; }
 .card.unavailable .card-cost { background: #2a2020; border-color: #3a2a2a; }
-.card.unavailable .card-cost span { color: #503030; }
+.card.unavailable .card-cost span { color: #c09080; }
 .card.p1-card { border-color: #1e2a4a; box-shadow: 0 0 6px rgba(40,80,160,0.2), inset 0 1px 0 rgba(74,120,216,0.1); }
 .card.p2-card { border-color: #3a1010; box-shadow: 0 0 6px rgba(160,20,20,0.2), inset 0 1px 0 rgba(200,48,48,0.1); }
 .card.p1-card.selected { border-color: var(--p1); box-shadow: 0 0 12px rgba(74,120,216,0.5); }
@@ -884,16 +1019,15 @@ width: 90%; text-align: center;
 
 /* Cost diamond — bottom centre absolute, matches draw pile */
 .card-cost {
-position: absolute; bottom: 4px; left: 50%; margin-left: -9px;
-background: #8a6010; border: 1px solid #c08020;
-border-radius: 2px; width: 18px; height: 18px;
+position: absolute; bottom: 5px; left: 50%; margin-left: -12px;
+background: var(--resources); border: 2px solid var(--resources-hi);
+border-radius: 3px; width: 24px; height: 24px;
 transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
-box-shadow: 0 0 4px rgba(180,120,0,0.4);
+box-shadow: 0 0 6px rgba(217,121,24,0.45);
 z-index: 1;
 }
-.card-cost span { transform: rotate(-45deg); font-size: var(--fs-sm); font-weight: 900; color: #f0d080; line-height: 1; }
-.card-cost span { transform: rotate(-45deg); font-size: var(--fs-sm); font-weight: 900; color: #f0d080; line-height: 1; }
+.card-cost span { transform: rotate(-45deg); font-size: 18px; font-weight: 900; color: var(--resources-text); line-height: 1; }
 
 /* Inspector card view — profile contents */
 .profile-header { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
@@ -917,9 +1051,9 @@ border-radius: 4px; overflow: hidden; margin-bottom: 4px;
 width: 100%;
 height: 64px; flex-shrink: 0;
 background: #0a0806; border: 1px solid #1a1408;
-border-radius: 3px; padding: 4px 6px;
-font-size: 11px; font-family: 'Spectral', Georgia, serif; color: #a08050; line-height: 1.4;
-overflow: hidden; box-sizing: border-box;
+border-radius: 3px; padding: 5px 7px;
+font-size: 11px; font-family: 'Spectral', Georgia, serif; color: #b8945e; line-height: 1.32;
+overflow-y: auto; overflow-x: hidden; box-sizing: border-box;
 }
 
 
@@ -930,7 +1064,7 @@ overflow: hidden; box-sizing: border-box;
 .special-name { color: #c8a060; font-weight: 700; }
 .btn-diamond {
 width: 24px; height: 24px; flex-shrink: 0;
-background: #8a5010; border: 2px solid #c08020;
+background: var(--resources); border: 2px solid var(--resources-hi);
 border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
 }
@@ -985,7 +1119,10 @@ animation: dmg-rise 1s ease-out forwards;
 }
 
 /* Top bar active/inactive */
-.player-side.inactive { opacity: 0.3; transition: opacity 0.3s; }
+.player-side.inactive { opacity: 1; transition: opacity 0.3s; }
+.player-side.inactive .avatar,
+.player-side.inactive .score-num { opacity: 0.3; }
+.player-side.inactive .res-badge { opacity: 1; }
 .player-side.active   { opacity: 1;   transition: opacity 0.3s; }
 
 /* Turn toast */
@@ -1025,8 +1162,8 @@ opacity: 0; transition: opacity 0.3s;
 .req-who.p2 { color: var(--p2); text-shadow: 0 0 12px rgba(200,48,48,0.5); }
 .req-icons { display: flex; gap: 20px; margin-top: 16px; align-items: center; justify-content: center; }
 .req-icon  { display: flex; align-items: center; gap: 7px; font-size: var(--fs-xs); color: #7a6030; letter-spacing: 0.1em; text-transform: uppercase; font-family: ‘Spectral’, Georgia, serif; }
-.req-icon .diamond { width: 20px; height: 20px; background: #8a5010; border: 1px solid #c08020; border-radius: 2px; transform: rotate(45deg); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.req-icon .diamond span { transform: rotate(-45deg); font-size: var(--fs-xs); font-weight: 900; color: #f0d080; }
+.req-icon .diamond { width: 20px; height: 20px; background: var(--resources); border: 1px solid var(--resources-hi); border-radius: 2px; transform: rotate(45deg); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.req-icon .diamond span { transform: rotate(-45deg); font-size: var(--fs-xs); font-weight: 900; color: var(--resources-text); }
 .req-icon .card-icon { width: 14px; height: 18px; background: #1a1610; border: 1px solid #4a3818; border-radius: 2px; display: inline-block; flex-shrink: 0; }
 .req-begin {
 margin-top: 16px;
@@ -1036,6 +1173,93 @@ color: #c8a060; background: linear-gradient(160deg, #2a2010 0%, #1a1408 100%);
 border: 1px solid #c08020; border-radius: 4px;
 padding: 10px 28px; cursor: pointer;
 box-shadow: 0 0 16px rgba(200,160,60,0.3);
+}
+
+/* Start splash overlay */
+.start-overlay {
+  background: rgba(0,0,0,0.92);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-align: center;
+  padding: 28px 22px calc(28px + env(safe-area-inset-bottom));
+}
+.start-overlay.has-splash-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.76) 62%, rgba(0,0,0,0.92) 100%);
+  pointer-events: none;
+}
+.start-overlay > * { position: relative; z-index: 1; }
+.splash-copy {
+  width: min(320px, 92vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+.splash-copy .req-title {
+  width: 100%;
+  text-align: center;
+  letter-spacing: 0.18em;
+  padding-left: 0.18em;
+}
+.splash-copy .req-sub {
+  width: 100%;
+  text-align: center;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  max-width: 280px;
+}
+.splash-actions {
+  width: min(280px, 86vw);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+.splash-btn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Spectral', Georgia, serif;
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c8a060;
+  background: linear-gradient(160deg, #2a2010 0%, #1a1408 100%);
+  border: 1px solid #c08020;
+  border-radius: 4px;
+  padding: 11px 18px;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(200,160,60,0.22);
+}
+.splash-btn.secondary {
+  border-color: #5a3a10;
+  background: linear-gradient(160deg,#1a1408,#100c04);
+  color: #a08050;
+}
+.splash-btn.ghost {
+  border-color: #2a1e0a;
+  background: rgba(10,8,4,0.84);
+  color: #5a4828;
+  box-shadow: none;
+}
+.splash-btn:active:not(:disabled) {
+  border-color: #f0d080;
+  color: #f0d080;
+}
+.splash-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+  box-shadow: none;
 }
 
 /* Activation diamond on unit tile */
@@ -1091,7 +1315,7 @@ color: #304080; padding: 6px 4px; cursor: default;
 .hand-draw-tile.p2-draw.can-draw .draw-tile-label { color: #cc3030; }
 .hand-draw-tile.p2-draw.can-draw .draw-tile-count { color: #c03030; }
 .prof-card-visual.cv-selected { border-color: #c8a060 !important; box-shadow: 0 0 10px rgba(200,160,60,0.5) !important; }
-.prof-cv-label.lbl-deploy-active { color: #c8a060; text-shadow: 0 0 6px rgba(200,160,60,0.4); }
+.prof-cv-label.lbl-deploy-active { color: #c8a060; text-shadow: 0 0 6px rgba(217,121,24,0.4); }
 
 /* Hand cards */
 .card {
@@ -1114,7 +1338,7 @@ box-shadow: 0 0 10px rgba(200,160,60,0.5);
 transform: translateY(-4px);
 }
 .card.unavailable .card-cost { background: #3a3030; border-color: #604040; box-shadow: none; }
-.card.unavailable .card-cost span { color: #604040; }
+.card.unavailable .card-cost span { color: #c09080; }
 
 /* HP circle — top centre */
 .card-hp {
@@ -1131,13 +1355,13 @@ box-shadow: 0 0 5px rgba(110,216,74,0.35);
 
 /* Cost diamond — bottom centre */
 .card-cost {
-width: 16px; height: 16px; flex-shrink: 0;
-background: #8a5010; border: 1.5px solid #c08020;
-border-radius: 2px; transform: rotate(45deg);
+width: 24px; height: 24px; flex-shrink: 0;
+background: var(--resources); border: 2px solid var(--resources-hi);
+border-radius: 3px; transform: rotate(45deg);
 display: flex; align-items: center; justify-content: center;
-box-shadow: 0 0 4px rgba(180,120,0,0.4);
+box-shadow: 0 0 6px rgba(217,121,24,0.45);
 }
-.card-cost span { transform: rotate(-45deg); font-size: var(--fs-sm); font-weight: 900; color: #f0d080; line-height: 1; }
+.card-cost span { transform: rotate(-45deg); font-size: 18px; font-weight: 900; color: var(--resources-text); line-height: 1; }
 
 /* ── PROFILE PANEL — compact bottom strip, no overlay ── */
 /* ── PLAYER COLOUR AFFILIATION ── */
@@ -1213,8 +1437,8 @@ box-shadow: 0 0 10px rgba(200,160,60,0.7) !important;
 .ability-btn {
 width: 100%; height: 100%; flex-shrink: 0; display: flex; align-items: center; gap: 4px;
 font-family: 'Spectral', Georgia, serif; font-size: var(--fs-xs); font-weight: 700;
-color: #7a6030; border: 1px solid #3a2e18; background: #1e1a12;
-border-radius: 3px; padding: 3px 6px; cursor: pointer; text-align: left;
+color: #b8945e; border: 1px solid #3a2e18; background: #1e1a12;
+border-radius: 3px; padding: 4px 6px; cursor: pointer; text-align: left;
 transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 .ability-btn.ability-idle {
@@ -1225,7 +1449,7 @@ background: rgba(146,84,220,0.12); box-shadow: 0 0 6px rgba(146,84,220,0.35);
 color: #e0c0ff; border-color: #f0d080;
 background: rgba(146,84,220,0.3); box-shadow: 0 0 10px rgba(146,84,220,0.6);
 }
-.ability-btn:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
+.ability-btn:disabled { opacity: 0.82; cursor: default; box-shadow: none; }
 .ability-btn .ab-star { color: #f0c020; text-shadow: 0 0 4px rgba(240,192,32,0.7); margin-right: 2px; }
 .ability-btn .ab-text { flex: 1; min-width: 0; text-align: left; white-space: normal; line-height: 1.3; }
 .ability-btn .special-name { color: #c8a060; font-weight: 700; }
@@ -1233,43 +1457,302 @@ background: rgba(146,84,220,0.3); box-shadow: 0 0 10px rgba(146,84,220,0.6);
 /* Enemy target on attack tile */
 .unit-on-tile.highlight-target { border-color: var(--p2) !important; box-shadow: 0 0 8px rgba(200,48,48,0.7) !important; }
 /* Battle overlay */
-.battle-overlay { position:fixed; inset:0; z-index:150; background:rgba(0,0,0,0.92); overflow-y:auto; display:flex; flex-direction:column; align-items:center; padding:14px 10px 20px; gap:10px; opacity:0; transition:opacity 0.2s; }
+.battle-overlay {
+position:fixed; inset:0; z-index:150;
+background:radial-gradient(circle at 50% 18%, rgba(90,50,20,0.16), transparent 36%), rgba(0,0,0,0.94);
+overflow-y:auto; display:flex; flex-direction:column; align-items:center;
+padding:12px 10px calc(18px + env(safe-area-inset-bottom)); gap:9px;
+opacity:0; transition:opacity 0.2s;
+}
 .battle-overlay.show { opacity:1; }
+.battle-shell { width:min(390px,100%); display:flex; flex-direction:column; align-items:center; gap:9px; }
 .battle-header { display:flex; align-items:center; justify-content:space-between; width:100%; }
-.battle-heading { font-size: var(--fs-xs); text-transform:uppercase; letter-spacing:0.25em; color:#5a4828; font-family:‘Spectral’,serif; }
+.battle-heading { font-size: var(--fs-xs); text-transform:uppercase; letter-spacing:0.22em; color:#7a6030; font-family:'Spectral',serif; font-weight:900; }
 .battle-close { font-size: var(--fs-md); color:#5a4828; cursor:pointer; padding:4px 8px; line-height:1; }
-.battle-cards { display:flex; align-items:stretch; gap:6px; width:100%; }
-.battle-card { flex:1; border-radius:5px; overflow:hidden; border:2px solid; display:flex; flex-direction:column; min-width:0; }
-.battle-card.p1-tint { border-color:#304880; }
-.battle-card.p2-tint { border-color:#801818; }
-.bcard-art { height:80px; position:relative; padding:6px; display:flex; flex-direction:column; justify-content:space-between; }
-.battle-card.p1-tint .bcard-art { background:linear-gradient(160deg,#101428,#1a2040,#0c1020); }
-.battle-card.p2-tint .bcard-art { background:linear-gradient(160deg,#2a0808,#1e0606,#140404); }
-.bcard-hp { font-size: var(--fs-xs); font-weight:900; color:var(--hp-positive); font-family:‘Spectral’,serif; line-height:1; }
-.bcard-cost-badge { position:absolute; top:5px; right:5px; width:18px; height:18px; background:#8a5010; border:1.5px solid #c08020; border-radius:2px; transform:rotate(45deg); display:flex; align-items:center; justify-content:center; }
-.bcard-cost-badge span { transform:rotate(-45deg); font-size: var(--fs-xs); font-weight:900; color:#f0d080; }
-.bcard-badges { display:flex; gap:3px; }
-.bcard-badge { font-size: var(--fs-xs); font-weight:700; color:#c8a060; background:rgba(0,0,0,0.65); padding:2px 4px; border-radius:2px; font-family:‘Spectral’,serif; }
-.bcard-info { padding:4px 6px 2px; background:#0a0806; border-top:1px solid rgba(255,255,255,0.04); }
-.bcard-type { font-size: var(--fs-xs); text-transform:uppercase; letter-spacing:0.1em; color:#5a4828; }
-.bcard-name { font-size: var(--fs-xs); font-weight:700; color:#c8a060; line-height:1.2; }
-.bcard-weapon { font-size: var(--fs-xs); color:#7a6030; margin-top:1px; }
-.bcard-stats { display:flex; background:#060604; border-top:1px solid #1a1408; }
-.bstat { flex:1; text-align:center; padding:3px 1px; border-right:1px solid #1a1408; }
-.bstat:last-child { border-right:none; }
-.bstat-val { font-size: var(--fs-xs); font-weight:700; color:#c8a060; }
-.bstat-lbl { font-size: var(--fs-xs); text-transform:uppercase; color:#4a3020; letter-spacing:0.04em; }
-.bcard-special { padding:3px 5px; font-size: var(--fs-xs); color:#7a6030; line-height:1.4; background:#0a0806; border-top:1px solid #1a1408; }
-.bcard-special-name { color:#c8a060; font-weight:700; }
-.battle-vs { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; flex-shrink:0; padding:0 2px; }
-.battle-vs-icon { font-size: var(--fs-sm); color:#c8a060; }
-.battle-vs-arrow { font-size: var(--fs-xs); color:#5a4828; }
-.battle-cta { width:100%; }
-.battle-attack-btn { width:100%; font-family:‘Spectral’,Georgia,serif; font-size: var(--fs-xs); font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#c8a060; background:linear-gradient(160deg,#2a2010,#1a1408); border:1px solid #c08020; border-radius:4px; padding:10px; cursor:pointer; box-shadow:0 0 16px rgba(200,160,60,0.2); }
-.battle-resolution { background:#0a0806; border:1px solid #2a1e0a; border-radius:5px; padding:10px 12px; }
-.battle-done-btn { width:100%; font-family:‘Spectral’,Georgia,serif; font-size: var(--fs-xs); font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#c8a060; background:linear-gradient(160deg,#1a1810,#100e08); border:1px solid #4a3818; border-radius:4px; padding:8px; cursor:pointer; margin-top:8px; }
+.battle-close:active { color:#c8a060; }
+.battle-duel { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; }
+.battle-zoom-card { width:min(148px,39vw); flex-shrink:1; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; }
+.battle-zoom-card.defender { width:min(138px,36vw); opacity:0.96; }
+.battle-card-role { font-size:9px; font-weight:900; letter-spacing:0.16em; text-transform:uppercase; color:#5a4828; line-height:1; }
+.battle-card-art {
+width:100%; aspect-ratio:5/7; border-radius:7px; position:relative; overflow:hidden;
+background:linear-gradient(160deg,#1a1610,#0e0c08) center/cover;
+border:2px solid #2a1e0a; box-shadow:0 10px 28px rgba(0,0,0,0.78), inset 0 1px 0 rgba(180,140,60,0.08);
+}
+.battle-card-art.p1-unit { border-color:#4a78d8; box-shadow:0 0 14px rgba(74,120,216,0.32), 0 10px 28px rgba(0,0,0,0.78); }
+.battle-card-art.p2-unit { border-color:#cc3030; box-shadow:0 0 14px rgba(204,48,48,0.30), 0 10px 28px rgba(0,0,0,0.78); }
+/* Battle screen only shows contextual target defence, not full card stats. */
+.battle-card-cost,
+.battle-stat-rail,
+.battle-stat { display:none; }
+.battle-target-hp {
+position:absolute; top:6px; left:6px; z-index:4;
+width:36px; height:36px; border-radius:50%;
+display:flex; align-items:center; justify-content:center;
+font-size:24px; font-weight:900; line-height:1; font-family:'Spectral',Georgia,serif;
+background:rgba(0,0,0,0.78); border:2px solid currentColor;
+box-shadow:0 0 10px rgba(0,0,0,0.82);
+}
+.battle-target-hp.p1-stat { color:var(--p1); background:rgba(4,10,28,0.86); }
+.battle-target-hp.p2-stat { color:var(--p2); background:rgba(28,4,4,0.86); }
+.battle-target-save {
+position:absolute; left:50%; bottom:7px; transform:translateX(-50%); z-index:4;
+min-width:46px; height:30px; padding:0 8px; border-radius:5px;
+display:flex; align-items:center; justify-content:center; gap:3px;
+font-size:21px; font-weight:900; line-height:1; font-family:'Spectral',Georgia,serif;
+color:#f0b070; background:rgba(10,6,4,0.82); border:2px solid #c87030;
+box-shadow:0 0 10px rgba(0,0,0,0.82);
+}
+.battle-target-save::before { content:'🛡'; font-size:14px; line-height:1; opacity:0.95; }
+.battle-card-fallback {
+position:absolute; left:10px; right:10px; top:50%; transform:translateY(-50%); z-index:3;
+max-height:48px; overflow:hidden; text-align:center;
+font-size:var(--fs-xs); font-weight:900; line-height:1.15; letter-spacing:0.07em;
+color:#c8a060; text-transform:uppercase;
+text-shadow:0 0 10px rgba(0,0,0,0.98), 0 1px 0 #000;
+pointer-events:none;
+}
+.battle-card-fallback.hidden { display:none; }
+.battle-card-name { width:100%; text-align:center; font-size:var(--fs-xs); font-weight:900; color:#c8a060; line-height:1.08; letter-spacing:0.06em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.battle-card-weapon { width:100%; text-align:center; font-size:9px; color:#5a4828; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.battle-vs { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; flex:0 0 36px; }
+.battle-vs-icon { font-size:26px; color:#c8a060; line-height:1; text-shadow:0 0 12px rgba(200,160,96,0.45); }
+.battle-vs-arrow { font-size:18px; color:#7a6030; line-height:1; }
+.battle-attack-profile { width:100%; }
+.battle-attack-profile .card-zoom-attack-pill { min-height:42px; border-color:#4a2a18; background:linear-gradient(160deg,#120806,#090504); box-shadow:0 0 12px rgba(160,40,20,0.16); justify-content:center; }
+.battle-attack-profile .card-zoom-weapon-icon { color:#cc3030; text-shadow:0 0 8px rgba(204,48,48,0.45); }
+.battle-cta { width:100%; display:flex; justify-content:center; align-items:center; }
+.battle-attack-btn {
+width:auto; min-width:168px; min-height:42px; font-family:'Spectral',Georgia,serif;
+font-size:var(--fs-sm); font-weight:900; letter-spacing:0.16em; text-transform:uppercase;
+color:#f0d080; background:linear-gradient(160deg,#4a1008,#1a0806);
+border:1px solid #c08020; border-radius:5px; padding:10px 18px; cursor:pointer;
+box-shadow:0 0 18px rgba(200,80,30,0.26), inset 0 1px 0 rgba(255,220,140,0.08);
+}
+.battle-attack-btn .battle-action-star { color:var(--resources-hi); text-shadow:0 0 8px rgba(217,121,24,0.75); margin-right:4px; }
+.battle-attack-btn:active { border-color:#f0d080; color:#ffffff; filter:brightness(1.15); }
+.battle-resolution { width:100%; background:#0a0806; border:1px solid #2a1e0a; border-radius:5px; padding:10px 12px; box-sizing:border-box; }
+.battle-sequence { width:100%; background:linear-gradient(160deg,#0c0806,#050403); border:1px solid #2a1e0a; border-radius:6px; padding:10px 12px; box-sizing:border-box; display:flex; flex-direction:column; gap:9px; }
+.battle-stage { border:1px solid #1a1408; background:rgba(0,0,0,0.34); border-radius:5px; padding:8px; box-sizing:border-box; opacity:1; transition:opacity 0.2s, transform 0.2s; }
+.battle-stage.hidden { display:none; }
+.battle-stage-title { font-size:var(--fs-xs); font-weight:900; color:#c8a060; letter-spacing:0.16em; text-transform:uppercase; line-height:1; margin-bottom:4px; }
+.battle-stage-sub { font-size:11px; color:#7a6030; letter-spacing:0.07em; text-transform:uppercase; line-height:1.35; margin-bottom:7px; }
+.battle-dice-row { display:flex; flex-wrap:wrap; gap:6px; min-height:32px; align-items:center; }
+.battle-sequence .die { width:30px; height:30px; font-size:18px; border-width:2px; opacity:0; transform:scale(0.7) rotate(-8deg); transition:opacity 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease; }
+.battle-sequence .die.die-reveal { opacity:1; transform:scale(1) rotate(0deg); box-shadow:0 0 10px rgba(200,160,80,0.18); }
+.battle-stage-summary { margin-top:7px; font-size:var(--fs-sm); font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#c8a060; min-height:20px; }
+.battle-stage-summary.good { color:var(--outcome-success); text-shadow:0 0 8px rgba(110,216,74,0.35); }
+.battle-stage-summary.bad { color:var(--outcome-fatal); text-shadow:0 0 8px rgba(204,48,48,0.35); }
+.battle-save-formula { display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-size:var(--fs-xs); color:#7a6030; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:7px; }
+.battle-save-pill { display:inline-flex; align-items:center; justify-content:center; min-width:38px; height:28px; padding:0 8px; border-radius:4px; border:1px solid #c87030; color:#f0b070; background:rgba(60,28,8,0.28); font-size:18px; font-weight:900; letter-spacing:0; }
+.battle-save-pill.final { border-color:#f0b070; color:#f0d080; box-shadow:0 0 10px rgba(200,112,48,0.25); }
+.battle-damage-line { display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; font-size:var(--fs-sm); font-weight:900; color:#c8a060; }
+.battle-damage-total { color:var(--outcome-fatal); font-size:var(--fs-md); text-shadow:0 0 10px rgba(204,48,48,0.45); }
+.battle-shell.stage-save .battle-zoom-card.attacker { transform:scale(0.92); opacity:0.64; }
+.battle-shell.stage-save .battle-zoom-card.defender { transform:scale(1.06); opacity:1; }
+.battle-shell.stage-damage .battle-zoom-card.attacker { transform:scale(0.94); opacity:0.72; }
+.battle-shell.stage-damage .battle-zoom-card.defender { transform:scale(1.04); opacity:1; }
+.battle-zoom-card { transition:transform 0.22s ease, opacity 0.22s ease; }
+.battle-done-btn { width:100%; font-family:'Spectral',Georgia,serif; font-size: var(--fs-xs); font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#c8a060; background:linear-gradient(160deg,#1a1810,#100e08); border:1px solid #4a3818; border-radius:4px; padding:8px; cursor:pointer; margin-top:8px; }
 .battle-card.slain { opacity:0.5; }
 .battle-card.slain .bcard-hp { color:var(--hp-negative); }
+
+
+/* Battle sequence v2 — fixed dice choreography, no scroll report */
+.battle-overlay { overflow:hidden; justify-content:flex-start; height:100dvh; padding:8px 10px calc(10px + env(safe-area-inset-bottom)); }
+.battle-shell { height:calc(100dvh - 18px - env(safe-area-inset-bottom)); max-height:calc(100dvh - 18px - env(safe-area-inset-bottom)); overflow:hidden; gap:6px; }
+.battle-header { flex:0 0 auto; }
+.battle-duel { flex:0 0 auto; gap:6px; }
+.battle-zoom-card { width:min(132px,36vw); gap:2px; }
+.battle-zoom-card.defender { width:min(132px,36vw); }
+.battle-card-role { font-size:8px; }
+.battle-card-name { font-size:10px; }
+.battle-card-weapon { font-size:8px; }
+.battle-target-hp { width:32px; height:32px; font-size:22px; }
+.battle-target-save { min-width:40px; height:27px; font-size:18px; bottom:6px; }
+.battle-vs { flex-basis:28px; }
+.battle-vs-icon { font-size:22px; }
+.battle-vs-arrow { font-size:15px; }
+.battle-attack-profile { flex:0 0 auto; }
+.battle-attack-profile.sequence-live { opacity:0.88; }
+.battle-attack-profile.sequence-live .card-zoom-attack-pill { min-height:36px; }
+.battle-attack-profile.sequence-live .zoom-stat-pair { transform:scale(0.92); transform-origin:center; }
+.battle-cta { flex:1 1 auto; min-height:0; display:flex; width:100%; }
+.battle-sequence { flex:1 1 auto; min-height:0; width:100%; background:linear-gradient(160deg,#0c0806,#050403); border:1px solid #2a1e0a; border-radius:6px; padding:6px; box-sizing:border-box; display:grid; grid-template-rows:auto 1fr auto; gap:6px; overflow:hidden; }
+.battle-hit-pool { min-height:44px; border:1px solid #1a1408; background:rgba(0,0,0,0.34); border-radius:5px; padding:5px 6px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; }
+.battle-hit-pool-label { font-size:9px; font-weight:900; letter-spacing:0.16em; text-transform:uppercase; color:#7a6030; line-height:1; }
+.battle-hit-dice { min-height:28px; display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; }
+.battle-current-stage { min-height:0; border:1px solid #1a1408; background:rgba(0,0,0,0.38); border-radius:5px; padding:6px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; overflow:hidden; }
+.battle-stage-title { margin:0; text-align:center; font-size:10px; }
+.battle-stage-sub { margin:0; text-align:center; font-size:10px; line-height:1.2; }
+.battle-dice-row { min-height:34px; display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:wrap; }
+.battle-sequence .die { width:30px; height:30px; font-size:18px; border-width:2px; opacity:0; transform:scale(0.68) rotate(-7deg); transition:opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease; }
+.battle-sequence .die.die-reveal { opacity:1; transform:scale(1) rotate(0deg); box-shadow:0 0 10px rgba(200,160,80,0.18); }
+.battle-sequence .die.hit-pool-die { opacity:1; transform:scale(1); }
+.battle-sequence .die.hit-cancelled { opacity:0.22; transform:scale(0.82); filter:grayscale(1); text-decoration:line-through; }
+.battle-stage-summary { margin:0; min-height:18px; text-align:center; font-size:15px; }
+.battle-save-formula { margin:0; justify-content:center; gap:5px; font-size:10px; }
+.battle-save-pill { min-width:34px; height:24px; font-size:16px; padding:0 6px; }
+.battle-ap-burst { min-height:30px; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; letter-spacing:0.08em; color:#f0d080; text-shadow:0 0 14px rgba(204,48,48,0.8); opacity:0; transform:scale(0.65); transition:opacity 0.16s ease, transform 0.16s ease; }
+.battle-ap-burst.show { opacity:1; transform:scale(1.12); }
+.battle-resolve-row { display:flex; flex-direction:column; align-items:center; gap:5px; min-height:54px; }
+.battle-resolve-summary { min-height:16px; font-size:11px; color:#c8a060; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; text-align:center; }
+.battle-cta > .battle-attack-btn { flex:0 0 auto; align-self:center; min-width:138px; min-height:38px; padding:8px 15px; font-size:14px; }
+.battle-defence-btn {
+  position:relative; overflow:hidden; min-width:184px; min-height:40px;
+  border-radius:5px; border:1px solid currentColor;
+  background:#100806; color:#c8a060;
+  font-family:'Spectral',Georgia,serif; font-size:12px; font-weight:900;
+  letter-spacing:0.14em; text-transform:uppercase; cursor:pointer;
+  padding:8px 14px; box-shadow:0 0 14px rgba(0,0,0,0.45);
+}
+.battle-defence-btn::before {
+  content:''; position:absolute; inset:0; z-index:0;
+  transform:scaleX(1); transform-origin:right center;
+  background:linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.18));
+}
+.battle-defence-btn.counting::before { transform:scaleX(0); transition:transform var(--defence-prompt-ms, 3s) linear; }
+.battle-defence-btn > span { position:relative; z-index:1; }
+.battle-defence-btn.p1-def { color:var(--p1); border-color:var(--p1); background:linear-gradient(160deg,#081024,#030710); box-shadow:0 0 14px rgba(74,120,216,0.28); }
+.battle-defence-btn.p1-def::before { background:linear-gradient(90deg, rgba(74,120,216,0.18), rgba(120,170,255,0.32)); }
+.battle-defence-btn.p2-def { color:var(--p2); border-color:var(--p2); background:linear-gradient(160deg,#240808,#100303); box-shadow:0 0 14px rgba(204,48,48,0.28); }
+.battle-defence-btn.p2-def::before { background:linear-gradient(90deg, rgba(204,48,48,0.18), rgba(255,120,120,0.32)); }
+.battle-defence-btn:active { filter:brightness(1.22); }
+
+.battle-done-btn { margin:0; min-height:34px; padding:7px 10px; }
+.battle-shell.stage-attack .battle-zoom-card.attacker { transform:scale(1.03); opacity:1; }
+.battle-shell.stage-attack .battle-zoom-card.defender { transform:scale(0.96); opacity:0.76; }
+.battle-shell.stage-save .battle-zoom-card.attacker { transform:scale(0.92); opacity:0.56; }
+.battle-shell.stage-save .battle-zoom-card.defender { transform:scale(1.06); opacity:1; }
+
+
+.battle-stage-title.announce { font-size:14px; color:#f0d080; text-shadow:0 0 12px rgba(200,160,80,0.45); }
+.battle-stage-sub.announce { color:#c8a060; }
+.battle-hit-pool.active { border-color:#4a3818; box-shadow:0 0 14px rgba(200,160,80,0.16); }
+.battle-hit-pool.empty .battle-hit-pool-label { color:#3a2a10; }
+
+/* Battle sequence v4 — contained top section + fixed lower combat tray */
+.battle-overlay { overflow:hidden; justify-content:flex-start; padding:6px 8px calc(8px + env(safe-area-inset-bottom)); }
+.battle-shell {
+  height:calc(100dvh - 14px - env(safe-area-inset-bottom));
+  max-height:calc(100dvh - 14px - env(safe-area-inset-bottom));
+  width:min(390px,100%);
+  display:grid;
+  grid-template-rows:auto minmax(0,31dvh) auto minmax(0,1fr);
+  align-items:stretch;
+  gap:5px;
+  overflow:hidden;
+}
+.battle-header { min-height:24px; }
+.battle-duel { min-height:0; align-items:center; justify-content:center; overflow:hidden; gap:5px; }
+.battle-zoom-card { width:min(112px,32vw); gap:2px; max-height:100%; }
+.battle-zoom-card.defender { width:min(112px,32vw); }
+.battle-card-role { font-size:8px; }
+.battle-card-name { font-size:10px; line-height:1; }
+.battle-card-weapon { font-size:8px; line-height:1; }
+.battle-target-hp { width:30px; height:30px; font-size:20px; top:5px; left:5px; }
+.battle-target-save { min-width:36px; height:25px; font-size:17px; bottom:5px; padding:0 6px; }
+.battle-target-save::before { font-size:12px; }
+.battle-vs { flex-basis:25px; }
+.battle-vs-icon { font-size:20px; }
+.battle-vs-arrow { font-size:14px; }
+.battle-attack-profile { min-height:36px; max-height:42px; overflow:hidden; }
+.battle-attack-profile .card-zoom-attack-pill { min-height:34px; padding:4px 5px; }
+.battle-attack-profile .zoom-stat-pair { gap:2px; }
+.battle-attack-profile .zoom-stat-icon { font-size:13px; }
+.battle-attack-profile .zoom-stat-value { font-size:18px; }
+.battle-attack-profile .card-zoom-weapon-icon { font-size:18px; }
+.battle-cta { min-height:0; height:100%; display:flex; align-items:flex-end; justify-content:center; overflow:hidden; }
+.battle-cta > .battle-attack-btn { align-self:flex-end; margin-bottom:2px; min-width:138px; min-height:38px; padding:8px 15px; font-size:14px; }
+.battle-sequence {
+  height:100%;
+  width:100%;
+  min-height:0;
+  display:grid;
+  grid-template-rows:minmax(0,1fr) minmax(0,1fr) 48px;
+  gap:5px;
+  padding:5px;
+  overflow:hidden;
+}
+.battle-roll-panel {
+  min-height:0;
+  padding:5px;
+  gap:3px;
+  justify-content:center;
+  overflow:hidden;
+}
+.battle-row-title { font-size:10px; line-height:1; }
+.battle-row-title.announce { font-size:13px; }
+.battle-row-sub { min-height:17px; font-size:9px; line-height:1.1; }
+.battle-dice-row { min-height:30px; gap:5px; }
+.battle-sequence .die { width:25px; height:25px; font-size:15px; border-width:2px; }
+.battle-row-summary { min-height:16px; font-size:13px; line-height:1; }
+.battle-save-formula { min-height:22px; gap:4px; font-size:9px; }
+.battle-save-pill { min-width:30px; height:21px; font-size:14px; padding:0 5px; }
+.battle-ap-burst { min-height:22px; font-size:18px; line-height:1; }
+.battle-resolve-row { min-height:0; height:48px; justify-content:center; gap:4px; }
+.battle-resolve-summary { min-height:13px; font-size:10px; line-height:1; }
+.battle-defence-btn { min-width:168px; min-height:34px; padding:6px 12px; font-size:11px; }
+.battle-done-btn { min-height:32px; padding:6px 10px; }
+
+/* Battle sequence v3 — fixed attack/defence rows with ghost dice */
+.battle-sequence { grid-template-rows:78px minmax(0,1fr); }
+.battle-roll-panel { min-height:0; border:1px solid #1a1408; background:rgba(0,0,0,0.38); border-radius:5px; padding:6px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:4px; overflow:hidden; }
+.battle-roll-panel.defence-panel { background:rgba(4,4,6,0.46); }
+.battle-roll-panel.attack-panel { justify-content:center; }
+.battle-roll-panel.attack-panel .battle-row-title { display:none; }
+.battle-roll-panel.attack-panel .battle-row-sub { min-height:14px; }
+.battle-row-title { margin:0; text-align:center; font-size:10px; font-weight:900; color:#c8a060; letter-spacing:0.16em; text-transform:uppercase; line-height:1; }
+.battle-row-title.announce { font-size:14px; color:#f0d080; text-shadow:0 0 12px rgba(200,160,80,0.45); }
+.battle-row-sub { margin:0; text-align:center; font-size:9px; line-height:1.15; color:#7a6030; letter-spacing:0.07em; text-transform:uppercase; min-height:18px; display:flex; align-items:center; justify-content:center; }
+.battle-row-summary { margin:0; min-height:16px; text-align:center; font-size:13px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#c8a060; display:flex; align-items:center; justify-content:center; }
+.battle-row-summary.good { color:var(--outcome-success); text-shadow:0 0 8px rgba(110,216,74,0.35); }
+.battle-row-summary.bad { color:var(--outcome-fatal); text-shadow:0 0 8px rgba(204,48,48,0.35); }
+.battle-dice-row { min-height:32px; width:100%; display:flex; justify-content:center; align-items:center; gap:5px; flex-wrap:wrap; }
+.battle-sequence .die.die-ghost { opacity:1; transform:none; border-style:dashed; border-color:#3a2a10; color:transparent; background:rgba(0,0,0,0.12); box-shadow:none; }
+.battle-sequence .die.die-hit-active { opacity:1; transform:scale(1) rotate(0deg); }
+.battle-sequence .die.hit-cancelled { opacity:0.22; transform:scale(0.82); filter:grayscale(1); text-decoration:line-through; }
+.battle-save-formula { min-height:22px; margin:0; justify-content:center; gap:5px; font-size:9px; }
+.battle-ap-burst { min-height:24px; }
+.battle-resolve-row { justify-content:flex-end; min-height:56px; }
+.battle-row-cta { margin-top:auto; min-height:40px; width:100%; display:flex; align-items:center; justify-content:center; }
+.battle-row-track { position:relative; width:100%; min-height:50px; display:flex; align-items:center; justify-content:center; }
+.battle-roll-stat { position:absolute; left:0; top:50%; transform:translateY(-50%); width:64px; min-width:64px; height:50px; border:1px solid #4a3818; border-radius:8px; background:linear-gradient(180deg,rgba(25,19,10,0.96),rgba(11,8,4,0.96)); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; box-shadow:inset 0 0 0 1px rgba(200,160,96,0.06); }
+.battle-roll-stat.attack { border-color:#5a3c12; }
+.battle-roll-stat.defence { border-color:#344154; }
+.battle-roll-stat-icon { font-size:24px; line-height:1; color:#c8a060; }
+.battle-roll-stat.defence .battle-roll-stat-icon { color:#9ab3d8; }
+.battle-roll-stat-value { font-size:32px; line-height:0.95; font-weight:900; color:#f2e4bf; letter-spacing:0.01em; }
+.battle-roll-stat.defence .battle-roll-stat-value { color:#d9e8ff; }
+.battle-dice-wrap { width:100%; display:flex; align-items:center; justify-content:center; padding:0 6px; box-sizing:border-box; }
+.battle-dice-wrap .battle-dice-row { justify-content:center; width:100%; }
+.battle-roll-panel.pre-attack .battle-save-formula, .battle-roll-panel.pre-attack .battle-ap-burst, .battle-roll-panel.pre-attack .battle-row-track, .battle-roll-panel.pre-attack .battle-row-summary { display:none; }
+.battle-roll-panel.pre-attack .battle-row-title, .battle-roll-panel.pre-attack .battle-row-sub { display:none; }
+.battle-row-cta .battle-attack-btn, .battle-row-cta .battle-defence-btn, .battle-row-cta .battle-done-btn { margin:0; align-self:center; }
+.battle-row-cta .battle-done-btn { width:auto; min-width:138px; }
+.battle-resolve-summary { min-height:18px; }
+
+/* Battle layout v4 — hit | dice | damage, AP bridge, save | dice | HP */
+.battle-sequence { grid-template-rows:78px auto minmax(0,1fr); }
+.battle-roll-panel.attack-panel, .battle-roll-panel.defence-panel { justify-content:center; }
+.battle-row-track { min-height:54px; }
+.battle-roll-stat { width:66px; min-width:66px; height:52px; }
+.battle-roll-stat.right { left:auto; right:0; }
+.battle-roll-stat.damage { border-color:#6a2a22; }
+.battle-roll-stat.damage .battle-roll-stat-icon, .battle-roll-stat.damage .battle-roll-stat-value { color:#ff8f7a; }
+.battle-roll-stat.hp { border-color:#2f5b2c; }
+.battle-roll-stat.hp .battle-roll-stat-icon, .battle-roll-stat.hp .battle-roll-stat-value { color:#9fe08d; }
+.battle-dice-wrap { padding:0 74px; }
+.battle-ap-bridge { min-height:22px; display:flex; align-items:center; justify-content:center; transition:opacity .2s ease, transform .2s ease, min-height .2s ease; }
+.battle-ap-bridge.pre-attack { opacity:0; min-height:0; height:0; overflow:hidden; pointer-events:none; }
+.battle-ap-chip { display:flex; align-items:center; justify-content:center; gap:5px; min-width:68px; height:22px; padding:0 8px; border:1px solid #4a3818; border-radius:999px; background:linear-gradient(180deg,rgba(28,10,10,0.96),rgba(12,5,5,0.96)); color:#f2b0b0; box-shadow:0 0 10px rgba(170,40,40,0.12); }
+.battle-ap-chip-icon { font-size:12px; line-height:1; color:#d28a8a; }
+.battle-ap-chip-value { font-size:16px; line-height:1; font-weight:900; color:#f2b0b0; letter-spacing:0.04em; }
+.battle-ap-chip.transfer { box-shadow:0 0 14px rgba(204,48,48,0.35); border-color:#8a2424; transform:scale(1.06); }
+.battle-roll-stat.applied { border-color:#b02a2a; box-shadow:0 0 14px rgba(204,48,48,0.35), inset 0 0 0 1px rgba(176,42,42,0.22); }
+.battle-roll-stat.applied .battle-roll-stat-icon, .battle-roll-stat.applied .battle-roll-stat-value { color:#ff8c8c; }
+.battle-roll-panel.pre-attack .battle-row-track, .battle-roll-panel.pre-attack .battle-row-summary { display:none; }
+
 
 /* Combat overlay */
 .combat-overlay { position: fixed; inset: 0; z-index: 150; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.88); opacity: 0; transition: opacity 0.2s; }
@@ -1325,7 +1808,7 @@ transition: border-color 0.15s, box-shadow 0.15s;
 }
 .pass-btn:active {
 border-color: #c8a060;
-box-shadow: 0 0 12px rgba(200,160,60,0.4);
+box-shadow: 0 0 12px rgba(217,121,24,0.4);
 }
 /* ── ROUND SCORING ── */
 .score-float {
@@ -1406,13 +1889,17 @@ pointer-events: none;
 
 <!-- GAME START OVERLAY -->
 
-<div class="req-overlay" id="start-overlay">
-  <div class="req-title">Revenant</div>
-  <div class="req-sub">Two players. Five rounds. Most points wins.</div>
-  <div class="req-who" id="start-sub"></div>
-  <button class="req-begin" onclick="beginGame()">Begin Battle ▶</button>
-  <button id="quick-load-btn" onclick="quickLoad()" style="display:none;margin-top:10px;font-family:Spectral,Georgia,serif;font-size:var(--fs-xs);font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#1a1408,#100c04);border:1px solid #5a3a10;border-radius:4px;padding:8px 24px;cursor:pointer;">Continue ▶</button>
-  <div onclick="skipToGame()" style="margin-top:10px;font-size:var(--fs-xs);color:#3a2a10;cursor:pointer;font-family:Spectral,serif;letter-spacing:0.1em;text-transform:uppercase">Skip Intro</div>
+<div class="req-overlay start-overlay" id="start-overlay">
+  <div class="splash-copy">
+    <div class="req-title">Revenant</div>
+    <div class="req-sub">Two players. Five rounds. Most points wins.</div>
+    <div class="req-who" id="start-sub"></div>
+  </div>
+  <div class="splash-actions">
+    <button class="splash-btn" onclick="beginGame()">New Game</button>
+    <button class="splash-btn secondary" id="quick-load-btn" onclick="quickLoad()">Continue</button>
+    <button class="splash-btn ghost" onclick="skipToGame()">Skip</button>
+  </div>
 </div>
 
 <!-- REQUISITION OVERLAY -->
@@ -1437,6 +1924,7 @@ pointer-events: none;
     <div class="res-badge" id="res-badge-p1"><span>3</span></div>
   </div>
   <div class="turn-block" style="position:relative;" onclick="document.getElementById('save-menu').classList.toggle('open')">
+    <div class="turn-label">Round</div>
     <div class="turn-num" id="turn-num">1/5</div>
     <div class="save-menu" id="save-menu">
       <div class="save-menu-item" onclick="saveGame();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Save</div>
@@ -1514,9 +2002,10 @@ pointer-events: none;
       <!-- Col 0: card visual — tappable when unactivated -->
       <div class="prof-card-visual" id="prof-card-visual" onclick="event.stopPropagation();openCardZoom(profileCard)">
         <div class="prof-cv-faction" id="prof-cv-faction"></div>
+        <div class="prof-cv-name hidden" id="prof-cv-name"></div>
         <div class="prof-cv-bottom" id="prof-cv-bottom">
           <div class="prof-cv-diamond" id="prof-cv-diamond">
-            <span class="diamond-cost" id="prof-cost" style="transform:rotate(-45deg);font-size:var(--fs-xs);font-weight:900;color:#f0d080;line-height:1">3</span>
+            <span class="diamond-cost" id="prof-cost" style="transform:rotate(-45deg);font-size:var(--fs-xs);font-weight:900;color:var(--resources-text);line-height:1">3</span>
             <span class="diamond-pips" style="display:none;transform:rotate(-45deg);gap:2px;align-items:center">
               <span id="d-pip-1" style="font-size:var(--fs-xs);color:#f0c020;text-shadow:0 0 4px rgba(240,192,32,0.8)">✦</span>
               <span id="d-pip-2" style="font-size:var(--fs-xs);color:#f0c020;text-shadow:0 0 4px rgba(240,192,32,0.8)">✦</span>
@@ -1547,7 +2036,7 @@ pointer-events: none;
             <div class="pill-wrap">
               <button class="prof-attack-pill" id="btn-attack" onclick="selectAction('attack')">
                 <div class="pill-seg pill-seg-icon">⚔</div>
-                <div class="pill-seg pill-seg-stat"><span class="pill-icon">⚔</span><span class="pill-val" id="prof-range">1</span></div>
+                <div class="pill-seg pill-seg-stat"><span class="pill-icon">↔</span><span class="pill-val" id="prof-range">1</span></div>
                 <div class="pill-seg pill-seg-stat"><span class="pill-icon">🎲</span><span class="pill-val" id="prof-atk">5</span></div>
                 <div class="pill-seg pill-seg-stat"><span class="pill-icon">🎯</span><span class="pill-val" id="prof-hit">4+</span></div>
                 <div class="pill-seg pill-seg-stat"><span class="pill-icon">🛡</span><span class="pill-val">−<span id="prof-ap">1</span></span></div>
@@ -1578,7 +2067,10 @@ pointer-events: none;
         <div class="hub-stat-badge badge-move" id="badge-move"><span id="badge-move-val">2</span></div>
         <div class="hub-stat-badge badge-save" id="badge-save"><span id="badge-save-val">4+</span></div>
       </div>
-      <button class="hub-pass-btn" id="hub-pass-btn" onclick="passAction()">Pass ▶</button>
+      <button class="hub-pass-btn" id="hub-pass-btn">
+        <span class="hub-pass-icon">☠</span>
+        <span class="hub-pass-copy"><span class="hub-pass-label">Pass</span><span class="hub-pass-sub">(Hold)</span></span>
+      </button>
     </div>
     <!-- Centre slot: diamond -->
     <div class="hub-center">
@@ -1847,6 +2339,7 @@ window.addEventListener('unhandledrejection', e => {
     activeAction: null,
     activeAbility: null,
     pendingReturnUnit: null,
+    deployModeFromInspector: false,
     laneEffects: { A: null, B: null },
   };
 
@@ -1864,6 +2357,8 @@ window.addEventListener('unhandledrejection', e => {
   ];
 
   function initGame() {
+    setupDrawHold();
+    setupPassHold();
     const {repo, lists, laneDeck} = loadFromStorage();
     [1,2].forEach(p=>{
       try {
@@ -1888,7 +2383,12 @@ window.addEventListener('unhandledrejection', e => {
     // Show splash — check for existing save
     const hasSave = !!localStorage.getItem('grim_save');
     const continueBtn = document.getElementById('quick-load-btn');
-    if (continueBtn) continueBtn.style.display = hasSave ? '' : 'none';
+    if (continueBtn) {
+      continueBtn.disabled = !hasSave;
+      continueBtn.setAttribute('aria-disabled', String(!hasSave));
+      continueBtn.title = hasSave ? 'Load saved game' : 'No saved game found';
+    }
+    loadSplashArt();
     requestAnimationFrame(() => document.getElementById('start-overlay').classList.add('show'));
   }
 
@@ -1907,13 +2407,39 @@ window.addEventListener('unhandledrejection', e => {
       if (!fx) { badge.style.display = 'none'; return; }
       badge.style.display = '';
       if (fx.revealed) {
-        badge.textContent = fx.name;
+        badge.textContent = formatCardName(fx.name);
         badge.classList.remove('hidden');
       } else {
         badge.textContent = '?';
         badge.classList.add('hidden');
       }
     });
+  }
+
+  function loadSplashArt() {
+    const overlay = document.getElementById('start-overlay');
+    if (!overlay) return;
+    const candidates = [
+      'splash.jpeg', 'splash.jpg', 'splash.png',
+      'splash.JPEG', 'splash.JPG', 'splash.PNG'
+    ];
+    let index = 0;
+    function tryNext() {
+      if (index >= candidates.length) {
+        overlay.classList.remove('has-splash-art');
+        overlay.style.backgroundImage = '';
+        return;
+      }
+      const src = candidates[index++];
+      const img = new Image();
+      img.onload = () => {
+        overlay.style.backgroundImage = `url('${src}')`;
+        overlay.classList.add('has-splash-art');
+      };
+      img.onerror = tryNext;
+      img.src = src;
+    }
+    tryNext();
   }
 
   function beginGame() {
@@ -1925,6 +2451,80 @@ window.addEventListener('unhandledrejection', e => {
     }, 300);
   }
 
+  function formatCardName(name) {
+    return String(name ?? '').trim().toUpperCase();
+  }
+
+  function normalisedCardType(card) {
+    return (card?.type || '').trim();
+  }
+
+  function cardInnerHTML(card, col) {
+    const type = normalisedCardType(card);
+    const name = formatCardName(card?.name);
+    if (type === 'Power') {
+      return `<div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#1a1020;border:1.5px solid #8a40c0;display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);z-index:1;">⚡</div>
+        <div class="card-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;text-align:center">${name}</div>
+        <div class="card-cost"><span>${card.cost}</span></div>`;
+    }
+    return `<div class="card-hp ${col}-hp"><span>${card.hp ?? ''}</span></div>
+      <div class="card-name">${name}</div>
+      <div class="card-cost"><span>${card.cost}</span></div>`;
+  }
+
+  function attachArtNameFallback(el, card, nameSelector='.card-name') {
+    if (!el || !card?.artId) return;
+    const tryHide = src => {
+      const img = new Image();
+      img.onload = () => { const n = el.querySelector(nameSelector); if(n) n.style.display='none'; };
+      img.src = src;
+    };
+    tryHide(`art/${card.artId}.png`);
+    tryHide(`art/${card.artId}.jpg`);
+    tryHide(`art/${card.artId}.jpeg`);
+  }
+
+  function updateInspectorCardNameFallback(card) {
+    const nameEl = document.getElementById('prof-cv-name');
+    if (!nameEl) return;
+    nameEl.textContent = formatCardName(card?.name);
+    nameEl.classList.remove('hidden');
+    const token = `${card?.uid || card?.id || card?.name || ''}-${Date.now()}`;
+    nameEl.dataset.artToken = token;
+    if (!card?.artId) return;
+    let pending = 3;
+    let loaded = false;
+    const done = () => {
+      pending -= 1;
+      if (pending <= 0 && !loaded && nameEl.dataset.artToken === token) {
+        nameEl.classList.remove('hidden');
+      }
+    };
+    [`art/${card.artId}.png`, `art/${card.artId}.jpg`, `art/${card.artId}.jpeg`].forEach(src => {
+      const img = new Image();
+      img.onload = () => {
+        if (nameEl.dataset.artToken !== token) return;
+        loaded = true;
+        nameEl.classList.add('hidden');
+      };
+      img.onerror = done;
+      img.src = src;
+    });
+  }
+
+  function resourceGainHtml(player, gain) {
+    const col = player === 1 ? 'var(--p1)' : 'var(--p2)';
+    const label = player === 1 ? 'Player I' : 'Player II';
+    return `<div style="text-align:center;min-width:100px;">
+      <div style="font-size:var(--fs-xs);color:${col};text-transform:uppercase;letter-spacing:0.12em;margin-bottom:8px;">${label}</div>
+      <div style="position:relative;width:62px;height:62px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;">
+        <div style="position:absolute;width:50px;height:50px;background:var(--resources);border:2px solid var(--resources-hi);border-radius:4px;transform:rotate(45deg);box-shadow:0 0 14px rgba(217,121,24,0.5);"></div>
+        <div style="position:relative;z-index:1;font-size:var(--fs-md);font-weight:900;color:var(--resources-text);line-height:1;text-shadow:0 1px 0 rgba(255,220,120,0.35);">+${gain}</div>
+      </div>
+      <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.08em;">Resources</div>
+    </div>`;
+  }
+
   function showDevSetup() {
     const ov = document.createElement('div');
     ov.id = 'dev-setup-overlay';
@@ -1934,54 +2534,39 @@ window.addEventListener('unhandledrejection', e => {
     function makeLaneCard(lane) {
       const fx = state.laneEffects[lane];
       const label = lane === 'A' ? 'I' : 'II';
-      return `<div onclick="devCycleLane('${lane}')" style="flex:1;background:#0e1a12;border:1px solid #1a5030;border-radius:6px;padding:10px;cursor:pointer;box-sizing:border-box;">
-        <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:5px;">Lane ${label} &nbsp;↺</div>
-        <div style="font-size:var(--fs-xs);color:#40a878;font-weight:700;margin-bottom:2px;">${fx ? fx.name : '—'}</div>
-        <div style="font-size:var(--fs-xs);color:#3a6848;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">${fx ? fx.trigger.replace(/_/g,' ') : ''}</div>
-        <div style="font-size:var(--fs-xs);color:#5a8868;line-height:1.5;">${fx ? fx.description : ''}</div>
+      return `<div onclick="devCycleLane('${lane}')" style="position:relative;width:75px;aspect-ratio:5/7;flex-shrink:0;background:linear-gradient(160deg,#0e1a12,#07100a);border:1px solid #1a5030;border-radius:5px;padding:7px 5px;cursor:pointer;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:inset 0 1px 0 rgba(80,180,120,0.08),0 4px 12px rgba(0,0,0,0.45);">
+        <div style="position:absolute;top:4px;left:5px;right:5px;font-size:9px;color:#3a6848;text-transform:uppercase;letter-spacing:0.12em;line-height:1;">Lane ${label}</div>
+        <div style="font-size:var(--fs-xs);color:#40a878;font-weight:900;line-height:1.15;text-transform:uppercase;width:100%;">${fx ? formatCardName(fx.name) : '—'}</div>
+        <div style="position:absolute;bottom:5px;left:0;right:0;font-size:10px;color:#255038;letter-spacing:0.08em;text-transform:uppercase;">Tap ↺</div>
       </div>`;
     }
 
     function makeHandCard(player, idx) {
       const card = state.players[player].hand[idx];
-      if (!card) return `<div style="width:52px;aspect-ratio:5/7;border:1px dashed #2a1e0a;border-radius:4px;flex-shrink:0;"></div>`;
-      const art = artStyle(card, true);
-      const hpCol = player===1 ? 'var(--p1)' : 'var(--p2)';
-      const hpBg  = player===1 ? '#080e1e' : '#1e0808';
+      if (!card) return `<div class="card" style="width:75px;height:105px;border-style:dashed;opacity:0.35;flex-shrink:0;"></div>`;
+      const col = player === 1 ? 'p1' : 'p2';
       const uid = `sc-${player}-${idx}-${Date.now()}`;
-      setTimeout(()=>{
-        const el = document.getElementById(uid);
-        if(!el || !card.artId) return;
-        const tryHide = src => { const p=new Image(); p.onload=()=>{ const n=el.querySelector('.sc-name'); if(n) n.style.display='none'; }; p.src=src; };
-        tryHide(`art/${card.artId}.png`);
-        tryHide(`art/${card.artId}.jpg`);
-        tryHide(`art/${card.artId}.jpeg`);
-      }, 0);
-      return `<div id="${uid}" onclick="devSwapCard(${player},${idx})" style="position:relative;width:52px;aspect-ratio:5/7;flex-shrink:0;border-radius:4px;border:1px solid #2a1e0a;background:linear-gradient(160deg,#1a1610,#100c08);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:5px 3px;cursor:pointer;box-sizing:border-box;${art}">
-        <div style="position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:${hpBg};border:1px solid ${hpCol};display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);color:${hpCol};font-weight:700;z-index:1;">${card.hp ?? ''}</div>
-        <div class="sc-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:var(--fs-xs);font-weight:700;color:#c8a060;line-height:1.3;width:90%;text-align:center;">${card.name}</div>
-        <div style="position:absolute;bottom:4px;left:50%;margin-left:-9px;width:18px;height:18px;background:#2a1408;border:1px solid #c08020;border-radius:2px;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;z-index:1;">
-          <span style="transform:rotate(-45deg);font-size:var(--fs-xs);font-weight:900;color:#f0d080;line-height:1;">${card.cost}</span>
-        </div>
-      </div>`;
+      const art = artStyle(card, true);
+      setTimeout(()=>attachArtNameFallback(document.getElementById(uid), card), 0);
+      return `<div id="${uid}" class="card ${col}-card" onclick="devSwapCard(${player},${idx})" style="width:75px;height:105px;flex-shrink:0;${art}">${cardInnerHTML(card, col)}</div>`;
     }
 
     function renderOverlay() {
       ov.innerHTML = `
-        <div style="font-size:var(--fs-md);font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(200,160,60,0.4);">Battle Setup</div>
+        <div style="font-size:var(--fs-md);font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(217,121,24,0.4);">Battle Setup</div>
         <div style="font-size:var(--fs-xs);color:#3a2a10;letter-spacing:0.2em;text-transform:uppercase;margin-top:-8px;">Dev Mode · Tap to change</div>
 
         <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;">Lane Effects</div>
-        <div style="display:flex;gap:8px;width:100%;">
+        <div style="display:flex;gap:12px;width:100%;justify-content:center;align-items:center;">
           ${makeLaneCard('A')}
           ${makeLaneCard('B')}
         </div>
 
         <div style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player I — Starting Hand</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i)).join('')}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i)).join('')}</div>
 
         <div style="font-size:var(--fs-xs);color:#cc3030;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player II — Starting Hand</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[2].hand.map((_,i)=>makeHandCard(2,i)).join('')}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;">${state.players[2].hand.map((_,i)=>makeHandCard(2,i)).join('')}</div>
 
         <button onclick="devSetupBegin()" style="margin-top:16px;font-family:Spectral,Georgia,serif;font-size:var(--fs-xs);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#2a2010,#1a1408);border:1px solid #c08020;border-radius:4px;padding:10px 28px;cursor:pointer;box-shadow:0 0 16px rgba(200,160,60,0.3);">Begin Battle ▶</button>
       `;
@@ -2013,28 +2598,20 @@ window.addEventListener('unhandledrejection', e => {
       renderHub();
 
       ov.innerHTML = `
-        <div style="font-size:var(--fs-md);font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(200,160,60,0.4);">Battle Begins</div>
+        <div style="font-size:var(--fs-md);font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(217,121,24,0.4);">Battle Begins</div>
         <div style="font-size:var(--fs-xs);color:#7a6030;letter-spacing:0.15em;text-transform:uppercase;margin-top:-6px;">Round 1 of ${state.maxRounds}</div>
 
-        <div style="display:flex;gap:16px;margin-top:12px;">
-          <div style="text-align:center">
-            <div style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">Player I</div>
-            <div style="font-size:var(--fs-lg);font-weight:900;color:#c8a060;">+${gain}</div>
-            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.08em;">Resources</div>
-          </div>
-          <div style="width:1px;background:#1a1408;"></div>
-          <div style="text-align:center">
-            <div style="font-size:var(--fs-xs);color:#cc3030;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:6px;">Player II</div>
-            <div style="font-size:var(--fs-lg);font-weight:900;color:#c8a060;">+${gain}</div>
-            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.08em;">Resources</div>
-          </div>
+        <div style="display:flex;gap:22px;margin-top:12px;align-items:center;justify-content:center;">
+          ${resourceGainHtml(1, gain)}
+          <div style="width:1px;height:76px;background:#1a1408;"></div>
+          ${resourceGainHtml(2, gain)}
         </div>
 
         <div style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:14px;">Player I — Starting Hand</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i)).join('')}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i)).join('')}</div>
 
         <div style="font-size:var(--fs-xs);color:#cc3030;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:8px;">Player II — Starting Hand</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">${state.players[2].hand.map((_,i)=>makeHandCard(2,i)).join('')}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;">${state.players[2].hand.map((_,i)=>makeHandCard(2,i)).join('')}</div>
 
         <button onclick="devBattleBegin()" style="margin-top:16px;font-family:Spectral,Georgia,serif;font-size:var(--fs-xs);font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#c8a060;background:linear-gradient(160deg,#2a2010,#1a1408);border:1px solid #c08020;border-radius:4px;padding:10px 28px;cursor:pointer;box-shadow:0 0 16px rgba(200,160,60,0.3);">Begin ▶</button>
       `;
@@ -2128,6 +2705,11 @@ window.addEventListener('unhandledrejection', e => {
     setTimeout(()=>{ if(_beginCallback) { _beginCallback(); _beginCallback=null; } }, 300);
   }
 
+  const TURN_TOAST_MS = 700;
+  const TURN_TOAST_FADE_MS = 150;
+  const TURN_ADVANCE_WAIT_MS = 500;
+  const TURN_WAIT_ICON_MS = 120;
+
   function showTurnToast(player, callback) {
     const p = state.players[player];
     const col = p.color;
@@ -2140,8 +2722,8 @@ window.addEventListener('unhandledrejection', e => {
     requestAnimationFrame(()=>{ toast.classList.add('show'); });
     setTimeout(()=>{
       toast.classList.remove('show');
-      setTimeout(()=>{ setUILock(false); if(callback) callback(); }, 250);
-    }, 2000);
+      setTimeout(()=>{ setUILock(false); if(callback) callback(); }, TURN_TOAST_FADE_MS);
+    }, TURN_TOAST_MS);
   }
 
   function startBattlePhase() {
@@ -2272,12 +2854,14 @@ window.addEventListener('unhandledrejection', e => {
     const canDraw=p.resources>=1&&p.deck.length>0&&!p.drawnThisRound;
     deckPile.classList.toggle('can-draw',canDraw);
     deckPile.classList.toggle('draw-exhausted',p.drawnThisRound);
-    deckPile.onclick=canDraw?()=>drawAction():null;
+    deckPile.onclick=null;
     // Pass widget — update pass button label if already passed
     const myPassed = state.players[state.activePlayer].passed;
     const oppPassed = opp.passed;
     const passBtn = document.getElementById('hub-pass-btn');
-    if (passBtn) passBtn.textContent = myPassed ? 'Passed ✓' : 'Pass ▶';
+    if (passBtn) passBtn.innerHTML = myPassed
+      ? `<span class="hub-pass-icon">☠</span><span class="hub-pass-copy"><span class="hub-pass-label">Passed ✓</span><span class="hub-pass-sub">—</span></span>`
+      : `<span class="hub-pass-icon">☠</span><span class="hub-pass-copy"><span class="hub-pass-label">Pass</span><span class="hub-pass-sub">(Hold)</span></span>`;
     // Ensure default bar state is set correctly
     if (state._ctaAction === 'pass' || state._ctaAction === 'draw' || !state._ctaAction) {
       setBarState('default');
@@ -2317,26 +2901,11 @@ window.addEventListener('unhandledrejection', e => {
       const col = p.color;
       el.className=`card ${col}-card${isSelected?' selected':''}${!canAfford?' unavailable':''}`;el.style.width=cw+'px';el.style.height=ch+'px';el.style.flexShrink='0';
       el.dataset.uid = card.uid;
-      el.innerHTML = (card.type||'').trim() === 'Power'
-        ? `<div style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#1a1020;border:1.5px solid #8a40c0;display:flex;align-items:center;justify-content:center;font-size:var(--fs-xs);z-index:1;">⚡</div>
-           <div class="card-name" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90%;text-align:center">${card.name}</div>
-           <div class="card-cost"><span>${card.cost}</span></div>`
-        : `<div class="card-hp ${col}-hp"><span>${card.hp ?? ''}</span></div>
-           <div class="card-name">${card.name}</div>
-           <div class="card-cost"><span>${card.cost}</span></div>`;
+      el.innerHTML = cardInnerHTML(card, col);
       const art = artStyle(card);
       if (art) {
         el.setAttribute('style', (el.getAttribute('style') || '') + art);
-        if (card.artId) {
-          const tryHide = src => {
-            const p = new Image();
-            p.onload = () => { const n = el.querySelector('.card-name'); if(n) n.style.display='none'; };
-            p.src = src;
-          };
-          tryHide(`art/${card.artId}.png`);
-          tryHide(`art/${card.artId}.jpg`);
-          tryHide(`art/${card.artId}.jpeg`);
-        }
+        attachArtNameFallback(el, card);
       }
       el.addEventListener('touchstart', e=>onHandCardTouchStart(e,card,el), {passive:false});
       el.addEventListener('click',()=>onHandCardTap(card));
@@ -2849,7 +3418,7 @@ window.addEventListener('unhandledrejection', e => {
       ov.innerHTML = `<div class="leo-title">Unknown Effect</div><div class="leo-desc leo-unknown">Reveals before Round 1 scoring.</div><button class="leo-close" onclick="this.closest('.lane-effect-overlay').remove()">Close</button>`;
     } else {
       ov.innerHTML = `
-        <div class="leo-title">${fx.name}</div>
+        <div class="leo-title">${formatCardName(fx.name)}</div>
         <div class="leo-trigger">${TRIGGER_LABELS[fx.trigger]||fx.trigger}</div>
         <div class="leo-desc">${fx.description}</div>
         <button class="leo-close" onclick="this.closest('.lane-effect-overlay').remove()">Close</button>`;
@@ -2861,27 +3430,154 @@ window.addEventListener('unhandledrejection', e => {
     document.body.appendChild(ov);
   }
 
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  }
+
+  function zoomAttackProfileHtml(card) {
+    const w = card.weapon || {};
+    if (!w || (!w.name && w.range == null && w.attacks == null)) return '';
+    const apVal = w.ap == null ? '' : `−${w.ap}`;
+    return `<div class="card-zoom-attack-pill">
+      <div class="card-zoom-weapon-icon">⚔</div>
+      <div class="card-zoom-statpair"><span class="cz-icon">↔</span><span class="cz-val">${escapeHtml(displayRange(w.range))}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🎲</span><span class="cz-val">${escapeHtml(w.attacks ?? '')}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🎯</span><span class="cz-val">${escapeHtml(w.hit ?? '')}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🛡</span><span class="cz-val">${escapeHtml(apVal)}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">💀</span><span class="cz-val">${escapeHtml(w.damage ?? '')}</span></div>
+    </div>`;
+  }
+
+  function battleAttackProfileHtml(card) {
+    const w = card.weapon || {};
+    if (!w || (!w.name && w.attacks == null)) return '';
+    const apVal = w.ap == null ? '' : `−${w.ap}`;
+    return `<div class="card-zoom-attack-pill">
+      <div class="card-zoom-weapon-icon">⚔</div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🎲</span><span class="cz-val">${escapeHtml(w.attacks ?? '')}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🎯</span><span class="cz-val">${escapeHtml(w.hit ?? '')}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🛡</span><span class="cz-val">${escapeHtml(apVal)}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">💀</span><span class="cz-val">${escapeHtml(w.damage ?? '')}</span></div>
+    </div>`;
+  }
+
+  function zoomSpecialHtml(card) {
+    const raw = (card.special || '').trim();
+    if (!raw || /^none[:\s]/i.test(raw)) {
+      return `<div class="card-zoom-special"><span class="special-name">No Special Ability</span>: This unit relies on strength of arms and discipline alone.</div>`;
+    }
+    const cleaned = raw.replace(/\((\d+)AP\)/gi, '').trim();
+    const idx = cleaned.indexOf(':');
+    if (idx === -1) return `<div class="card-zoom-special"><span class="special-name">${escapeHtml(cleaned)}</span></div>`;
+    const title = cleaned.slice(0, idx).trim();
+    const desc = cleaned.slice(idx + 1).trim();
+    return `<div class="card-zoom-special"><span class="special-name">${escapeHtml(title)}</span>: ${escapeHtml(desc)}</div>`;
+  }
+
+  function updateZoomCardNameFallback(card) {
+    const nameEl = document.getElementById('czoom-fallback-name');
+    if (!nameEl) return;
+    nameEl.textContent = formatCardName(card?.name);
+    nameEl.classList.remove('hidden');
+    const token = `${card?.uid || card?.id || card?.name || ''}-${Date.now()}`;
+    nameEl.dataset.artToken = token;
+    if (!card?.artId) return;
+    let pending = 3;
+    let loaded = false;
+    const done = () => {
+      pending -= 1;
+      if (pending <= 0 && !loaded && nameEl.dataset.artToken === token) nameEl.classList.remove('hidden');
+    };
+    [`art/${card.artId}.png`, `art/${card.artId}.jpg`, `art/${card.artId}.jpeg`].forEach(src => {
+      const img = new Image();
+      img.onload = () => {
+        if (nameEl.dataset.artToken !== token) return;
+        loaded = true;
+        nameEl.classList.add('hidden');
+      };
+      img.onerror = done;
+      img.src = src;
+    });
+  }
+
+  function setupZoomTilt(artEl) {
+    if (!artEl) return;
+    const maxY = 8;
+    const maxX = 5;
+
+    const setTilt = (clientX, clientY) => {
+      const r = artEl.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const nx = Math.max(-1, Math.min(1, ((clientX - r.left) / r.width - 0.5) * 2));
+      const ny = Math.max(-1, Math.min(1, ((clientY - r.top) / r.height - 0.5) * 2));
+      const rotateY = nx * maxY;
+      const rotateX = -ny * maxX;
+      const shineX = 50 + nx * 28;
+      const shineY = 38 + ny * 24;
+      artEl.classList.add('tilting');
+      artEl.style.setProperty('--shine-x', `${shineX}%`);
+      artEl.style.setProperty('--shine-y', `${shineY}%`);
+      artEl.style.transform = `perspective(720px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.018)`;
+    };
+
+    const resetTilt = () => {
+      artEl.classList.remove('tilting');
+      artEl.style.transform = 'perspective(720px) rotateX(0deg) rotateY(0deg) scale(1)';
+      artEl.style.setProperty('--shine-x', '50%');
+      artEl.style.setProperty('--shine-y', '35%');
+    };
+
+    artEl.addEventListener('pointerdown', e => {
+      if (e.target.closest('.card-zoom-close-btn')) return;
+      artEl.setPointerCapture?.(e.pointerId);
+      setTilt(e.clientX, e.clientY);
+    });
+    artEl.addEventListener('pointermove', e => {
+      if (e.pointerType === 'mouse' || e.buttons) setTilt(e.clientX, e.clientY);
+    });
+    artEl.addEventListener('pointerup', resetTilt);
+    artEl.addEventListener('pointercancel', resetTilt);
+    artEl.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') resetTilt(); });
+  }
+
   function openCardZoom(card) {
     const existing = document.getElementById('card-zoom-overlay');
     if (existing) existing.remove();
     const col = card.owner === 1 ? 'p1' : card.owner === 2 ? 'p2' : '';
+    const isPower = normalisedCardType(card) === 'Power';
     const ov = document.createElement('div');
     ov.id = 'card-zoom-overlay';
     ov.className = 'card-zoom-overlay';
     ov.innerHTML = `
-      <div class="card-zoom-art ${col}-unit" id="czoom-art"></div>
-      <div style="display:flex;align-items:center;gap:4px">
-        <span class="card-zoom-faction">${FACTION_ICONS[card.faction]||''}</span>
-        <span class="card-zoom-name">${card.name}</span>
-      </div>
-      ${card.weapon?.name ? `<div class="card-zoom-weapon">${card.weapon.name}</div>` : ''}
-      ${card.flavour ? `<div class="card-zoom-flavour">${card.flavour}</div>` : ''}
-      <div class="card-zoom-close" onclick="document.getElementById('card-zoom-overlay').remove()">✕ Close</div>`;
+      <div class="card-zoom-shell" onclick="event.stopPropagation()">
+        <div class="card-zoom-art ${col}-unit" id="czoom-art">
+          <button class="card-zoom-close-btn" onclick="document.getElementById('card-zoom-overlay').remove()">×</button>
+          <div class="card-zoom-cost"><span>${escapeHtml(card.cost ?? '')}</span></div>
+          ${!isPower ? `<div class="card-zoom-stat-rail">
+            <div class="card-zoom-stat hp">${escapeHtml(card.hp ?? '')}</div>
+            <div class="card-zoom-stat move">${escapeHtml(card.move === -1 ? '—' : card.move ?? '')}</div>
+            <div class="card-zoom-stat save">${escapeHtml(card.save ?? '')}</div>
+          </div>` : ''}
+          <div class="card-zoom-fallback-name" id="czoom-fallback-name">${formatCardName(card.name)}</div>
+          <div class="card-zoom-shine" id="czoom-shine"></div>
+        </div>
+        <div class="card-zoom-info">
+          <div style="display:flex;align-items:center;justify-content:center;gap:4px;max-width:100%;">
+            <span class="card-zoom-faction">${FACTION_ICONS[card.faction]||''}</span>
+            <span class="card-zoom-name">${formatCardName(card.name)}</span>
+          </div>
+          ${card.weapon?.name ? `<div class="card-zoom-weapon">${escapeHtml(card.weapon.name)}</div>` : ''}
+        </div>
+        ${zoomAttackProfileHtml(card)}
+        ${zoomSpecialHtml(card)}
+        ${card.flavour ? `<div class="card-zoom-flavour">${escapeHtml(card.flavour)}</div>` : ''}
+      </div>`;
     document.body.appendChild(ov);
-    // Apply art
     const artEl = document.getElementById('czoom-art');
     const art = artStyle(card, true);
     if (art) artEl.setAttribute('style', artEl.getAttribute('style') + art);
+    updateZoomCardNameFallback(card);
+    setupZoomTilt(artEl);
     ov.addEventListener('click', e => { if(e.target===ov) ov.remove(); });
   }
 
@@ -2918,6 +3614,12 @@ window.addEventListener('unhandledrejection', e => {
       // Tap on empty board space — cancel pending
       if(state.pendingTile) cancelPendingDeploy();
       else if(state._ctaAction==='activate') onHubCancel();
+      return;
+    }
+
+    // Inspector deploy mode — Deploy button was pressed, tile tap now confirms placement immediately
+    if (state.deployModeFromInspector && state._ctaAction === 'deploy' && state.selectedHandCard && tile.classList.contains('highlight-deploy')) {
+      executeDeployTo(tileId);
       return;
     }
 
@@ -3042,7 +3744,7 @@ window.addEventListener('unhandledrejection', e => {
       const preview = document.createElement('div');
       preview.className = `unit-on-tile ${col}-unit pending-deploy-preview`;
       preview.style.cssText = 'opacity:0.7;';
-      preview.innerHTML = `<div class="unit-name-on-tile" style="font-size:var(--fs-xs);line-height:1.2;text-align:center;padding:2px;">${card.name}</div>`;
+      preview.innerHTML = `<div class="unit-name-on-tile" style="font-size:var(--fs-xs);line-height:1.2;text-align:center;padding:2px;">${formatCardName(card.name)}</div>`;
       tile.appendChild(preview);
     }
     const cost = card?.cost ?? 0;
@@ -3061,6 +3763,7 @@ window.addEventListener('unhandledrejection', e => {
     const tileId = state.pendingTile;
     clearConfirm();
     state.pendingTile = null;
+    state.deployModeFromInspector = false;
     // Restore card to hand
     deselectAll();
   }
@@ -3079,6 +3782,8 @@ window.addEventListener('unhandledrejection', e => {
     tile.classList.remove('confirm-tile','highlight-deploy');
     renderUnit(tile, state.board[tileId]);
 
+    state.deployModeFromInspector = false;
+    closeProfile();
     deselectAll();
     renderHub();
     endCurrentTurn();
@@ -3168,14 +3873,14 @@ window.addEventListener('unhandledrejection', e => {
       badges.style.display = cardTypeEarly === 'Power' ? 'none' : '';
     }
     if (unitInfo) unitInfo.style.display = 'none';
-    document.getElementById('prof-name').textContent=card.name;
+    document.getElementById('prof-name').textContent=formatCardName(card.name);
     document.getElementById('prof-weapon-name').textContent = card.weapon?.name ?? '';
     document.getElementById('prof-faction-icon').textContent=FACTION_ICONS[card.faction]||'';
     // Show unit info in bottom bar — hidden, badges used instead
     const uInfo = document.getElementById('hub-unit-info');
     if (uInfo) {
       document.getElementById('hub-unit-icon').textContent = FACTION_ICONS[card.faction] ?? '';
-      document.getElementById('hub-unit-name').textContent = card.name ?? '';
+      document.getElementById('hub-unit-name').textContent = formatCardName(card.name);
       document.getElementById('hub-unit-weapon').textContent = card.weapon?.name ? '⚔ ' + card.weapon.name : '';
     }
     document.getElementById('prof-move').textContent = card.move == null ? '' : card.move===-1 ? '—' : card.move;
@@ -3216,7 +3921,7 @@ window.addEventListener('unhandledrejection', e => {
         </button>`;
     } else {
       document.getElementById('prof-special').innerHTML =
-        '<span style="opacity:0.2;font-style:italic">No special ability — this unit relies on strength of arms and discipline alone.</span>';
+        '<span style="color:#9f7a4a;font-style:italic">No special ability — this unit relies on strength of arms and discipline alone.</span>';
     }
     const visual      = document.getElementById('prof-card-visual');
     const ownerCol    = isBoard && card.owner ? (card.owner===1?'p1':'p2') : (state.activePlayer===1?'p1':'p2');
@@ -3225,6 +3930,7 @@ window.addEventListener('unhandledrejection', e => {
     visual.className = `prof-card-visual ${ownerCol}-unit`;
     const art = artStyle(card);
     visual.style.cssText = art;
+    updateInspectorCardNameFallback(card);
     const canAffordActivate = isOwnUnit && card.actionsLeft===null && state.players[state.activePlayer].resources >= 1;
     const canDeploy = context==='hand' && state.players[state.activePlayer].resources >= card.cost;
     if (isOwnUnit && card.actionsLeft===null) visual.classList.add('cv-selected','cv-pulse');
@@ -3328,6 +4034,12 @@ window.addEventListener('unhandledrejection', e => {
     const uInfo = document.getElementById('hub-unit-info');
     if (uInfo) uInfo.style.display = 'none';
         if (!state.activeUnit) {
+      if (state.deployModeFromInspector) {
+        state.deployModeFromInspector = false;
+        state.selectedHandCard = null;
+        state.pendingTile = null;
+        clearConfirm();
+      }
       highlightDeployTiles(false);
       setBarState('default');
       // Restore hand view
@@ -3365,7 +4077,7 @@ window.addEventListener('unhandledrejection', e => {
 
     el.innerHTML = `
       <div class="unit-hp ${unit.owner===1?'p1-hp':unit.owner===2?'p2-hp':''}"><span>${unit.hp}</span></div>
-      <div class="unit-name">${unit.name}</div>
+      <div class="unit-name">${formatCardName(unit.name)}</div>
       ${bottomHtml}`;
     if (unit.artId) {
       el.setAttribute('style', artStyle(unit));
@@ -3375,6 +4087,125 @@ window.addEventListener('unhandledrejection', e => {
       tryHide(`art/${unit.artId}.jpeg`);
     }
     tile.appendChild(el);
+  }
+
+  // ── HOLD TO DRAW ──
+  const DRAW_HOLD_MS = 1200;
+  let drawHoldTimer = null;
+  let drawHoldPointerId = null;
+
+  function canHoldDraw() {
+    const p = state.players[state.activePlayer];
+    return state._ctaAction === 'draw' && p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound && p.hand.length < MAX_HAND;
+  }
+
+  function clearDrawHold() {
+    if (drawHoldTimer) clearTimeout(drawHoldTimer);
+    drawHoldTimer = null;
+    drawHoldPointerId = null;
+    const btn = document.getElementById('hub-btn');
+    if (btn) btn.classList.remove('hold-drawing','hold-complete');
+  }
+
+  function startDrawHold(e) {
+    if (!canHoldDraw()) return;
+    e.preventDefault();
+    const btn = document.getElementById('hub-btn');
+    if (!btn) return;
+    clearDrawHold();
+    drawHoldPointerId = e.pointerId;
+    try { btn.setPointerCapture?.(e.pointerId); } catch(err) {}
+    btn.style.setProperty('--draw-hold-ms', `${DRAW_HOLD_MS}ms`);
+    btn.classList.remove('hold-complete');
+    // restart transition cleanly
+    btn.classList.remove('hold-drawing');
+    void btn.offsetWidth;
+    btn.classList.add('hold-drawing');
+    drawHoldTimer = setTimeout(() => {
+      if (!canHoldDraw()) { clearDrawHold(); return; }
+      btn.classList.remove('hold-drawing');
+      btn.classList.add('hold-complete');
+      drawHoldTimer = null;
+      drawHoldPointerId = null;
+      drawAction();
+      setTimeout(() => btn.classList.remove('hold-complete'), 250);
+    }, DRAW_HOLD_MS);
+  }
+
+  function cancelDrawHold(e) {
+    if (drawHoldPointerId !== null && e?.pointerId !== drawHoldPointerId) return;
+    clearDrawHold();
+  }
+
+  function setupDrawHold() {
+    const btn = document.getElementById('hub-btn');
+    if (!btn || btn.dataset.holdDrawReady === '1') return;
+    btn.dataset.holdDrawReady = '1';
+    btn.addEventListener('pointerdown', startDrawHold);
+    btn.addEventListener('pointerup', cancelDrawHold);
+    btn.addEventListener('pointercancel', cancelDrawHold);
+    btn.addEventListener('pointerleave', cancelDrawHold);
+  }
+
+
+  // ── HOLD TO PASS ──
+  const PASS_HOLD_MS = 1200;
+  let passHoldTimer = null;
+  let passHoldPointerId = null;
+
+  function canHoldPass() {
+    const btn = document.getElementById('hub-pass-btn');
+    const p = state.players[state.activePlayer];
+    return state.phase === 'battle' && btn?.classList.contains('show') && !p.passed && !state.activeUnit;
+  }
+
+  function clearPassHold() {
+    if (passHoldTimer) clearTimeout(passHoldTimer);
+    passHoldTimer = null;
+    passHoldPointerId = null;
+    const btn = document.getElementById('hub-pass-btn');
+    if (btn) btn.classList.remove('hold-passing','hold-complete');
+  }
+
+  function startPassHold(e) {
+    if (!canHoldPass()) return;
+    e.preventDefault();
+    const btn = document.getElementById('hub-pass-btn');
+    if (!btn) return;
+    clearPassHold();
+    passHoldPointerId = e.pointerId;
+    try { btn.setPointerCapture?.(e.pointerId); } catch(err) {}
+    btn.style.setProperty('--pass-hold-ms', `${PASS_HOLD_MS}ms`);
+    btn.classList.remove('hold-complete');
+    btn.classList.remove('hold-passing');
+    void btn.offsetWidth;
+    btn.classList.add('hold-passing');
+    passHoldTimer = setTimeout(() => {
+      if (!canHoldPass()) { clearPassHold(); return; }
+      btn.classList.remove('hold-passing');
+      btn.classList.add('hold-complete');
+      passHoldTimer = null;
+      passHoldPointerId = null;
+      passAction();
+      setTimeout(() => btn.classList.remove('hold-complete'), 250);
+    }, PASS_HOLD_MS);
+  }
+
+  function cancelPassHold(e) {
+    if (passHoldPointerId !== null && e?.pointerId !== passHoldPointerId) return;
+    clearPassHold();
+  }
+
+  function setupPassHold() {
+    const btn = document.getElementById('hub-pass-btn');
+    if (!btn || btn.dataset.holdPassReady === '1') return;
+    btn.dataset.holdPassReady = '1';
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', e => e.preventDefault());
+    btn.addEventListener('pointerdown', startPassHold);
+    btn.addEventListener('pointerup', cancelPassHold);
+    btn.addEventListener('pointercancel', cancelPassHold);
+    btn.addEventListener('pointerleave', cancelPassHold);
   }
 
   // ── DRAW ACTION ──
@@ -3594,109 +4425,287 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   function openBattleOverlay(targetTileId) {
-    const atk=state.activeUnit.card;
-    const def=state.board[targetTileId];
-    if(!def) return;
-    const atkCol=state.activePlayer===1?'p1':'p2';
-    const defCol=state.activePlayer===1?'p2':'p1';
+    const atk = state.activeUnit.card;
+    const def = state.board[targetTileId];
+    if (!def) return;
 
-    function bCardHtml(card,col,curHp) {
-      const rng=displayRange(card.weapon.range);
-      const mv=card.move===-1?'—':`${card.move}"`;
-      const sp=card.special.indexOf(':');
-      return `<div class="battle-card ${col}-tint">
-        <div class="bcard-art" style="${artStyle(card, true)}">
-          <div class="bcard-hp">❤ ${curHp}</div>
-          <div class="bcard-cost-badge"><span>${card.cost}</span></div>
-          <div class="bcard-badges">
-            <div class="bcard-badge">🛡 ${card.save}</div>
-            <div class="bcard-badge">↗ ${mv}</div>
-          </div>
+    function battleCardHtml(card, role, currentHp) {
+      const ownerCol = card.owner === 1 ? 'p1' : card.owner === 2 ? 'p2' : '';
+      const fallbackId = `battle-${role}-fallback`;
+      const art = artStyle(card, true);
+      const defenceHtml = role === 'defender'
+        ? `<div class="battle-target-hp ${ownerCol}-stat">${escapeHtml(currentHp ?? card.hp ?? '')}</div>
+           <div class="battle-target-save">${escapeHtml(card.save ?? '')}</div>`
+        : '';
+      return `<div class="battle-zoom-card ${role}">
+        <div class="battle-card-role">${role === 'attacker' ? 'Attacker' : 'Defender'}</div>
+        <div class="battle-card-art ${ownerCol}-unit" id="battle-${role}-art" style="${art}">
+          ${defenceHtml}
+          <div class="battle-card-fallback" id="${fallbackId}">${formatCardName(card.name)}</div>
         </div>
-        <div class="bcard-info">
-          <div class="bcard-type">${card.type}</div>
-          <div class="bcard-name">${card.name}</div>
-          <div class="bcard-weapon">${card.weapon.name}</div>
-        </div>
-        <div class="bcard-stats">
-          <div class="bstat"><div class="bstat-val">${rng}</div><div class="bstat-lbl">Rng</div></div>
-          <div class="bstat"><div class="bstat-val">${card.weapon.attacks}</div><div class="bstat-lbl">Atk</div></div>
-          <div class="bstat"><div class="bstat-val">${card.weapon.hit}</div><div class="bstat-lbl">Hit</div></div>
-          <div class="bstat"><div class="bstat-val">${card.weapon.ap}</div><div class="bstat-lbl">AP</div></div>
-          <div class="bstat"><div class="bstat-val">${card.weapon.damage}</div><div class="bstat-lbl">Dmg</div></div>
-        </div>
-        <div class="bcard-special"><span class="bcard-special-name">${card.special.substring(0,sp)}:</span>${card.special.substring(sp+1)}</div>
+        <div class="battle-card-name">${formatCardName(card.name)}</div>
+        ${card.weapon?.name ? `<div class="battle-card-weapon">${escapeHtml(card.weapon.name)}</div>` : ''}
       </div>`;
     }
 
-    const ov=document.createElement('div');
-    ov.className='battle-overlay';
-    ov.innerHTML=`
-      <div class="battle-header">
-        <div class="battle-heading">Combat</div>
-        <div class="battle-close" id="battle-close">✕</div>
-      </div>
-      <div class="battle-cards">
-        ${bCardHtml(atk,atkCol,atk.hp)}
-        <div class="battle-vs"><div class="battle-vs-icon">⚔</div><div class="battle-vs-arrow">→</div></div>
-        ${bCardHtml(def,defCol,def.hp)}
-      </div>
-      <div class="battle-cta" id="battle-cta">
-        <button class="battle-attack-btn">Attack ▶</button>
+    function updateBattleFallback(card, role) {
+      const nameEl = document.getElementById(`battle-${role}-fallback`);
+      if (!nameEl) return;
+      nameEl.textContent = formatCardName(card?.name);
+      nameEl.classList.remove('hidden');
+      if (!card?.artId) return;
+      let pending = 3;
+      let loaded = false;
+      const done = () => { pending -= 1; if (pending <= 0 && !loaded) nameEl.classList.remove('hidden'); };
+      [`art/${card.artId}.png`, `art/${card.artId}.jpg`, `art/${card.artId}.jpeg`].forEach(src => {
+        const img = new Image();
+        img.onload = () => { loaded = true; nameEl.classList.add('hidden'); };
+        img.onerror = done;
+        img.src = src;
+      });
+    }
+
+    const ov = document.createElement('div');
+    ov.className = 'battle-overlay';
+    ov.innerHTML = `
+      <div class="battle-shell" onclick="event.stopPropagation()">
+        <div class="battle-header">
+          <div class="battle-heading">Attack Declared</div>
+          <div class="battle-close" id="battle-close">✕</div>
+        </div>
+        <div class="battle-duel">
+          ${battleCardHtml(atk,'attacker',atk.hp)}
+          <div class="battle-vs"><div class="battle-vs-icon">⚔</div><div class="battle-vs-arrow">→</div></div>
+          ${battleCardHtml(def,'defender',def.hp)}
+        </div>
+        <div class="battle-attack-profile">
+          ${battleAttackProfileHtml(atk)}
+        </div>
+        <div class="battle-cta" id="battle-cta"></div>
       </div>`;
     document.body.appendChild(ov);
-    requestAnimationFrame(()=>ov.classList.add('show'));
+    updateBattleFallback(atk, 'attacker');
+    updateBattleFallback(def, 'defender');
+    requestAnimationFrame(() => ov.classList.add('show'));
 
-    ov.querySelector('#battle-close').addEventListener('click',()=>ov.remove());
+    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+    ov.querySelector('#battle-close').addEventListener('click', () => ov.remove());
 
-    ov.querySelector('.battle-attack-btn').addEventListener('click',()=>{
-      const result=resolveCombat(atk,def,unitLane(targetTileId));
-      const hpBefore=def.hp;
-      const hpAfter=Math.max(0,hpBefore-result.totalDmg);
-      const slain=hpAfter<=0;
-      const {atkDice,hits,saveDice,saved,autoFail,modSave,totalDmg,hitThresh}=result;
-      const atkDiceHtml = atkDice.map(d=>`<span class="die ${d>=hitThresh?'die-hit':'die-miss'}">${d}</span>`).join('');
-      const saveDiceHtml = saveDice.map(d=>`<span class="die ${d>=modSave?'die-saved':'die-failed'}">${d}</span>`).join('');
-      const saveLabel=autoFail?'Save (auto-fail)':`Save ${modSave}+`;
-      const saveLine=autoFail
-        ?`<div class="combat-row"><span class="combat-lbl">${saveLabel}</span><span class="combat-val saves">0/${hits}</span></div>`
-        :`<div class="combat-row"><span class="combat-lbl">${saveLabel}</span><div class="dice-row">${saveDiceHtml}</div><span class="combat-val saves">${saved} saved</span></div>`;
-      document.getElementById('battle-cta').innerHTML=`<div class="battle-resolution">
-        <div class="combat-row"><span class="combat-lbl">Hit ${atk.weapon.hit}</span><div class="dice-row">${atkDiceHtml}</div><span class="combat-val hits">${hits} hit${hits!==1?'s':''}</span></div>
-        ${saveLine}
-        <div class="combat-divider"></div>
-        <div class="combat-row"><span class="combat-lbl">Damage</span><span class="combat-val dmg">${totalDmg>0?`−${totalDmg}`:'None'}</span></div>
-        <div class="combat-row"><span class="combat-lbl">${def.name} HP</span><span class="combat-val hp">${slain?'☠ Slain':`${hpBefore} → ${hpAfter}`}</span></div>
-        <button class="battle-done-btn" id="battle-done-btn">Resolve ▶</button>
+    const cta = document.getElementById('battle-cta');
+    cta.innerHTML = `
+      <div class="battle-sequence">
+        <div class="battle-roll-panel attack-panel">
+          <div class="battle-row-track">
+            <div class="battle-roll-stat attack" id="battle-hit-box">
+              <div class="battle-roll-stat-icon">🎯</div>
+              <div class="battle-roll-stat-value" id="battle-hit-stat">${escapeHtml(atk.weapon?.hit ?? '')}</div>
+            </div>
+            <div class="battle-dice-wrap"><div class="battle-dice-row" id="battle-attack-row"></div></div>
+            <div class="battle-roll-stat damage right" id="battle-dmg-box">
+              <div class="battle-roll-stat-icon">💀</div>
+              <div class="battle-roll-stat-value" id="battle-dmg-stat">${escapeHtml(atk.weapon?.damage ?? '')}</div>
+            </div>
+          </div>
+          <div class="battle-row-summary" id="battle-attack-summary"></div>
+        </div>
+        <div class="battle-ap-bridge pre-attack" id="battle-ap-bridge">
+          <div class="battle-ap-chip" id="battle-ap-chip"><span class="battle-ap-chip-icon">🛡</span><span class="battle-ap-chip-value" id="battle-ap-value">${atk.weapon?.ap > 0 ? `-${escapeHtml(atk.weapon.ap)}` : '0'}</span></div>
+        </div>
+        <div class="battle-roll-panel defence-panel pre-attack" id="battle-defence-panel">
+          <div class="battle-row-track">
+            <div class="battle-roll-stat defence" id="battle-save-box">
+              <div class="battle-roll-stat-icon">🛡</div>
+              <div class="battle-roll-stat-value" id="battle-save-stat">${escapeHtml(def.save ?? '')}</div>
+            </div>
+            <div class="battle-dice-wrap"><div class="battle-dice-row" id="battle-defence-row"></div></div>
+            <div class="battle-roll-stat hp right" id="battle-hp-box">
+              <div class="battle-roll-stat-icon">♥</div>
+              <div class="battle-roll-stat-value" id="battle-hp-stat">${escapeHtml(def.hp ?? '')}</div>
+            </div>
+          </div>
+          <div class="battle-row-summary" id="battle-defence-summary"></div>
+          <div class="battle-row-cta" id="battle-row-cta"></div>
+        </div>
       </div>`;
-      document.getElementById('battle-done-btn').addEventListener('click',()=>{
-        // Close overlay immediately
-        ov.remove();
-        clearHighlights();
-        setUILock(true);
-        // Apply state changes
-        def.hp = hpAfter;
-        atk.actionsLeft--;
-        // Show float on board
-        if(result.totalDmg > 0) showDamageFloat(targetTileId, result.totalDmg);
-        // Update board after short delay so float is visible
-        setTimeout(()=>{
-          if(slain){
-            removeSlain(targetTileId);
-          } else {
-            const tile=document.querySelector(`[data-id="${targetTileId}"]`);
-            const tileHp=tile?.querySelector('.unit-hp span');
-            if(tileHp) tileHp.textContent=def.hp;
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const DIE_MS = 450;
+    const PRE_ATTACK_PAUSE = 350;
+    const POST_ATTACK_PAUSE = 1000;
+    const DEFENCE_STAGE_PAUSE = 550;
+    const AP_TRANSFER_PAUSE = 650;
+    const attackRow = document.getElementById('battle-attack-row');
+    const defenceRow = document.getElementById('battle-defence-row');
+    const attackSummary = document.getElementById('battle-attack-summary');
+    const hitStatEl = document.getElementById('battle-hit-stat');
+    const dmgStatEl = document.getElementById('battle-dmg-stat');
+    const defenceSummary = document.getElementById('battle-defence-summary');
+    const saveStatEl = document.getElementById('battle-save-stat');
+    const hpStatEl = document.getElementById('battle-hp-stat');
+    const rowCta = document.getElementById('battle-row-cta');
+    const defencePanel = document.getElementById('battle-defence-panel');
+    const apBridge = document.getElementById('battle-ap-bridge');
+    const apChip = document.getElementById('battle-ap-chip');
+    const apValue = document.getElementById('battle-ap-value');
+    const saveBox = document.getElementById('battle-save-box');
+    const attackProfile = ov.querySelector('.battle-attack-profile');
+
+    const makeDie = (value='', cls='') => {
+      const die = document.createElement('span');
+      die.className = `die ${cls}`.trim();
+      die.textContent = value;
+      return die;
+    };
+    const setupGhostRow = (row, count) => {
+      if (!row) return;
+      row.innerHTML = '';
+      for (let i = 0; i < count; i++) row.appendChild(makeDie('', 'die-ghost die-reveal'));
+    };
+    const fillPlaceholder = async (row, index, value, cls='') => {
+      const die = row?.children?.[index];
+      if (!die) return null;
+      die.textContent = value;
+      die.className = `die ${cls} die-reveal`.trim();
+      await wait(DIE_MS);
+      return die;
+    };
+    const setAttackSummary = (summary='', kind='') => {
+      if (!attackSummary) return;
+      attackSummary.textContent = summary;
+      attackSummary.className = 'battle-row-summary' + (kind ? ` ${kind}` : '');
+    };
+    const setDefenceSummary = (summary='', kind='') => {
+      if (!defenceSummary) return;
+      defenceSummary.textContent = summary;
+      defenceSummary.className = 'battle-row-summary' + (kind ? ` ${kind}` : '');
+    };
+    const setPreAttackDefenceRow = () => {
+      defencePanel?.classList.add('pre-attack');
+      apBridge?.classList.add('pre-attack');
+      if (defenceRow) defenceRow.innerHTML = '';
+      setDefenceSummary('');
+      if (saveStatEl) saveStatEl.textContent = escapeHtml(def.save ?? '');
+      if (hpStatEl) hpStatEl.textContent = escapeHtml(def.hp ?? '');
+      saveBox?.classList.remove('applied');
+      apChip?.classList.remove('transfer');
+    };
+    const activateDefenceRow = () => {
+      defencePanel?.classList.remove('pre-attack');
+      apBridge?.classList.remove('pre-attack');
+    };
+    const cancelOneAttackHit = () => {
+      const hit = attackRow?.querySelector('.die-hit-active:not(.hit-cancelled)');
+      if (hit) hit.classList.add('hit-cancelled');
+    };
+    const setRowButton = (html, onClick) => {
+      if (!rowCta) return null;
+      rowCta.innerHTML = html || '';
+      const btn = rowCta.querySelector('button');
+      if (btn && onClick) btn.addEventListener('click', onClick, { once:true });
+      return btn;
+    };
+    const applyResolve = (result, hpAfter, slain) => {
+      ov.remove();
+      clearHighlights();
+      setUILock(true);
+      def.hp = hpAfter;
+      atk.actionsLeft--;
+      if (result.totalDmg > 0) showDamageFloat(targetTileId, result.totalDmg);
+      setTimeout(() => {
+        if (slain) {
+          removeSlain(targetTileId);
+        } else {
+          const tile = document.querySelector(`[data-id="${targetTileId}"]`);
+          const tileHp = tile?.querySelector('.unit-hp span');
+          if (tileHp) tileHp.textContent = def.hp;
+        }
+        const atkTile = document.querySelector(`[data-id="${state.activeUnit.tileId}"]`);
+        if (atkTile) renderUnit(atkTile, atk);
+        renderHub();
+        setUILock(false);
+        if (atk.actionsLeft > 0) { state.activeAction = null; selectAction('attack'); }
+        else { closeProfile(); endCurrentTurn(); waitThenAdvance(); }
+      }, 600);
+    };
+
+    setupGhostRow(attackRow, atk.weapon?.attacks ?? 0);
+    if (hitStatEl) hitStatEl.textContent = escapeHtml(atk.weapon?.hit ?? '');
+    if (dmgStatEl) dmgStatEl.textContent = escapeHtml(atk.weapon?.damage ?? '');
+    setAttackSummary('');
+    setPreAttackDefenceRow();
+    setRowButton('<button class="battle-attack-btn" id="battle-start-attack"><span class="battle-action-star">✦</span> Attack</button>', startAttackSequence);
+
+    function startAttackSequence() {
+      const result = resolveCombat(atk, def, unitLane(targetTileId));
+      const hpBefore = def.hp;
+      const hpAfter = Math.max(0, hpBefore - result.totalDmg);
+      const slain = hpAfter <= 0;
+      const { atkDice, hits, saveDice, saved, autoFail, modSave, hitThresh } = result;
+      const failed = Math.max(0, hits - saved);
+      const ap = atk.weapon?.ap ?? 0;
+      if (attackProfile) attackProfile.classList.add('sequence-live');
+      setRowButton('', null);
+      setupGhostRow(attackRow, atkDice.length);
+      setAttackSummary('');
+      setPreAttackDefenceRow();
+
+      (async () => {
+        await wait(PRE_ATTACK_PAUSE);
+        let slotIndex = 0;
+        for (const d of atkDice) {
+          const isHit = d >= hitThresh;
+          await fillPlaceholder(attackRow, slotIndex++, d, isHit ? 'die-hit die-hit-active' : 'die-miss');
+        }
+        setAttackSummary(`${hits} hit${hits !== 1 ? 's' : ''}`, hits > 0 ? 'good' : 'bad');
+        await wait(POST_ATTACK_PAUSE);
+
+        if (hits <= 0) {
+          activateDefenceRow();
+          if (apValue) apValue.textContent = ap > 0 ? `-${ap}` : '0';
+          setDefenceSummary('No hits to save', 'bad');
+          setRowButton('<button class="battle-done-btn">Resolve ▶</button>', () => applyResolve(result, hpAfter, slain));
+          return;
+        }
+
+        activateDefenceRow();
+        if (apValue) apValue.textContent = ap > 0 ? `-${ap}` : '0';
+        if (saveStatEl) saveStatEl.textContent = escapeHtml(def.save ?? '');
+        if (hpStatEl) hpStatEl.textContent = escapeHtml(def.hp ?? '');
+        setupGhostRow(defenceRow, hits);
+        setDefenceSummary('');
+        const defClass = def.owner === 1 ? 'p1-def' : 'p2-def';
+        const startDefence = () => {
+          setRowButton('', null);
+          runDefencePhase();
+        };
+        const btn = setRowButton(`<button class="battle-defence-btn ${defClass}" id="battle-defence-btn"><span>Roll Defence</span></button>`, startDefence);
+        requestAnimationFrame(() => btn?.classList.add('counting'));
+
+        async function runDefencePhase() {
+          if (ap > 0) {
+            apChip?.classList.add('transfer');
+            saveBox?.classList.add('applied');
+            if (saveStatEl) saveStatEl.textContent = `-${ap}`;
+            await wait(AP_TRANSFER_PAUSE);
+            apChip?.classList.remove('transfer');
+            saveBox?.classList.remove('applied');
           }
-          const atkTile=document.querySelector(`[data-id="${state.activeUnit.tileId}"]`);
-          if(atkTile) renderUnit(atkTile, atk);
-          renderHub();
-          setUILock(false);
-          if(atk.actionsLeft>0){ state.activeAction=null; selectAction('attack'); }
-          else { closeProfile(); endCurrentTurn(); waitThenAdvance(); }
-        }, 600);
-      });
-    });
+          if (saveStatEl) saveStatEl.textContent = autoFail ? '—' : `${modSave}+`;
+          await wait(DEFENCE_STAGE_PAUSE);
+          let defIndex = 0;
+          for (const d of saveDice) {
+            const didSave = !autoFail && d >= modSave;
+            await fillPlaceholder(defenceRow, defIndex++, d, didSave ? 'die-saved' : 'die-failed');
+            if (didSave) {
+              cancelOneAttackHit();
+              await wait(160);
+            }
+          }
+          setDefenceSummary(`${saved} saved · ${failed} unsaved`, failed > 0 ? 'bad' : 'good');
+          setRowButton('<button class="battle-done-btn">Resolve ▶</button>', () => applyResolve(result, hpAfter, slain));
+        }
+      })();
+    }
   }
 
   function removeSlain(tileId) {
@@ -3747,6 +4756,7 @@ window.addEventListener('unhandledrejection', e => {
     const costVal = document.getElementById('hub-btn-cost-val');
     const oppEl = document.getElementById('hub-btn-opp');
     btn.className = 'hub-btn ' + btnState;
+    btn.style.removeProperty('--draw-hold-ms');
     lbl.textContent = label || '';
     subEl.textContent = sub || '';
     if (cost != null) {
@@ -3761,13 +4771,14 @@ window.addEventListener('unhandledrejection', e => {
   function onHubBtn() {
     if (state._ctaAction === 'pre-deploy') {
       selectHandCard(profileCard);
-      state._ctaAction = 'deploy';
+      state.deployModeFromInspector = true;
+      setBarState('pending', { label: 'Choose Tile', cost: profileCard?.cost ?? null, action: 'deploy' });
     }
-    else if (state._ctaAction === 'deploy' && state.pendingTile) executeDeployTo(state.pendingTile);
+    else if (state._ctaAction === 'deploy' && state.pendingTile && !state.deployModeFromInspector) executeDeployTo(state.pendingTile);
     else if (state._ctaAction === 'activate') activateUnit();
     else if (state._ctaAction === 'cast') { state.selectedHandCard = profileCard; castPowerCard(profileCard); }
-    else if (state._ctaAction === 'draw') drawAction();
-    else if (state._ctaAction === 'pass') passAction();
+    else if (state._ctaAction === 'draw') { /* draw now requires hold */ }
+    else if (state._ctaAction === 'pass') { /* pass now requires hold */ }
   }
 
   function setBarState(state_name, opts={}) {
@@ -3795,13 +4806,14 @@ window.addEventListener('unhandledrejection', e => {
       if (badges) badges.style.display = 'none';
       const p = state.players[state.activePlayer];
       const canDraw = p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound && p.hand.length < MAX_HAND;
-      setHubBtn(canDraw ? 'state-active' : 'state-dim', 'Draw', '', 1);
+      setHubBtn(canDraw ? 'state-ready' : 'state-dim', 'Draw', canDraw ? '(Hold)' : '', 1);
       state._ctaAction = 'draw';
 
     } else if (state_name === 'pending') {
       if (!inspectorOpen) deck.style.display = '';
       diamond.style.display = '';
-      setHubBtn('state-active', opts.label || 'Confirm', '', opts.cost ?? null);
+      const isConfirmState = opts.confirm === true || (opts.action === 'deploy' && state.pendingTile && !state.deployModeFromInspector);
+      setHubBtn(isConfirmState ? 'state-active' : 'state-pending', opts.label || 'Confirm', '', opts.cost ?? null);
       state._ctaAction = opts.action || null;
 
     } else if (state_name === 'dim') {
@@ -4031,8 +5043,8 @@ window.addEventListener('unhandledrejection', e => {
     }
     _advancePending = true;
     setUILock(true);
-    setTimeout(() => document.getElementById('turn-wait').classList.add('show'), 300);
-    setTimeout(advanceTurn, 2000);
+    setTimeout(() => document.getElementById('turn-wait').classList.add('show'), TURN_WAIT_ICON_MS);
+    setTimeout(advanceTurn, TURN_ADVANCE_WAIT_MS);
   }
 
   function advanceTurn() {
@@ -4118,7 +5130,7 @@ window.addEventListener('unhandledrejection', e => {
     const fxB = state.laneEffects.B;
     const makeCard = (fx, preview) => fx ? `
       <div style="background:#0e1a12;border:1px solid #1a5030;border-radius:6px;padding:10px 12px;text-align:left;flex:1">
-        <div style="font-size:var(--fs-xs);color:#40a878;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:2px">${fx.name}</div>
+        <div style="font-size:var(--fs-xs);color:#40a878;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:2px">${formatCardName(fx.name)}</div>
         <div style="font-size:var(--fs-xs);color:#3a6848;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">${fx.trigger.replace(/_/g,' ')}</div>
         <div style="font-size:var(--fs-xs);color:#5a8868;line-height:1.5">${fx.description}</div>
         ${preview ? `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #1a3020;font-size:var(--fs-xs);color:#7a8868;line-height:1.5;">${preview}</div>` : ''}
@@ -4253,6 +5265,7 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   function quickLoad() {
+    if(!localStorage.getItem('grim_save')) { showToastMsg('No Save Found'); return; }
     document.getElementById('start-overlay').classList.remove('show');
     loadGame();
   }
