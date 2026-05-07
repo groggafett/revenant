@@ -256,8 +256,8 @@ border: 1px solid #5a4020;
 text-align: center; color: #d4b870;
 transition: opacity 0.2s;
 }
-.unit-on-tile.p1-unit { border: 2px solid #4a78d8; box-shadow: 0 0 6px rgba(74,120,216,0.5); background: linear-gradient(160deg,#161c38 0%,#0c1028 100%); }
-.unit-on-tile.p2-unit { border: 2px solid #cc3030; box-shadow: 0 0 6px rgba(204,48,48,0.5); background: linear-gradient(160deg,#341010 0%,#200808 100%); }
+.unit-on-tile.p1-unit { border: 2px solid #4a78d8; box-shadow: 0 0 6px rgba(74,120,216,0.5); background: linear-gradient(160deg,#22345f,#162443); }
+.unit-on-tile.p2-unit { border: 2px solid #cc3030; box-shadow: 0 0 6px rgba(204,48,48,0.5); background: linear-gradient(160deg,#5a1a1a,#3f1111); }
 /* HP circle — top left absolute */
 .unit-hp {
 position: absolute; top: 2px; left: 2px;
@@ -311,8 +311,8 @@ opacity:0; transition: opacity 0.18s ease;
 mix-blend-mode: screen;
 }
 .card-zoom-art.tilting .card-zoom-shine { opacity:1; }
-.card-zoom-art.p1-unit { border-color: #4a78d8; box-shadow: 0 0 20px rgba(74,120,216,0.36), 0 12px 38px rgba(0,0,0,0.8); }
-.card-zoom-art.p2-unit { border-color: #cc3030; box-shadow: 0 0 20px rgba(204,48,48,0.36), 0 12px 38px rgba(0,0,0,0.8); }
+.card-zoom-art.p1-unit { border-color: #4a78d8; background: linear-gradient(160deg,#22345f,#162443); box-shadow: 0 0 20px rgba(74,120,216,0.36), 0 12px 38px rgba(0,0,0,0.8); }
+.card-zoom-art.p2-unit { border-color: #cc3030; background: linear-gradient(160deg,#5a1a1a,#3f1111); box-shadow: 0 0 20px rgba(204,48,48,0.36), 0 12px 38px rgba(0,0,0,0.8); }
 .card-zoom-close-btn {
 position:absolute; top:8px; right:8px; z-index:8;
 width:28px; height:28px; border-radius:50%;
@@ -779,8 +779,8 @@ transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
 position: relative; z-index: 1;
 margin-top: 10%;
 }
-.prof-card-visual.p1-unit { border-color: #2e3a6a; }
-.prof-card-visual.p2-unit { border-color: #5a1818; }
+.prof-card-visual.p1-unit { border-color: #2e3a6a; background: linear-gradient(160deg,#22345f,#162443); }
+.prof-card-visual.p2-unit { border-color: #5a1818; background: linear-gradient(160deg,#5a1a1a,#3f1111); }
 .prof-card-visual.cv-activated.p1-unit { border-color: var(--p1); box-shadow: 0 0 8px rgba(74,120,216,0.4); }
 .prof-card-visual.cv-activated.p2-unit { border-color: var(--p2); box-shadow: 0 0 8px rgba(200,48,48,0.4); }
 .prof-card-visual.cv-exhausted { opacity: 0.45; }
@@ -973,6 +973,18 @@ padding: 0 8px;
 
 .card-name, .unit-name, .bcard-name, .card-zoom-name, .prof-name-txt, .hub-unit-name { text-transform: uppercase; }
 
+/* Hand hold-preview */
+.card.hand-previewing { outline:2px solid #f0d080; box-shadow:0 0 16px rgba(240,208,128,0.58), 0 10px 22px rgba(0,0,0,0.62); filter:brightness(1.08); z-index:60 !important; }
+.hand-hold-preview { position:fixed; left:50%; bottom:186px; transform:translateX(-50%) translateY(8px); z-index:140; pointer-events:none; width:min(255px,66vw); aspect-ratio:5/7; border-radius:10px; border:2px solid #c8a060; background:linear-gradient(160deg,#17100a,#050403); box-shadow:0 18px 48px rgba(0,0,0,0.82), 0 0 22px rgba(200,160,80,0.25); overflow:hidden; opacity:0; transition:opacity .18s ease, transform .18s ease; }
+.hand-hold-preview.show { opacity:1; transform:translateX(-50%) translateY(-16px); }
+.hand-hold-preview-art { position:absolute; inset:0; background:linear-gradient(160deg,#17100a,#050403); background-position:center; background-size:cover; }
+.hand-hold-preview-name { position:absolute; left:14px; right:14px; top:50%; transform:translateY(-50%); font-size:18px; font-weight:900; line-height:1.15; letter-spacing:.08em; text-align:center; color:#c8a060; text-shadow:0 0 10px #000, 0 1px 0 #000; text-transform:uppercase; max-height:64px; overflow:hidden; }
+.hand-hold-preview-name.hidden { display:none; }
+.hand-hold-preview-cost { position:absolute; top:10px; right:10px; width:36px; height:36px; background:var(--resources); border:2px solid var(--resources-hi); border-radius:5px; transform:rotate(45deg); display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(217,121,24,.45); }
+.hand-hold-preview-cost span { transform:rotate(-45deg); color:var(--resources-text); font-size:18px; font-weight:900; line-height:1; }
+.hand-hold-preview-hp { position:absolute; top:10px; left:10px; width:34px; height:34px; border-radius:50%; border:2px solid var(--hp-positive); background:#0e2208; color:var(--hp-positive); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
+.hand-hold-preview-power { position:absolute; top:10px; left:10px; width:34px; height:34px; border-radius:50%; border:2px solid #8a40c0; background:#1a1020; color:#d6a8ff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
+
 /* Hand cards */
 .card {
 width: 52px; aspect-ratio: 5/7; flex-shrink: 0;
@@ -989,8 +1001,8 @@ transition: border-color 0.15s, transform 0.15s, opacity 0.15s;
 .card.unavailable { opacity: 0.35; }
 .card.unavailable .card-cost { background: #2a2020; border-color: #3a2a2a; }
 .card.unavailable .card-cost span { color: #c09080; }
-.card.p1-card { border-color: #1e2a4a; box-shadow: 0 0 6px rgba(40,80,160,0.2), inset 0 1px 0 rgba(74,120,216,0.1); }
-.card.p2-card { border-color: #3a1010; box-shadow: 0 0 6px rgba(160,20,20,0.2), inset 0 1px 0 rgba(200,48,48,0.1); }
+.card.p1-card { border-color: #1e2a4a; background: linear-gradient(160deg,#22345f,#162443); box-shadow: 0 0 6px rgba(40,80,160,0.2), inset 0 1px 0 rgba(74,120,216,0.1); }
+.card.p2-card { border-color: #3a1010; background: linear-gradient(160deg,#5a1a1a,#3f1111); box-shadow: 0 0 6px rgba(160,20,20,0.2), inset 0 1px 0 rgba(200,48,48,0.1); }
 .card.p1-card.selected { border-color: var(--p1); box-shadow: 0 0 12px rgba(74,120,216,0.5); }
 .card.p2-card.selected { border-color: var(--p2); box-shadow: 0 0 12px rgba(200,48,48,0.5); }
 
@@ -1300,6 +1312,10 @@ flex: 1; align-items: flex-end; justify-content: center;
 width: 100%; padding: 0 6px;
 }
 .hand-scroll::-webkit-scrollbar { display: none; }
+/* Hand fan layout */
+.hand-scroll.hand-fanned { overflow: visible; justify-content: center; align-items: flex-end; padding: 0 12px 4px; }
+.hand-scroll.hand-fanned .card { transition: transform .12s ease, box-shadow .12s ease, filter .12s ease; will-change: transform; }
+.hand-scroll.hand-fanned .card.hand-previewing { z-index: 50 !important; }
 .card-empty {
 width: 68px; aspect-ratio: 5/7; flex-shrink: 0;
 border-radius: 4px; border: 1px dashed #2a1e0a;
@@ -1376,7 +1392,7 @@ box-shadow: 0 0 6px rgba(217,121,24,0.45);
 
 /* ── PROFILE PANEL — compact bottom strip, no overlay ── */
 /* ── PLAYER COLOUR AFFILIATION ── */
-.unit-on-tile.p2-unit { border-color: #5a1818; background: linear-gradient(160deg,#341010 0%,#200808 100%); }
+.unit-on-tile.p2-unit { border-color: #5a1818; background: linear-gradient(160deg,#5a1a1a,#3f1111); }
 font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.1em;
 text-transform: uppercase; padding: 4px 8px;
 border-radius: 3px; cursor: pointer;
@@ -1490,8 +1506,8 @@ width:100%; aspect-ratio:5/7; border-radius:7px; position:relative; overflow:hid
 background:linear-gradient(160deg,#1a1610,#0e0c08) center/cover;
 border:2px solid #2a1e0a; box-shadow:0 10px 28px rgba(0,0,0,0.78), inset 0 1px 0 rgba(180,140,60,0.08);
 }
-.battle-card-art.p1-unit { border-color:#4a78d8; box-shadow:0 0 14px rgba(74,120,216,0.32), 0 10px 28px rgba(0,0,0,0.78); }
-.battle-card-art.p2-unit { border-color:#cc3030; box-shadow:0 0 14px rgba(204,48,48,0.30), 0 10px 28px rgba(0,0,0,0.78); }
+.battle-card-art.p1-unit { border-color:#4a78d8; background: linear-gradient(160deg,#22345f,#162443); box-shadow:0 0 14px rgba(74,120,216,0.32), 0 10px 28px rgba(0,0,0,0.78); }
+.battle-card-art.p2-unit { border-color:#cc3030; background: linear-gradient(160deg,#5a1a1a,#3f1111); box-shadow:0 0 14px rgba(204,48,48,0.30), 0 10px 28px rgba(0,0,0,0.78); }
 /* Battle screen only shows contextual target defence, not full card stats. */
 .battle-card-cost,
 .battle-stat-rail,
@@ -2959,49 +2975,69 @@ window.addEventListener('unhandledrejection', e => {
     renderHand();
   }
 
-  const MAX_HAND = 7;
+  const MAX_HAND = 10;
   function renderHand() {
     const p = state.players[state.activePlayer];
     const scroll = document.getElementById('hand-scroll');
     scroll.innerHTML = '';
+    scroll.classList.add('hand-fanned');
     const count = p.hand.length;
-    let cw, ch;
-    if (count >= 7)      { cw = 50; ch = 70; }
-    else if (count >= 6) { cw = 60; ch = 84; }
-    else                 { cw = 70; ch = 98; }
     const existingLabel = document.getElementById('hand-full-label');
     if (existingLabel) existingLabel.remove();
-    if (count >= 7) {
+    if (count >= MAX_HAND) {
       const lbl = document.createElement('div');
       lbl.id = 'hand-full-label';
       lbl.textContent = 'Hand Full';
       lbl.style.cssText = 'font-size:10px;font-family:Spectral,Georgia,serif;color:#5a4828;letter-spacing:0.15em;text-transform:uppercase;text-align:center;padding:2px 0;flex-shrink:0;width:100%;';
       scroll.parentElement.insertBefore(lbl, scroll);
     }
-    scroll.style.justifyContent = count >= 5 ? 'space-evenly' : 'center';
-    scroll.style.alignItems = 'flex-end';
-    scroll.style.gap = count >= 5 ? '0' : '4px';
-    p.hand.forEach(card=>{
-      const canAfford=p.resources>=card.cost;
-      const isSelected=state.selectedHandCard?.uid===card.uid;
-      const el=document.createElement('div');
+
+    let cw = 78;
+    if (count >= 10)      cw = 52;
+    else if (count >= 9)  cw = 54;
+    else if (count >= 8)  cw = 58;
+    else if (count >= 7)  cw = 62;
+    else if (count >= 6)  cw = 67;
+    else if (count >= 5)  cw = 71;
+    else if (count >= 4)  cw = 74;
+    const ch = Math.round(cw * 1.41);
+
+    const maxWidth = Math.max(240, (scroll.clientWidth || scroll.parentElement?.clientWidth || window.innerWidth || 360) - 8);
+    const center = (count - 1) / 2;
+    const visibleStep = count <= 1 ? cw : Math.max(16, Math.min(cw - 10, Math.floor((maxWidth - cw) / Math.max(1, count - 1))));
+    const overlap = count <= 1 ? 0 : Math.max(10, cw - visibleStep);
+    const maxAngle = count >= 10 ? 5 : count >= 8 ? 6 : count >= 6 ? 7 : 9;
+    const angleStep = count >= 10 ? 2.2 : count >= 8 ? 2.8 : 3.6;
+
+    p.hand.forEach((card, idx) => {
+      const canAfford = p.resources >= card.cost;
+      const isSelected = state.selectedHandCard?.uid === card.uid;
       const col = p.color;
-      el.className=`card ${col}-card${isSelected?' selected':''}${!canAfford?' unavailable':''}`;el.style.width=cw+'px';el.style.height=ch+'px';el.style.flexShrink='0';
+      const el = document.createElement('div');
+      const offset = idx - center;
+      const lift = Math.abs(offset) < 0.25 ? -4 : Math.abs(offset) < 1.25 ? -2 : 0;
+      const angle = Math.max(-maxAngle, Math.min(maxAngle, offset * angleStep));
+      const baseTransform = `translateY(${lift}px) rotate(${angle}deg)`;
+      el.className = `card ${col}-card hand-fan-card${isSelected ? ' selected' : ''}${!canAfford ? ' unavailable' : ''}`;
+      el.style.width = cw + 'px';
+      el.style.height = ch + 'px';
+      el.style.flexShrink = '0';
+      el.style.marginLeft = idx === 0 ? '0px' : `-${overlap}px`;
+      el.style.zIndex = String(20 + idx);
+      el.style.transform = baseTransform;
+      el.dataset.baseTransform = baseTransform;
       el.dataset.uid = card.uid;
       el.innerHTML = cardInnerHTML(card, col);
       const art = artStyle(card);
       if (art) {
-        el.setAttribute('style', (el.getAttribute('style') || '') + art);
+        el.setAttribute('style', (el.getAttribute('style') || '') + ';' + art);
         attachArtNameFallback(el, card);
       }
-      el.addEventListener('touchstart', e=>onHandCardTouchStart(e,card,el), {passive:false});
-      el.addEventListener('click',()=>onHandCardTap(card));
+      el.addEventListener('touchstart', e => onHandCardTouchStart(e, card, el), { passive:false });
       scroll.appendChild(el);
     });
 
-    // Update inspector card visual if a hand card is selected
     if (state.selectedHandCard) {
-      const p = state.players[state.activePlayer];
       const canAfford = p.resources >= state.selectedHandCard.cost;
       setResPulse(canAfford);
       const visual = document.getElementById('prof-card-visual');
@@ -3022,50 +3058,135 @@ window.addEventListener('unhandledrejection', e => {
 
 
   // ── DRAG FROM HAND ──
-  const DRAG_THRESHOLD = 3;
+  const DRAG_THRESHOLD = 18;
   const INSPECT_MS = 300;
   let dragState = null;
+  let handPreviewState = null;
+
+  function handPreviewCardMarkup(card) {
+    const isPower = normalisedCardType(card) === 'Power';
+    const stat = isPower
+      ? `<div class="hand-hold-preview-power">⚡</div>`
+      : `<div class="hand-hold-preview-hp">${escapeHtml(card.hp ?? '')}</div>`;
+    return `<div class="hand-hold-preview-art" id="hand-preview-art" style="${artStyle(card, true)}"></div>
+      ${stat}
+      <div class="hand-hold-preview-cost"><span>${escapeHtml(card.cost ?? '')}</span></div>
+      <div class="hand-hold-preview-name" id="hand-preview-name">${expectedArtLabel(card)}</div>`;
+  }
+
+  function updateHandPreviewCard(card) {
+    if (!handPreviewState?.el || !card) return;
+    handPreviewState.card = card;
+    handPreviewState.el.innerHTML = handPreviewCardMarkup(card);
+    document.querySelectorAll('.card[data-uid]').forEach(el => {
+      if (el.dataset.baseTransform) el.style.transform = el.dataset.baseTransform;
+      el.classList.remove('hand-previewing');
+    });
+    const activeEl = document.querySelector(`.card[data-uid="${card.uid}"]`);
+    if (activeEl) {
+      activeEl.classList.add('hand-previewing');
+      const base = activeEl.dataset.baseTransform || '';
+      activeEl.style.transform = `${base} translateY(-8px) scale(1.04)`;
+    }
+    const nameEl = document.getElementById('hand-preview-name');
+    if (!nameEl || !card.artId) return;
+    let loaded = false;
+    artCandidates(card.artId).forEach(src => {
+      const img = new Image();
+      img.onload = () => {
+        if (handPreviewState?.card?.uid !== card.uid) return;
+        loaded = true;
+        nameEl.classList.add('hidden');
+      };
+      img.src = src;
+    });
+  }
+
+  function showHandHoldPreview(card) {
+    closeHandHoldPreview();
+    const el = document.createElement('div');
+    el.className = 'hand-hold-preview';
+    document.body.appendChild(el);
+    handPreviewState = { el, card };
+    updateHandPreviewCard(card);
+    requestAnimationFrame(() => el.classList.add('show'));
+    try{navigator.vibrate?.(15);}catch(e){}
+  }
+
+  function closeHandHoldPreview() {
+    document.querySelectorAll('.card[data-uid]').forEach(el => {
+      el.classList.remove('hand-previewing');
+      if (el.dataset.baseTransform) el.style.transform = el.dataset.baseTransform;
+    });
+    if (handPreviewState?.el) handPreviewState.el.remove();
+    handPreviewState = null;
+  }
+
+  function handCardFromPoint(x, y) {
+    const direct = document.elementFromPoint(x, y)?.closest?.('.card[data-uid]');
+    if (direct) return direct;
+    const cards = [...document.querySelectorAll('#hand-scroll .card[data-uid]')];
+    let best = null, bestDist = Infinity;
+    for (const el of cards) {
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = x - cx, dy = y - cy;
+      const dist = Math.hypot(dx, dy);
+      if (y >= r.top - 24 && y <= r.bottom + 28 && dist < bestDist) { best = el; bestDist = dist; }
+    }
+    return best;
+  }
+
+  function updateHandPreviewFromPoint(x, y) {
+    if (!handPreviewState) return;
+    const el = handCardFromPoint(x, y);
+    const uid = el?.dataset?.uid;
+    if (!uid || handPreviewState.card?.uid === uid) return;
+    const p = state.players[state.activePlayer];
+    const card = p.hand.find(c => c.uid === uid);
+    if (card) updateHandPreviewCard(card);
+  }
 
   function cancelDragState() {
     if (!dragState) return;
     clearTimeout(dragState.inspectTimer);
     dragState.ghostEl?.remove();
     clearDragHover();
-    if (dragState.sourceEl) dragState.sourceEl.style.transform = '';
+    closeHandHoldPreview();
     document.removeEventListener('touchmove', onHandDragMove);
     document.removeEventListener('touchend',  onHandDragEnd);
     dragState = null;
   }
 
+  const HAND_PREVIEW_DELAY = 180;
+
   function onHandCardTouchStart(e, card, sourceEl) {
     if (e.touches.length > 1) return;
-    e.preventDefault(); // seize touch — no scroll or pan from this point
-    if(state.pendingTile) cancelPendingDeploy();
+    e.preventDefault();
+    if (state.pendingTile) cancelPendingDeploy();
     cancelDragState();
     const t = e.touches[0];
-    // Visual "ready" — slight scale on touch
-    sourceEl.style.transform = 'scale(1.08)';
     try{navigator.vibrate?.(8);}catch(e){}
     dragState = {
       card, sourceEl,
       startX: t.clientX, startY: t.clientY,
       active: false, ghostEl: null, hoveredLane: null, hoverTile: null,
-      inspectTimer: setTimeout(() => {
-        // Long press — open modal overlay
-        if (dragState && !dragState.active) {
-          const c = dragState.card;
-          try{navigator.vibrate?.(15);}catch(e){}
-          cancelDragState();
-          openProfile(c, 'hand', null, {strip: false});
-        }
-      }, INSPECT_MS)
+      previewActive: false,
+      inspectTimer: null
     };
+    dragState.inspectTimer = setTimeout(() => {
+      if (!dragState || dragState.active || dragState.card?.uid !== card.uid) return;
+      dragState.previewActive = true;
+      showHandHoldPreview(card);
+    }, HAND_PREVIEW_DELAY);
     document.addEventListener('touchmove', onHandDragMove, {passive: false});
-    document.addEventListener('touchend',  onHandDragEnd,  {once: true});
+    document.addEventListener('touchend', onHandDragEnd, {once: true});
   }
 
   function liftHandCard(x, y) {
     if (!dragState || dragState.active) return;
+    closeHandHoldPreview();
     clearTimeout(dragState.inspectTimer);
     dragState.sourceEl.style.transform = '';
     dragState.sourceEl.style.opacity = '0';
@@ -3108,12 +3229,16 @@ window.addEventListener('unhandledrejection', e => {
     const dx = t.clientX - dragState.startX;
     const dy = t.clientY - dragState.startY;
     if (!dragState.active) {
-      if (Math.hypot(dx, dy) > DRAG_THRESHOLD) {
+      e.preventDefault();
+      const upwardDrag = dy < -DRAG_THRESHOLD && Math.abs(dy) > Math.abs(dx) * 1.15;
+      if (upwardDrag) {
         liftHandCard(t.clientX, t.clientY);
         if (dragState?.ghostEl) {
           dragState.ghostEl.style.left = t.clientX - 34 + 'px';
           dragState.ghostEl.style.top  = t.clientY - 90 + 'px';
         }
+      } else if (dragState.previewActive) {
+        updateHandPreviewFromPoint(t.clientX, t.clientY);
       }
       return;
     }
@@ -3151,7 +3276,7 @@ window.addEventListener('unhandledrejection', e => {
     document.removeEventListener('touchmove', onHandDragMove);
     if (!dragState) return;
     if (!dragState.active) {
-      // Released without moving and before long-press — do nothing, return to normal
+      // Released without moving: touch preview ends and hand returns to normal.
       cancelDragState();
       return;
     }
@@ -3194,14 +3319,7 @@ window.addEventListener('unhandledrejection', e => {
 
   // ── HAND CARD TAP ──
   function onHandCardTap(card) {
-    // If tapping already-selected card, deselect
-    if(state.selectedHandCard?.uid===card.uid){
-      deselectAll();
-      return;
-    }
-    selectHandCard(card);
-    // Tap = strip inspector, long press = modal (handled in touch handler)
-    openProfile(card, 'hand');
+    // Tap intentionally does nothing. Hand cards use hold-to-preview and drag-to-deploy.
   }
 
   function selectHandCard(card) {
@@ -3699,6 +3817,10 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   function onTileTap(tileId) {
+    if (state._suppressNextMoveTap) {
+      state._suppressNextMoveTap = false;
+      return;
+    }
     const tile=document.querySelector(`[data-id="${tileId}"]`);
     if(!tile) {
       // Tap on empty board space — cancel pending
@@ -3782,8 +3904,13 @@ window.addEventListener('unhandledrejection', e => {
 
   // ── EXECUTE MOVE ──
   function executeMove(toTileId) {
+    if (state._moveExecuting) return;
+    if (!state.activeUnit?.tileId || !state.activeUnit?.card) return;
     const fromTileId = state.activeUnit.tileId;
     const unit = state.activeUnit.card;
+    if (!state.board[fromTileId] || state.board[toTileId]) return;
+    state._moveExecuting = true;
+    clearMoveConfirm();
 
     // Update board state
     state.board[toTileId] = unit;
@@ -3804,6 +3931,7 @@ window.addEventListener('unhandledrejection', e => {
     const updatedTile = document.querySelector(`[data-id="${toTileId}"]`);
     if(updatedTile) renderUnit(updatedTile, unit);
     clearHighlights();
+    setTimeout(() => { state._moveExecuting = false; }, 250);
 
     if(unit.actionsLeft > 0) {
       // Auto re-highlight from new position
@@ -3902,9 +4030,10 @@ window.addEventListener('unhandledrejection', e => {
   }
   function clearMoveConfirm() {
     document.querySelectorAll('.highlight-move.dim-move').forEach(t=>t.classList.remove('dim-move'));
-    document.querySelectorAll('.move-src-icon').forEach(e=>e.remove());
+    document.querySelectorAll('.move-src-icon,.move-longpress-tick').forEach(e=>e.remove());
+    document.querySelectorAll('.confirm-tile').forEach(t=>t.classList.remove('confirm-tile'));
     const btn=document.getElementById('move-confirm-btn');
-    if(btn){ btn.closest('.confirm-tile')?.classList.remove('confirm-tile'); btn.remove(); }
+    if(btn) btn.remove();
     pendingMoveTile=null;
   }
 
@@ -4367,8 +4496,11 @@ window.addEventListener('unhandledrejection', e => {
     const id = card?.artId;
     if (!id) return '';
     const dim = overlay ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.25)';
-    const urls = artCandidates(id).map(src => `url('${src}') center/cover`).join(', ');
-    return `background: linear-gradient(${dim},${dim}) center/cover, ${urls};`;
+    const urls = artCandidates(id).map(src => `url('${src}')`).join(', ');
+    const layers = `linear-gradient(${dim},${dim}), ${urls}`;
+    const sizes = ['cover', ...artCandidates(id).map(() => 'cover')].join(', ');
+    const positions = ['center', ...artCandidates(id).map(() => 'center')].join(', ');
+    return `background-image:${layers};background-size:${sizes};background-position:${positions};background-repeat:no-repeat;`;
   }
 
   function parseRange(r) {
@@ -5013,23 +5145,36 @@ window.addEventListener('unhandledrejection', e => {
         const mt = document.querySelector(`[data-id="${id}"]`);
         if (!mt) return;
         mt.classList.add('highlight-move');
-        // Long press (200ms) on move tile = auto-confirm move
-        let _mvTimer = null;
-        mt.addEventListener('touchstart', e=>{
-          if(e.touches.length>1) return;
-          _mvTimer = setTimeout(()=>{
-            if(mt.classList.contains('highlight-move')){
-              // Show brief tick then execute
-              mt.innerHTML += '<div class="move-longpress-tick">✓</div>';
-              setTimeout(()=>{
-                clearMoveConfirm();
-                executeMove(id);
-              }, 150);
-            }
-          }, 200);
-        }, {passive:true});
-        mt.addEventListener('touchend', ()=>clearTimeout(_mvTimer), {once:true});
-        mt.addEventListener('touchmove', ()=>clearTimeout(_mvTimer), {passive:true, once:true});
+        // Long press on move tile = auto-confirm move. Bound once per tile to avoid stacked listeners.
+        if (mt.dataset.moveHoldBound !== '1') {
+          mt.dataset.moveHoldBound = '1';
+          let _mvTimer = null;
+          let _mvFired = false;
+          mt.addEventListener('touchstart', e=>{
+            if(e.touches.length>1) return;
+            _mvFired = false;
+            const targetId = mt.dataset.id;
+            clearTimeout(_mvTimer);
+            _mvTimer = setTimeout(()=>{
+              if(mt.classList.contains('highlight-move') && state.activeAction === 'move' && !state._moveExecuting){
+                _mvFired = true;
+                state._suppressNextMoveTap = true;
+                mt.querySelectorAll('.move-longpress-tick').forEach(el=>el.remove());
+                const tick = document.createElement('div');
+                tick.className = 'move-longpress-tick';
+                tick.textContent = '✓';
+                mt.appendChild(tick);
+                setTimeout(()=> executeMove(targetId), 120);
+              }
+            }, 260);
+          }, {passive:true});
+          mt.addEventListener('touchend', ()=>{
+            clearTimeout(_mvTimer);
+            if (_mvFired) setTimeout(()=>{ state._suppressNextMoveTap = false; }, 220);
+          }, {passive:true});
+          mt.addEventListener('touchcancel', ()=>clearTimeout(_mvTimer), {passive:true});
+          mt.addEventListener('touchmove', ()=>clearTimeout(_mvTimer), {passive:true});
+        }
       });
     } else {
       const enemy=state.activePlayer===1?2:1;
