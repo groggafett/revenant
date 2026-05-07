@@ -24,7 +24,12 @@
       "special": "",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "city militia_hand_weapons",
@@ -50,7 +55,12 @@
       "special": "",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "cavalry_spears",
@@ -76,7 +86,12 @@
       "special": "THUNDERING CHARGE (2AP): This unit must make a Move Action followed by an Attack Action. All Hits are resolved with +1 Lethality and +1 Damage",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "sentinels_maces",
@@ -102,7 +117,12 @@
       "special": "Wall of Iron (1AP): For the rest of this Battle Round this Unit reduces all damage taken by 1",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "artillery_siegebreaker_shells",
@@ -128,7 +148,12 @@
       "special": "Targeted Destruction (2AP): This Unit makes an Attack Action that can target enemies anywhere on the battlefield",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "knights_lances",
@@ -154,7 +179,12 @@
       "special": "unstoppable force (2AP)",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "commander",
@@ -180,7 +210,12 @@
       "special": "INSPIRE: (1AP) Pick a friendly non-hero unit in this lane. they get to make a free move or attack action",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": true,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "avatar of the flame",
@@ -206,17 +241,27 @@
       "special": "ENGULF: Each successful hit causes 1 damage to adjacent units (friend or foe)",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": true,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "city militia_bows",
       "name": "ranged militia",
       "internalName": "city militia",
       "variant": "bows",
-      "artId": "city militia_bows",
+      "artId": "city_militia_bows",
       "type": "Common",
-      "faction": "orderofiron",
+      "faction": "",
       "cost": 2,
+      "activationCost": 1,
+      "role": "Infantry",
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null,
       "hp": 5,
       "maxHp": 5,
       "move": 1,
@@ -229,7 +274,7 @@
         "ap": 1,
         "damage": 1
       },
-      "special": "",
+      "special": "None: No special ability.",
       "flavour": "",
       "effect": null,
       "value": null
@@ -258,7 +303,12 @@
       "special": "BLAZE: Each natural roll of a 6 to Hit generates an additional Attack. Roll to Hit again as usual. Repeat until no 6s are rolled",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Infantry",
+      "activationCost": 1,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "inferno",
@@ -277,7 +327,12 @@
       "special": "Choose ANY Tile - on a 2+",
       "flavour": "deal d6 damage to Units on this tile",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Spell",
+      "activationCost": 0,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "ironwill",
@@ -296,7 +351,12 @@
       "special": "Duty in Death: Play this card on any Tile in which a friendly Unit was Destroyed in the previous activation. The destroyed Unit activates immediately as if it were still alive. After it has activated",
       "flavour": "remove both cards.\"",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Spell",
+      "activationCost": 0,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "reinforce",
@@ -315,7 +375,12 @@
       "special": "Generate 2 Resources immediately",
       "flavour": "",
       "effect": "add_resources",
-      "value": 2
+      "value": 2,
+      "role": "Spell",
+      "activationCost": 0,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "gambit",
@@ -334,7 +399,12 @@
       "special": "generate d6 resoures",
       "flavour": "",
       "effect": "add_resources_random",
-      "value": "d6"
+      "value": "d6",
+      "role": "Spell",
+      "activationCost": 0,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "entrance",
@@ -353,7 +423,12 @@
       "special": "place a new temporary deployment tile",
       "flavour": "",
       "effect": "place_structure",
-      "value": null
+      "value": null,
+      "role": "Spell",
+      "activationCost": 0,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "reign of arrows",
@@ -372,7 +447,12 @@
       "special": "deal 1 damage to all enemy units in a lane",
       "flavour": "",
       "effect": null,
-      "value": null
+      "value": null,
+      "role": "Spell",
+      "activationCost": 0,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     },
     {
       "id": "redeploy",
@@ -391,7 +471,12 @@
       "special": "pick any friendly deployed unit. immediately removed them from the board and redpoly them following normal deployment rules.",
       "flavour": "",
       "effect": "redeploy_unit",
-      "value": null
+      "value": null,
+      "role": "Spell",
+      "activationCost": 0,
+      "elite": false,
+      "keywords": [],
+      "deckLimit": null
     }
   ],
   "grim_lane_deck": [
@@ -442,30 +527,30 @@
     }
   ],
   "grim_deck_p1": {
-    "city militia_improvised": 2,
+    "city militia_bows": 2,
     "city militia_hand_weapons": 1,
-    "cavalry_spears": 2,
-    "artillery_siegebreaker_shells": 1,
-    "knights_lances": 1,
     "commander": 1,
+    "city militia_improvised": 2,
     "avatar of the flame": 1,
-    "city militia_bows": 1,
-    "entrance": 1,
-    "redeploy": 1,
-    "reinforce": 2,
+    "artillery_siegebreaker_shells": 2,
+    "cavalry_spears": 1,
+    "knights_lances": 1,
     "inferno cannon": 1,
-    "inferno": 1
+    "reinforce": 2,
+    "entrance": 2
   },
   "grim_deck_p2": {
-    "commander": 1,
-    "knights_lances": 2,
-    "cavalry_spears": 1,
-    "city militia_hand_weapons": 3,
-    "sentinels_maces": 2,
-    "reign of arrows": 2,
-    "ironwill": 2,
-    "city militia_bows": 1,
+    "city militia_improvised": 2,
+    "city militia_hand_weapons": 2,
+    "cavalry_spears": 2,
+    "knights_lances": 1,
     "artillery_siegebreaker_shells": 1,
-    "inferno": 1
+    "sentinels_maces": 1,
+    "commander": 1,
+    "avatar of the flame": 1,
+    "city militia_bows": 2,
+    "inferno cannon": 1,
+    "entrance": 1,
+    "reinforce": 1
   }
 }
