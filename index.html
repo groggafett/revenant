@@ -3196,6 +3196,7 @@ window.addEventListener('unhandledrejection', e => {
       el.style.transform = baseTransform;
       el.dataset.baseTransform = baseTransform;
       el.dataset.uid = card.uid;
+      el.dataset.handIndex = String(idx);
       el.innerHTML = cardInnerHTML(card, col);
       const art = artStyle(card);
       if (art) {
@@ -3269,7 +3270,8 @@ window.addEventListener('unhandledrejection', e => {
     if (!handPreviewState?.el || !card) return;
     handPreviewState.card = card;
     const col = state.players[state.activePlayer]?.color || 'p1';
-    handPreviewState.el.className = `hand-hold-preview card-zoom-art ${col}-unit`;
+    const wasShown = handPreviewState.el.classList.contains('show');
+    handPreviewState.el.className = `hand-hold-preview card-zoom-art ${col}-unit${wasShown ? ' show' : ''}`;
     const art = artStyle(card, true);
     handPreviewState.el.setAttribute('style', art || '');
     handPreviewState.el.innerHTML = handPreviewCardMarkup(card);
@@ -3277,7 +3279,7 @@ window.addEventListener('unhandledrejection', e => {
       if (el.dataset.baseTransform) el.style.transform = el.dataset.baseTransform;
       el.classList.remove('hand-previewing');
     });
-    const activeEl = document.querySelector(`.card[data-uid="${card.uid}"]`);
+    const activeEl = [...document.querySelectorAll('#hand-scroll .card[data-uid]')].find(el => el.dataset.uid === String(card.uid));
     if (activeEl) {
       activeEl.classList.add('hand-previewing');
       const base = activeEl.dataset.baseTransform || '';
@@ -3321,15 +3323,30 @@ window.addEventListener('unhandledrejection', e => {
     const cards = [...document.querySelectorAll('#hand-scroll .card[data-uid]')];
     if (!cards.length) return null;
 
-    // While previewing, treat horizontal finger position as the selector even if
-    // the finger is above the hand / over the zoom card. This makes hand-scrub reliable.
+    // While previewing, scrub by the visible slices of the fanned hand.
+    // Switch as soon as the finger enters the exposed part of the next card,
+    // rather than waiting until the centre of that card.
     if (handPreviewState) {
-      return cards.reduce((best, el) => {
-        const r = el.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const dist = Math.abs(x - cx);
-        return !best || dist < best.dist ? { el, dist } : best;
-      }, null)?.el || null;
+      const rects = cards.map(el => ({ el, r: el.getBoundingClientRect() }));
+      const minTop = Math.min(...rects.map(o => o.r.top));
+      const maxBottom = Math.max(...rects.map(o => o.r.bottom));
+      if (y < minTop - 80 || y > maxBottom + 180) return null;
+
+      const firstLeft = rects[0].r.left;
+      const lastRight = rects[rects.length - 1].r.right;
+      const clampedX = Math.max(firstLeft, Math.min(lastRight, x));
+
+      let chosen = rects[0].el;
+      for (let i = 0; i < rects.length; i++) {
+        const thisLeft = rects[i].r.left;
+        const nextLeft = rects[i + 1]?.r.left ?? (rects[i].r.right + 1);
+        if (clampedX >= thisLeft && clampedX < nextLeft) {
+          chosen = rects[i].el;
+          break;
+        }
+        if (clampedX >= thisLeft) chosen = rects[i].el;
+      }
+      return chosen;
     }
 
     const direct = document.elementFromPoint(x, y)?.closest?.('.card[data-uid]');
@@ -3350,10 +3367,13 @@ window.addEventListener('unhandledrejection', e => {
     if (!handPreviewState) return;
     const el = handCardFromPoint(x, y);
     const uid = el?.dataset?.uid;
-    if (!uid || handPreviewState.card?.uid === uid) return;
+    const idx = Number(el?.dataset?.handIndex);
+    if (!uid) return;
     const p = state.players[state.activePlayer];
-    const card = p.hand.find(c => c.uid === uid);
-    if (card) updateHandPreviewCard(card);
+    const card = Number.isInteger(idx) && p.hand[idx]?.uid === uid ? p.hand[idx] : p.hand.find(c => c.uid === uid);
+    if (!card) return;
+    if (handPreviewState.card?.uid === card.uid) return;
+    updateHandPreviewCard(card);
   }
 
   function cancelDragState() {
@@ -3381,6 +3401,7 @@ window.addEventListener('unhandledrejection', e => {
     dragState = {
       card, sourceEl,
       startX: t.clientX, startY: t.clientY,
+      lastX: t.clientX, lastY: t.clientY,
       active: false, ghostEl: null, hoveredLane: null, hoverTile: null,
       previewActive: false,
       inspectTimer: null
@@ -3389,6 +3410,7 @@ window.addEventListener('unhandledrejection', e => {
       if (!dragState || dragState.active || dragState.card?.uid !== card.uid) return;
       dragState.previewActive = true;
       showHandHoldPreview(card);
+      updateHandPreviewFromPoint(dragState.lastX ?? dragState.startX, dragState.lastY ?? dragState.startY);
     }, HAND_PREVIEW_DELAY);
     document.addEventListener('touchmove', onHandDragMove, {passive: false});
     document.addEventListener('touchend', onHandDragEnd, {once: true});
@@ -3474,6 +3496,8 @@ window.addEventListener('unhandledrejection', e => {
   function onHandDragMove(e) {
     if (!dragState) return;
     const t = e.touches[0];
+    dragState.lastX = t.clientX;
+    dragState.lastY = t.clientY;
     const dx = t.clientX - dragState.startX;
     const dy = t.clientY - dragState.startY;
     if (!dragState.active) {
@@ -3715,6 +3739,16 @@ window.addEventListener('unhandledrejection', e => {
     removePowerReadyOverlays();
     document.querySelectorAll('.power-confirm-tile').forEach(t => t.classList.remove('power-confirm-tile'));
     document.getElementById('power-cast-zone')?.classList.remove('power-confirm','drag-hover');
+  }
+
+  function cancelPendingPowerDrop() {
+    clearPowerConfirm();
+    clearConfirm();
+    removePowerCastZone();
+    document.querySelectorAll('.highlight-deploy,.highlight-ability').forEach(t => t.classList.remove('highlight-deploy','highlight-ability'));
+    state.selectedHandCard = null;
+    if (!state.activeUnit) setBarState('default');
+    renderHand();
   }
 
   function confirmDraggedPowerCard(card, tileId) {
@@ -4410,7 +4444,18 @@ window.addEventListener('unhandledrejection', e => {
     if(!tile) {
       // Tap on empty board space — cancel pending
       if(state.pendingTile) cancelPendingDeploy();
+      else if(state._pendingPowerDrop) cancelPendingPowerDrop();
       else if(state._ctaAction==='activate') onHubCancel();
+      return;
+    }
+
+    // Tapping somewhere else on the board cancels pending unit deploy / power cast confirmation.
+    if (state.pendingTile && tileId !== state.pendingTile) {
+      cancelPendingDeploy();
+      return;
+    }
+    if (state._pendingPowerDrop && tileId !== state._pendingPowerDrop.tileId) {
+      cancelPendingPowerDrop();
       return;
     }
 
@@ -4464,6 +4509,12 @@ window.addEventListener('unhandledrejection', e => {
       } else {
         openProfile(unit, 'board', tileId);
       }
+      return;
+    }
+
+    // Deployed structures / ongoing power cards can be zoomed from their tile.
+    if (state.structures?.[tileId]?.card) {
+      openCardZoom(state.structures[tileId].card);
       return;
     }
 
@@ -4557,6 +4608,7 @@ window.addEventListener('unhandledrejection', e => {
   function clearConfirm() {
     document.querySelectorAll('.confirm-tile').forEach(t=>t.classList.remove('confirm-tile'));
     document.querySelectorAll('.power-confirm-tile').forEach(t=>t.classList.remove('power-confirm-tile'));
+    document.querySelectorAll('.power-ready-overlay').forEach(e=>e.remove());
     document.querySelectorAll('.pending-deploy-preview').forEach(e=>e.remove());
     state._pendingPowerDrop = null;
     const btn=document.getElementById('confirm-btn');
