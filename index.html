@@ -241,6 +241,52 @@ transition: transform 0.1s ease, box-shadow 0.1s ease;
 border-color: #40a030 !important;
 box-shadow: 0 0 12px rgba(60,180,40,0.6) !important;
 }
+.tile.power-confirm-tile {
+border-color: #8a40c0 !important;
+box-shadow: 0 0 14px rgba(138,64,192,0.72) !important;
+}
+.tile.power-confirm-tile::before {
+display:block; content:''; position:absolute; inset:-2px; z-index:6; pointer-events:none;
+border-radius:5px; border:2px solid rgba(240,208,128,0.92);
+background:linear-gradient(180deg, rgba(126,56,176,0.16), rgba(28,12,44,0.48));
+box-shadow: inset 0 0 0 1px rgba(138,64,192,0.5), 0 0 18px rgba(240,208,128,0.34);
+animation: powerReadyPulse 1.05s ease-in-out infinite;
+}
+.tile.power-confirm-tile .unit-on-tile { filter: brightness(0.52) saturate(0.88); }
+.power-ready-overlay {
+position:absolute; inset:0; z-index:7; pointer-events:none;
+display:flex; align-items:center; justify-content:center;
+}
+.power-ready-chip {
+display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;
+min-width:76%; padding:3px 2px; border-radius:6px;
+background:linear-gradient(180deg, rgba(18,8,28,0.94), rgba(44,18,62,0.9));
+border:1px solid rgba(240,208,128,0.78);
+box-shadow:0 0 14px rgba(138,64,192,0.32);
+}
+.power-ready-icon { font-size:14px; line-height:1; color:#f0d080; text-shadow:0 0 6px rgba(240,208,128,0.7); }
+.power-ready-text { font-size:8px; line-height:1; font-weight:900; letter-spacing:0.14em; color:#f6e0a2; text-transform:uppercase; }
+.power-ready-label {
+position:absolute; left:50%; top:-14px; transform:translateX(-50%);
+max-width:110px; padding:2px 6px 3px; border-radius:999px;
+background:rgba(20,8,28,0.96); border:1px solid rgba(240,208,128,0.8);
+box-shadow:0 0 10px rgba(138,64,192,0.26);
+font-size:8px; line-height:1; font-weight:900; letter-spacing:0.08em;
+text-transform:uppercase; color:#f3e4b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+@keyframes powerReadyPulse {
+0% { opacity:0.72; transform:scale(1); }
+50% { opacity:1; transform:scale(1.015); }
+100% { opacity:0.72; transform:scale(1); }
+}
+
+.power-cast-zone { position:fixed; left:50%; bottom:clamp(190px, 32vh, 260px); transform:translateX(-50%) translateY(12px); z-index:130; min-width:178px; min-height:48px; padding:8px 16px; box-sizing:border-box; border:2px dashed #8a40c0; border-radius:10px; background:linear-gradient(160deg,rgba(34,14,50,0.94),rgba(8,4,12,0.94)); color:#d6a8ff; font-family:'Spectral',Georgia,serif; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; box-shadow:0 0 24px rgba(138,64,192,0.32), 0 12px 32px rgba(0,0,0,0.72); opacity:0; pointer-events:none; transition:opacity .14s ease, transform .14s ease, border-color .14s ease, box-shadow .14s ease; }
+.power-cast-zone.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+.power-cast-zone.drag-hover, .power-cast-zone.power-confirm { border-style:solid; border-color:#f0d080; color:#f0d080; box-shadow:0 0 28px rgba(240,208,128,0.44), 0 12px 32px rgba(0,0,0,0.72); }
+.power-cast-zone-main { font-size:13px; line-height:1; }
+.power-cast-zone-sub { font-size:9px; line-height:1; color:#7a5aa0; letter-spacing:0.10em; }
+#hand-scroll.hand-tucked { transform:translateY(42px) scale(.94); opacity:.72; transition:transform .16s ease, opacity .16s ease; }
+#hand-scroll { transition:transform .16s ease, opacity .16s ease; }
 
 .divider { display: none; }
 
@@ -378,6 +424,43 @@ border-radius:5px; padding:8px 10px; font-size: var(--fs-xs); color:#7a6848;
 line-height:1.55; text-align:center; font-style:italic; box-sizing:border-box;
 }
 .card-zoom-close { display:none; }
+
+/* Zoom close button outside card */
+.card-zoom-shell { position:relative; overflow:visible; }
+.card-zoom-close-btn { top:-16px !important; right:-10px !important; left:auto !important; z-index:20; width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,0.82); border:1px solid rgba(240,208,128,0.72); box-shadow:0 0 14px rgba(0,0,0,0.65), 0 0 10px rgba(240,208,128,0.18); }
+/* Real-card zoom view v1 */
+.card-zoom-overlay { justify-content:center; padding:calc(14px + env(safe-area-inset-top)) 10px calc(14px + env(safe-area-inset-bottom)); overflow:hidden; }
+.card-zoom-shell { width:min(270px,72vw); gap:0; }
+.card-zoom-art { width:min(263px,70.5vw); border-radius:18px; border-width:2px; }
+.card-zoom-close-btn { top:14px; left:14px; right:auto; width:34px; height:34px; font-size:22px; background:rgba(0,0,0,0.72); }
+.card-zoom-cost { top:18px; right:18px; width:48px; height:48px; border-radius:8px; box-shadow:0 0 16px rgba(0,255,210,0.35),0 0 12px rgba(217,121,24,0.35); }
+.card-zoom-cost span { font-size:30px; }
+.card-zoom-stat-rail { left:10px; top:92px; bottom:auto; gap:12px; }
+.card-zoom-stat { width:40px; height:40px; border-width:0; border-radius:8px; background:rgba(22,10,10,0.78); color:#fff3d8; box-shadow:0 0 12px rgba(0,0,0,0.7); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0; }
+.card-zoom-stat.hp { border-radius:50%; background:linear-gradient(180deg,#b21414,#7a0c0c); color:#fff; }
+.card-zoom-stat.move { clip-path:none; border-radius:0 22px 22px 0; background:linear-gradient(180deg,#f5f1ed,#d5d0cb); color:#241810; padding-right:0; }
+.card-zoom-stat.save { background:rgba(30,18,18,0.78); color:#fff; }
+.card-zoom-stat .czs-icon { font-size:17px; line-height:1; }
+.card-zoom-stat .czs-val { font-size:18px; font-weight:900; line-height:1; font-family:'Spectral',Georgia,serif; }
+.card-zoom-fallback-name { left:56px; right:56px; top:43%; color:#f3dfb3; }
+.card-zoom-bottom { position:absolute; left:0; right:0; bottom:0; z-index:6; background:linear-gradient(180deg,rgba(5,4,6,0) 0%,rgba(5,4,6,0.18) 8%,rgba(6,5,8,0.76) 24%,rgba(7,6,10,0.96) 42%,rgba(7,6,10,0.98) 100%); padding:0 0 10px; }
+.card-zoom-quote { margin:0; padding:0 18px 10px; color:rgba(255,247,232,0.88); font-size:12px; line-height:1.35; text-align:center; font-style:italic; text-shadow:0 1px 4px rgba(0,0,0,0.9); }
+.card-zoom-titleband { display:grid; grid-template-columns:42px 1fr 42px; align-items:center; gap:8px; padding:8px 14px 10px; background:rgba(5,4,8,0.82); border-top:1px solid rgba(240,208,128,0.18); border-bottom:1px solid rgba(240,208,128,0.14); }
+.card-zoom-side-icon { display:flex; align-items:center; justify-content:center; font-size:30px; color:#f0d080; text-shadow:0 0 10px rgba(240,208,128,0.28); }
+.card-zoom-side-icon.power { font-size:26px; }
+.card-zoom-title { min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; text-align:center; }
+.card-zoom-order { font-size:10px; font-weight:900; letter-spacing:0.14em; text-transform:uppercase; color:#d8bf7a; line-height:1; }
+.card-zoom-name { font-size:20px; color:#fff6e0; line-height:1; letter-spacing:0.02em; }
+.card-zoom-weapon { font-size:12px; color:#f4ead4; letter-spacing:0.02em; margin-bottom:0; text-transform:none; }
+.card-zoom-attack-pill { margin:10px 14px 8px; width:auto; min-height:0; border-radius:18px; padding:7px 10px; gap:8px; background:rgba(0,0,0,0.72); border:1px solid rgba(255,255,255,0.08); box-shadow:inset 0 0 0 1px rgba(255,255,255,0.04); }
+.card-zoom-attack-pill.power-pill { justify-content:center; }
+.card-zoom-weapon-icon { flex:0 0 24px; font-size:20px; color:#fff; }
+.card-zoom-statpair { gap:4px; }
+.card-zoom-statpair .cz-icon { font-size:18px; color:#fff; opacity:0.96; }
+.card-zoom-statpair .cz-val { font-size:18px; color:#fff; }
+.card-zoom-special { margin:0 14px 0; width:auto; min-height:0; padding:8px 10px 10px; background:transparent; border:0; border-radius:0; color:#f3eee4; font-size:12px; line-height:1.45; text-shadow:0 1px 2px rgba(0,0,0,0.9); }
+.card-zoom-special .special-name { color:#fff0c6; }
+.card-zoom-flavour { display:none; }
 /* Name — middle */
 .unit-name { font-size: var(--fs-xs); font-weight: 700; line-height: 1.2; color: #d4b870; }
 /* Lightning action pips on board unit */
@@ -975,15 +1058,32 @@ padding: 0 8px;
 
 /* Hand hold-preview */
 .card.hand-previewing { outline:2px solid #f0d080; box-shadow:0 0 16px rgba(240,208,128,0.58), 0 10px 22px rgba(0,0,0,0.62); filter:brightness(1.08); z-index:60 !important; }
-.hand-hold-preview { position:fixed; left:50%; bottom:186px; transform:translateX(-50%) translateY(8px); z-index:140; pointer-events:none; width:min(255px,66vw); aspect-ratio:5/7; border-radius:10px; border:2px solid #c8a060; background:linear-gradient(160deg,#17100a,#050403); box-shadow:0 18px 48px rgba(0,0,0,0.82), 0 0 22px rgba(200,160,80,0.25); overflow:hidden; opacity:0; transition:opacity .18s ease, transform .18s ease; }
+.hand-hold-preview { position:fixed; left:50%; bottom:172px; transform:translateX(-50%) translateY(8px); z-index:140; pointer-events:none; width:min(248px,66vw); aspect-ratio:5/7; border-radius:18px; border:2px solid #c8a060; background:linear-gradient(160deg,#17100a,#050403); box-shadow:0 18px 48px rgba(0,0,0,0.82), 0 0 22px rgba(200,160,80,0.25); overflow:hidden; opacity:0; transition:opacity .18s ease, transform .18s ease; }
 .hand-hold-preview.show { opacity:1; transform:translateX(-50%) translateY(-16px); }
 .hand-hold-preview-art { position:absolute; inset:0; background:linear-gradient(160deg,#17100a,#050403); background-position:center; background-size:cover; }
 .hand-hold-preview-name { position:absolute; left:14px; right:14px; top:50%; transform:translateY(-50%); font-size:18px; font-weight:900; line-height:1.15; letter-spacing:.08em; text-align:center; color:#c8a060; text-shadow:0 0 10px #000, 0 1px 0 #000; text-transform:uppercase; max-height:64px; overflow:hidden; }
 .hand-hold-preview-name.hidden { display:none; }
+.hand-hold-preview-text { position:absolute; left:12px; right:12px; bottom:54px; z-index:4; max-height:58px; overflow:hidden; padding:7px 8px; border:1px solid rgba(200,160,80,0.58); border-radius:7px; background:rgba(5,4,3,0.78); color:#d7bd7a; font-family:'Spectral',Georgia,serif; font-size:11px; line-height:1.22; text-align:left; box-shadow:0 0 10px rgba(0,0,0,0.55); }
+.hand-hold-preview-text .power-title { display:block; color:#f0d080; font-size:10px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:2px; }
 .hand-hold-preview-cost { position:absolute; top:10px; right:10px; width:36px; height:36px; background:var(--resources); border:2px solid var(--resources-hi); border-radius:5px; transform:rotate(45deg); display:flex; align-items:center; justify-content:center; box-shadow:0 0 12px rgba(217,121,24,.45); }
 .hand-hold-preview-cost span { transform:rotate(-45deg); color:var(--resources-text); font-size:18px; font-weight:900; line-height:1; }
 .hand-hold-preview-hp { position:absolute; top:10px; left:10px; width:34px; height:34px; border-radius:50%; border:2px solid var(--hp-positive); background:#0e2208; color:var(--hp-positive); display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
 .hand-hold-preview-power { position:absolute; top:10px; left:10px; width:34px; height:34px; border-radius:50%; border:2px solid #8a40c0; background:#1a1020; color:#d6a8ff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
+.hand-hold-preview .card-zoom-cost { width:42px; height:42px; top:14px; right:14px; }
+.hand-hold-preview .card-zoom-cost span { font-size:26px; }
+.hand-hold-preview .card-zoom-stat-rail { top:84px; left:9px; gap:10px; }
+.hand-hold-preview .card-zoom-stat { width:36px; height:36px; }
+.hand-hold-preview .card-zoom-bottom { padding-bottom:8px; }
+.hand-hold-preview .card-zoom-quote { font-size:11px; padding-bottom:8px; }
+.hand-hold-preview .card-zoom-titleband { padding:7px 12px 8px; grid-template-columns:36px 1fr 36px; }
+.hand-hold-preview .card-zoom-name { font-size:18px; }
+.hand-hold-preview .card-zoom-order { font-size:9px; }
+.hand-hold-preview .card-zoom-weapon { font-size:11px; }
+.hand-hold-preview .card-zoom-attack-pill { margin:8px 12px 6px; padding:6px 8px; }
+.hand-hold-preview .card-zoom-statpair .cz-icon { font-size:16px; }
+.hand-hold-preview .card-zoom-statpair .cz-val { font-size:16px; }
+.hand-hold-preview .card-zoom-special { margin:0 12px; padding:6px 8px 8px; font-size:11px; line-height:1.32; max-height:62px; overflow:hidden; }
+.hand-hold-preview-name.hidden { display:none; }
 
 /* Hand cards */
 .card {
@@ -1421,13 +1521,13 @@ box-shadow: 0 0 8px rgba(200,160,60,0.1);
 .btn-diamond.act-0 { background: #1a1408; border-color: #3a2010; }
 .btn-diamond.act-0 span, .btn-diamond.act-1 span { visibility: hidden; }
 
-/* Active unit tile glow */
-.tile.unit-active .unit-on-tile { border-color: #c8a060; box-shadow: 0 0 6px rgba(200,160,60,0.5); }
+/* Active unit: no glow by itself. Gold is reserved for explicitly selected friendly units. */
+.tile.unit-active .unit-on-tile { box-shadow: none; }
 /* Exhausted — subtle darkening only, full opacity */
 .unit-on-tile.exhausted {
 filter: brightness(0.75) saturate(0.75);
 }
-/* Selected — gold border + 25% scale */
+/* Selected friendly unit — gold border + 25% scale */
 .tile.unit-selected {
 z-index: 3;
 transform: scale(1.25);
@@ -1458,8 +1558,10 @@ box-shadow: 0 0 10px rgba(200,160,60,0.7) !important;
 .tile.highlight-attack { border: 2px solid #883030 !important; box-shadow: 0 0 8px rgba(160,48,48,0.3) !important; }
 .tile.highlight-attack::before { background: linear-gradient(160deg, #2a1010 0%, #1a0808 100%) !important; }
 /* Ability targeting highlight — purple */
-.tile.highlight-ability { border-color: var(--faction-shadows) !important; box-shadow: 0 0 10px rgba(146,84,220,0.5), inset 0 0 8px rgba(146,84,220,0.15) !important; }
-.tile.highlight-ability::before { background: linear-gradient(160deg, #1a1028 0%, #100820 100%) !important; }
+.tile.highlight-ability { border:2px solid var(--faction-shadows) !important; box-shadow: 0 0 14px rgba(146,84,220,0.62), inset 0 0 10px rgba(146,84,220,0.22) !important; }
+.tile.highlight-ability::before { display:block; background: linear-gradient(160deg, rgba(70,32,112,0.66) 0%, rgba(22,8,38,0.76) 100%) !important; }
+.tile.highlight-ability:not(.power-confirm-tile) .unit-on-tile { border-color: var(--faction-shadows) !important; box-shadow: 0 0 12px rgba(146,84,220,0.58) !important; filter: saturate(1.08) brightness(0.88); }
+.tile.highlight-ability:not(.power-confirm-tile)::after { filter: hue-rotate(45deg) saturate(1.4); }
 /* Ability button — full row, purple tinted like move/attack pills */
 .ability-btn {
 width: 100%; height: 100%; flex-shrink: 0; display: flex; align-items: center; gap: 4px;
@@ -2185,7 +2287,71 @@ window.addEventListener('unhandledrejection', e => {
       hp:null, maxHp:null, move:null, save:null,
       weapon:null, effect:'add_resources', value:2,
       special:'Reinforce: Immediately gain 2 resources. Discard after use.' },
+
+    // Prototype powers — mechanic test cards. These are appended into decks for playtesting.
+    { id:'proto_power_ember_bolt', name:'Ember Bolt', internalName:'ember_bolt', variant:'prototype', artId:'ember_bolt_prototype', type:'Power', faction:'order_of_flame', cost:2,
+      hp:null, maxHp:null, move:null, save:null,
+      weapon:{name:'Ember Bolt', range:null, attacks:null, hit:null, ap:0, damage:2}, effect:'direct_damage_enemy', value:2,
+      special:'Prototype: Target an enemy unit. Deal 2 damage.' },
+    { id:'proto_power_burning_front', name:'Burning Front', internalName:'burning_front', variant:'prototype', artId:'burning_front_prototype', type:'Power', faction:'order_of_flame', cost:3,
+      hp:null, maxHp:null, move:null, save:null,
+      weapon:{name:'Burning Front', range:null, attacks:null, hit:null, ap:1, damage:1}, effect:'damage_enemy_lane', value:1,
+      special:'Prototype: Target a lane. Enemy units in that lane each make a save at AP 1 or suffer 1 damage.' },
+    { id:'proto_power_rallying_horn', name:'Rallying Horn', internalName:'rallying_horn', variant:'prototype', artId:'rallying_horn_prototype', type:'Power', faction:'order_of_iron', cost:2,
+      hp:null, maxHp:null, move:null, save:null,
+      weapon:null, effect:'rally_friendly_unit', value:1,
+      special:'Prototype: Target a friendly deployed unit. It gains +1 action, up to 2.' },
+    { id:'proto_power_mending_light', name:'Mending Light', internalName:'mending_light', variant:'prototype', artId:'mending_light_prototype', type:'Power', faction:'order_of_light', cost:2,
+      hp:null, maxHp:null, move:null, save:null,
+      weapon:null, effect:'heal_friendly_unit', value:3,
+      special:'Prototype: Target a friendly unit. Restore 3 HP, not above max HP.' },
+    { id:'proto_power_iron_bastion', name:'Iron Bastion', internalName:'iron_bastion', variant:'prototype', artId:'iron_bastion_prototype', type:'Power', faction:'order_of_iron', cost:2,
+      hp:null, maxHp:null, move:null, save:null,
+      weapon:null, effect:'fortify_friendly_unit', value:2,
+      special:'Prototype: Target a friendly unit. It gains +2 max HP and +2 current HP.' },
+    { id:'proto_power_black_market', name:'Black Market', internalName:'black_market', variant:'prototype', artId:'black_market_prototype', type:'Power', faction:'universal', cost:0,
+      hp:null, maxHp:null, move:null, save:null,
+      weapon:null, effect:'add_resources_random', value:[1,3],
+      special:'Prototype: Instant. Gain 1-3 resources.' },
   ];
+
+  const PROTOTYPE_POWER_CARD_IDS = [
+    'ember_bolt_prototype',
+    'burning_front_prototype',
+    'rallying_horn_prototype',
+    'mending_light_prototype',
+    'iron_bastion_prototype',
+    'black_market_prototype'
+  ];
+
+  function prototypePowerCardsFrom(repo) {
+    const cleanRepo = normaliseCardRepo(repo) || [];
+    return PROTOTYPE_POWER_CARD_IDS
+      .map(id => cleanRepo.find(c => c.id === id || c.artId === id))
+      .filter(Boolean);
+  }
+
+  function mergePrototypePowerCards(repo) {
+    const cleanRepo = normaliseCardRepo(repo) || [];
+    const existingIds = new Set(cleanRepo.map(c => c.id));
+    const builtIns = normaliseCardRepo(CARDS).filter(c => PROTOTYPE_POWER_CARD_IDS.includes(c.id));
+    builtIns.forEach(card => {
+      if (!existingIds.has(card.id)) cleanRepo.push(card);
+    });
+    return cleanRepo;
+  }
+
+  function injectPrototypePowerCards(deck, repo, player) {
+    const existing = new Set((deck || []).map(c => c.id));
+    let uid = deck.length;
+    prototypePowerCardsFrom(repo).forEach(card => {
+      if (!existing.has(card.id)) {
+        deck.push({ ...normaliseImportedCard(card), uid:`proto-${player}-${uid++}` });
+      }
+    });
+    for (let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}
+    return deck;
+  }
 
   // ── CARD LOADING ──
   const DEFAULT_LANE_EFFECTS = [
@@ -2365,6 +2531,7 @@ window.addEventListener('unhandledrejection', e => {
       const ld = localStorage.getItem('grim_lane_deck');
       if (ld) laneDeck = JSON.parse(ld);
     } catch(e) { console.warn('Card data load failed', e); }
+    repo = mergePrototypePowerCards(repo);
     return { repo, lists, laneDeck };
   }
 
@@ -2462,6 +2629,7 @@ window.addEventListener('unhandledrejection', e => {
         console.warn(`Deck build failed for P${p}, using default`, e);
         state.players[p].deck = makeDeck();
       }
+      state.players[p].deck = injectPrototypePowerCards(state.players[p].deck, repo, p);
       state.players[p].hand=[];
       state.players[p].graveyard=[];
       state.players[p].resources=3;
@@ -2972,6 +3140,7 @@ window.addEventListener('unhandledrejection', e => {
     // Top bar sides
     document.getElementById('side-p1').className=`player-side left ${state.activePlayer===1?'active':'inactive'}`;
     document.getElementById('side-p2').className=`player-side right ${state.activePlayer===2?'active':'inactive'}`;
+    syncBoardSelectionHighlight();
     renderHand();
   }
 
@@ -3065,18 +3234,44 @@ window.addEventListener('unhandledrejection', e => {
 
   function handPreviewCardMarkup(card) {
     const isPower = normalisedCardType(card) === 'Power';
-    const stat = isPower
-      ? `<div class="hand-hold-preview-power">⚡</div>`
-      : `<div class="hand-hold-preview-hp">${escapeHtml(card.hp ?? '')}</div>`;
-    return `<div class="hand-hold-preview-art" id="hand-preview-art" style="${artStyle(card, true)}"></div>
-      ${stat}
-      <div class="hand-hold-preview-cost"><span>${escapeHtml(card.cost ?? '')}</span></div>
-      <div class="hand-hold-preview-name" id="hand-preview-name">${expectedArtLabel(card)}</div>`;
+    const col = state.players[state.activePlayer]?.color || 'p1';
+    const factionIcon = FACTION_ICONS[card.faction] || (isPower ? '✦' : '');
+    const subtitle = isPower ? '' : (card.weapon?.name ? `w/ ${card.weapon.name}` : '');
+    const header = isPower ? zoomPowerSubtypeLabel(card) : formatFactionHeader(card.faction);
+    const profileHtml = isPower ? zoomPowerProfileHtml(card) : zoomAttackProfileHtml(card);
+    const quoteHtml = card.flavour ? `<div class="card-zoom-quote">${escapeHtml(card.flavour)}</div>` : '';
+    return `
+      <div class="card-zoom-cost"><span>${escapeHtml(card.cost ?? '')}</span></div>
+      ${!isPower ? `<div class="card-zoom-stat-rail">
+        <div class="card-zoom-stat hp"><span class="czs-icon">♥</span><span class="czs-val">${escapeHtml(card.hp ?? '')}</span></div>
+        <div class="card-zoom-stat save"><span class="czs-icon">🛡</span><span class="czs-val">${escapeHtml(card.save ?? '')}</span></div>
+        <div class="card-zoom-stat move"><span class="czs-icon">➤</span><span class="czs-val">${escapeHtml(card.move === -1 ? '—' : card.move ?? '')}</span></div>
+      </div>` : ''}
+      <div class="card-zoom-fallback-name hand-hold-preview-name" id="hand-preview-name">${expectedArtLabel(card)}</div>
+      <div class="card-zoom-shine" id="hand-preview-shine"></div>
+      <div class="card-zoom-bottom">
+        ${quoteHtml}
+        <div class="card-zoom-titleband">
+          <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
+          <div class="card-zoom-title">
+            <div class="card-zoom-order">${escapeHtml(header)}</div>
+            <div class="card-zoom-name">${formatCardName(card.name)}</div>
+            ${subtitle ? `<div class="card-zoom-weapon">${escapeHtml(subtitle)}</div>` : ''}
+          </div>
+          <div class="card-zoom-side-icon">${isPower ? '✦' : factionIcon}</div>
+        </div>
+        ${profileHtml}
+        ${zoomSpecialHtml(card)}
+      </div>`;
   }
 
   function updateHandPreviewCard(card) {
     if (!handPreviewState?.el || !card) return;
     handPreviewState.card = card;
+    const col = state.players[state.activePlayer]?.color || 'p1';
+    handPreviewState.el.className = `hand-hold-preview card-zoom-art ${col}-unit`;
+    const art = artStyle(card, true);
+    handPreviewState.el.setAttribute('style', art || '');
     handPreviewState.el.innerHTML = handPreviewCardMarkup(card);
     document.querySelectorAll('.card[data-uid]').forEach(el => {
       if (el.dataset.baseTransform) el.style.transform = el.dataset.baseTransform;
@@ -3123,9 +3318,22 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   function handCardFromPoint(x, y) {
+    const cards = [...document.querySelectorAll('#hand-scroll .card[data-uid]')];
+    if (!cards.length) return null;
+
+    // While previewing, treat horizontal finger position as the selector even if
+    // the finger is above the hand / over the zoom card. This makes hand-scrub reliable.
+    if (handPreviewState) {
+      return cards.reduce((best, el) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const dist = Math.abs(x - cx);
+        return !best || dist < best.dist ? { el, dist } : best;
+      }, null)?.el || null;
+    }
+
     const direct = document.elementFromPoint(x, y)?.closest?.('.card[data-uid]');
     if (direct) return direct;
-    const cards = [...document.querySelectorAll('#hand-scroll .card[data-uid]')];
     let best = null, bestDist = Infinity;
     for (const el of cards) {
       const r = el.getBoundingClientRect();
@@ -3133,7 +3341,7 @@ window.addEventListener('unhandledrejection', e => {
       const cy = r.top + r.height / 2;
       const dx = x - cx, dy = y - cy;
       const dist = Math.hypot(dx, dy);
-      if (y >= r.top - 24 && y <= r.bottom + 28 && dist < bestDist) { best = el; bestDist = dist; }
+      if (y >= r.top - 32 && y <= r.bottom + 36 && dist < bestDist) { best = el; bestDist = dist; }
     }
     return best;
   }
@@ -3153,6 +3361,8 @@ window.addEventListener('unhandledrejection', e => {
     clearTimeout(dragState.inspectTimer);
     dragState.ghostEl?.remove();
     clearDragHover();
+    setHandTucked(false);
+    removePowerCastZone();
     closeHandHoldPreview();
     document.removeEventListener('touchmove', onHandDragMove);
     document.removeEventListener('touchend',  onHandDragEnd);
@@ -3184,6 +3394,35 @@ window.addEventListener('unhandledrejection', e => {
     document.addEventListener('touchend', onHandDragEnd, {once: true});
   }
 
+  function setHandTucked(on) {
+    const hand = document.getElementById('hand-scroll');
+    if (hand) hand.classList.toggle('hand-tucked', !!on);
+  }
+
+  function removePowerCastZone() {
+    document.getElementById('power-cast-zone')?.remove();
+  }
+
+  function showPowerCastZone() {
+    let zone = document.getElementById('power-cast-zone');
+    if (!zone) {
+      zone = document.createElement('div');
+      zone.id = 'power-cast-zone';
+      zone.className = 'power-cast-zone';
+      zone.innerHTML = `<div class="power-cast-zone-main">✦ Cast Power</div><div class="power-cast-zone-sub">Drop here</div>`;
+      document.body.appendChild(zone);
+    }
+    requestAnimationFrame(() => zone.classList.add('show'));
+    return zone;
+  }
+
+  function isPointInCastZone(x, y) {
+    const zone = document.getElementById('power-cast-zone');
+    if (!zone) return false;
+    const r = zone.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  }
+
   function liftHandCard(x, y) {
     if (!dragState || dragState.active) return;
     closeHandHoldPreview();
@@ -3205,18 +3444,27 @@ window.addEventListener('unhandledrejection', e => {
     document.body.appendChild(ghost);
     dragState.active = true;
     dragState.ghostEl = ghost;
+    setHandTucked(true);
     try{navigator.vibrate?.(20);}catch(e){}
     resetBoardZoom();
     // Clear previous selection state without renderHand (avoid DOM rebuild during touch)
     state.selectedHandCard = null;
     state.pendingTile = null;
     state.activeAction = null;
+    if (normalisedCardType(dragState.card) === 'Power') {
+      state.selectedBoardTile = null;
+      document.querySelectorAll('.unit-active,.unit-selected').forEach(t => t.classList.remove('unit-active','unit-selected'));
+    }
     clearHighlights();
     clearConfirm();
-    // Now set new drag card and highlight deploy tiles
+    // Now set new drag card and highlight valid drop targets
     state.selectedHandCard = dragState.card;
     const p = state.players[state.activePlayer];
-    if (p.resources >= dragState.card.cost) highlightDeployTiles(true);
+    const isPower = normalisedCardType(dragState.card) === 'Power';
+    if (p.resources >= dragState.card.cost) {
+      if (isPower) highlightPowerDragTargets(dragState.card);
+      else highlightDeployTiles(true);
+    }
   }
 
   function clearDragHover() {
@@ -3245,10 +3493,12 @@ window.addEventListener('unhandledrejection', e => {
     e.preventDefault();
     dragState.ghostEl.style.left = t.clientX - 34 + 'px';
     dragState.ghostEl.style.top  = t.clientY - 90 + 'px';
+    const castZone = document.getElementById('power-cast-zone');
+    if (castZone) castZone.classList.toggle('drag-hover', isPointInCastZone(t.clientX, t.clientY));
     // Only update tile hover when it changes — prevents flicker
     const under = document.elementFromPoint(t.clientX, t.clientY);
     const tile = under?.closest('[data-id]');
-    const newHoverTile = tile?.classList.contains('highlight-deploy') ? tile : null;
+    const newHoverTile = tile?.classList.contains('highlight-deploy') || tile?.classList.contains('highlight-ability') ? tile : null;
     if (newHoverTile !== dragState.hoverTile) {
       clearDragHover();
       dragState.hoverTile = newHoverTile;
@@ -3285,11 +3535,23 @@ window.addEventListener('unhandledrejection', e => {
     clearDragHover();
     resetBoardZoom();
     dragState.ghostEl.style.display = 'none';
+    const card = dragState.card;
+    const isPowerDrop = normalisedCardType(card) === 'Power';
+    const castZoneDrop = isPowerDrop && isPointInCastZone(t.clientX, t.clientY);
     const under = document.elementFromPoint(t.clientX, t.clientY);
     const tile = under?.closest('[data-id]');
-    const tileId = tile?.dataset.id;
-    const validDrop = tileId && tile.classList.contains('highlight-deploy');
-    if (validDrop) {
+    const tileId = castZoneDrop ? '__cast_zone__' : tile?.dataset.id;
+    const validDrop = castZoneDrop || (tileId && (tile.classList.contains('highlight-deploy') || tile.classList.contains('highlight-ability')));
+    setHandTucked(false);
+    if (validDrop && isPowerDrop) {
+      const ghost = dragState.ghostEl;
+      const srcEl = dragState.sourceEl;
+      dragState = null;
+      ghost.remove();
+      const confirmed = confirmDraggedPowerCard(card, tileId);
+      if (srcEl) { srcEl.style.opacity = ''; srcEl.style.pointerEvents = ''; }
+      if (!confirmed) { removePowerCastZone(); renderHand(); }
+    } else if (validDrop) {
       dragState.ghostEl.remove();
       dragState = null;
       onTileTap(tileId);
@@ -3313,6 +3575,7 @@ window.addEventListener('unhandledrejection', e => {
       } else {
         ghost.remove();
       }
+      removePowerCastZone();
       deselectAll();
     }
   }
@@ -3345,6 +3608,7 @@ window.addEventListener('unhandledrejection', e => {
     state.activeAction=null;
     highlightDeployTiles(false);
     highlightCentreTiles(false);
+    clearPowerHighlights();
     clearHighlights();
     clearConfirm();
     const p=state.players[state.activePlayer];
@@ -3376,6 +3640,125 @@ window.addEventListener('unhandledrejection', e => {
     });
   }
 
+  function clearPowerHighlights() {
+    document.querySelectorAll('.tile.highlight-deploy,.tile.highlight-ability').forEach(t => {
+      t.classList.remove('highlight-deploy','highlight-ability');
+    });
+    if (!state._pendingPowerDrop) removePowerCastZone();
+  }
+
+  function highlightPowerDragTargets(card) {
+    const reg = POWER_REGISTRY[card?.effect];
+    if (!reg) return;
+    if (reg.subtype === 'instant') {
+      showPowerCastZone();
+    } else if (reg.subtype === 'lane_target') {
+      highlightCentreTiles(true);
+    } else if (reg.subtype === 'unit_target') {
+      highlightPowerTargets(reg);
+    } else if (reg.subtype === 'tile_target') {
+      document.querySelectorAll('.tile').forEach(t => {
+        const tid = t.dataset.id;
+        if (reg.targetFilter && reg.targetFilter(tid)) t.classList.add('highlight-deploy');
+      });
+    }
+  }
+
+  function spendPowerCard(card) {
+    const p = state.players[state.activePlayer];
+    if (!card || p.resources < card.cost) return false;
+    p.resources -= card.cost;
+    p.hand = p.hand.filter(c => c.uid !== card.uid);
+    p.graveyard.push({...card});
+    state.selectedHandCard = null;
+    return true;
+  }
+
+  function getPowerTargetForTile(card, tileId) {
+    const reg = POWER_REGISTRY[card?.effect];
+    if (!reg) { console.warn('Unknown power effect:', card?.effect); return null; }
+    const tile = tileId === '__cast_zone__' ? document.getElementById('power-cast-zone') : document.querySelector(`[data-id="${tileId}"]`);
+    if (!tile) return null;
+    let target = null;
+    if (reg.subtype === 'instant') {
+      if (tileId !== '__cast_zone__') return null;
+    } else if (reg.subtype === 'lane_target') {
+      if (!tile.classList.contains('highlight-deploy')) return null;
+      target = tileMap[tileId]?.lane || unitLane(tileId);
+    } else if (reg.subtype === 'unit_target') {
+      if (!tile.classList.contains('highlight-ability')) return null;
+      target = tileId;
+    } else if (reg.subtype === 'tile_target') {
+      if (!tile.classList.contains('highlight-deploy')) return null;
+      target = tileId;
+    } else {
+      return null;
+    }
+    return { reg, target, tileId };
+  }
+
+  function addPowerReadyOverlay(tile, card) {
+    if (!tile || tile.id === 'power-cast-zone') return;
+    tile.querySelector('.power-ready-overlay')?.remove();
+    const overlay = document.createElement('div');
+    overlay.className = 'power-ready-overlay';
+    overlay.innerHTML = `<div class="power-ready-chip"><div class="power-ready-icon">✦</div><div class="power-ready-text">Cast Ready</div></div><div class="power-ready-label">${escapeHtml(formatCardName(card?.name || 'Power'))}</div>`;
+    tile.appendChild(overlay);
+  }
+
+  function removePowerReadyOverlays() {
+    document.querySelectorAll('.power-ready-overlay').forEach(el => el.remove());
+  }
+
+  function clearPowerConfirm() {
+    state._pendingPowerDrop = null;
+    removePowerReadyOverlays();
+    document.querySelectorAll('.power-confirm-tile').forEach(t => t.classList.remove('power-confirm-tile'));
+    document.getElementById('power-cast-zone')?.classList.remove('power-confirm','drag-hover');
+  }
+
+  function confirmDraggedPowerCard(card, tileId) {
+    const targetInfo = getPowerTargetForTile(card, tileId);
+    if (!targetInfo) return false;
+    clearConfirm();
+    clearPowerConfirm();
+    const tile = tileId === '__cast_zone__' ? document.getElementById('power-cast-zone') : document.querySelector(`[data-id="${tileId}"]`);
+    if (tileId === '__cast_zone__') tile?.classList.add('power-confirm');
+    else if (tile) {
+      tile.classList.add('confirm-tile','power-confirm-tile');
+      addPowerReadyOverlay(tile, card);
+    }
+    state.selectedHandCard = card;
+    state._pendingPowerDrop = { card, ...targetInfo };
+    setBarState('pending', { label:'Cast', cost:card?.cost ?? 0, action:'cast', confirm:true });
+    return true;
+  }
+
+  function executeConfirmedPowerCard() {
+    const pending = state._pendingPowerDrop;
+    if (!pending?.card || !pending?.reg) return false;
+    const { card, reg, target } = pending;
+    if (!spendPowerCard(card)) return false;
+    clearPowerConfirm();
+    removePowerCastZone();
+    clearPowerHighlights();
+    clearHighlights();
+    clearConfirm();
+    renderHub();
+    if (reg.subtype === 'instant') {
+      reg.execute(card);
+      powerCardDone();
+    } else {
+      reg.execute(card, target);
+    }
+    return true;
+  }
+
+  function playDraggedPowerCard(card, tileId) {
+    // Deprecated direct-cast path kept as a wrapper. Dragging now prepares a Cast confirmation.
+    return confirmDraggedPowerCard(card, tileId);
+  }
+
   // ── TILE TAP ──
   function showDamageFloat(tileId, amount) {
     const tile = document.querySelector(`[data-id="${tileId}"]`);
@@ -3405,6 +3788,47 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   // ── POWER CARD REGISTRY ──
+  function damageUnitByPower(tileId, amount, label='Damage') {
+    const unit = state.board[tileId];
+    const tile = document.querySelector(`[data-id="${tileId}"]`);
+    if (!unit || !tile) return false;
+    unit.hp = Math.max(0, unit.hp - amount);
+    showDamageFloat(tileId, amount);
+    tile.classList.add('highlight-target');
+    setTimeout(() => tile.classList.remove('highlight-target'), 700);
+    if (unit.hp <= 0) {
+      setTimeout(() => { if (state.board[tileId]) removeSlain(tileId); }, 600);
+    } else {
+      const hpEl = tile.querySelector('.unit-hp span');
+      setTimeout(() => { if (hpEl) hpEl.textContent = unit.hp; }, 350);
+    }
+    showToastMsg(label);
+    return true;
+  }
+
+  function healUnitByPower(tileId, amount, label='Healed') {
+    const unit = state.board[tileId];
+    const tile = document.querySelector(`[data-id="${tileId}"]`);
+    if (!unit || !tile) return false;
+    const before = unit.hp ?? 0;
+    const cap = unit.maxHp ?? unit.hp ?? before;
+    unit.hp = Math.min(cap, before + amount);
+    const healed = Math.max(0, unit.hp - before);
+    tile.classList.add('confirm-tile');
+    setTimeout(() => tile.classList.remove('confirm-tile'), 700);
+    const hpEl = tile.querySelector('.unit-hp span');
+    if (hpEl) hpEl.textContent = unit.hp;
+    showToastMsg(`${label}: +${healed} HP`);
+    return true;
+  }
+
+  function saveRollAgainst(unit, ap=0) {
+    const saveVal = parseInt(unit?.save) || 7;
+    const modSave = Math.min(7, saveVal + ap);
+    const roll = Math.floor(Math.random() * 6) + 1;
+    return { roll, saved: roll >= modSave, modSave };
+  }
+
   const POWER_REGISTRY = {
 
     add_resources: {
@@ -3423,6 +3847,90 @@ window.addEventListener('unhandledrejection', e => {
         const roll = lo + Math.floor(Math.random() * (hi - lo + 1));
         state.players[state.activePlayer].resources += roll;
         showToastMsg(`+${roll} Resources (rolled)`);
+      }
+    },
+
+    direct_damage_enemy: {
+      subtype: 'unit_target',
+      targetFilter: (tid) => state.board[tid]?.owner && state.board[tid].owner !== state.activePlayer,
+      execute(card, tileId) {
+        const dmg = card.value ?? card.weapon?.damage ?? 2;
+        damageUnitByPower(tileId, dmg, `${formatCardName(card.name)}: ${dmg} damage`);
+        powerCardDone();
+      }
+    },
+
+    heal_friendly_unit: {
+      subtype: 'unit_target',
+      targetFilter: (tid) => state.board[tid]?.owner === state.activePlayer,
+      execute(card, tileId) {
+        const amt = card.value ?? 3;
+        healUnitByPower(tileId, amt, formatCardName(card.name));
+        powerCardDone();
+      }
+    },
+
+    rally_friendly_unit: {
+      subtype: 'unit_target',
+      targetFilter: (tid) => state.board[tid]?.owner === state.activePlayer,
+      execute(card, tileId) {
+        const unit = state.board[tileId];
+        const tile = document.querySelector(`[data-id="${tileId}"]`);
+        if (!unit || !tile) { powerCardDone(); return; }
+        const gain = card.value ?? 1;
+        const current = unit.actionsLeft == null ? 0 : unit.actionsLeft;
+        unit.actionsLeft = Math.min(2, current + gain);
+        tile.classList.add('confirm-tile');
+        setTimeout(() => tile.classList.remove('confirm-tile'), 700);
+        renderUnit(tile, unit);
+        showToastMsg(`${formatCardName(card.name)}: +${gain} action`);
+        powerCardDone();
+      }
+    },
+
+    fortify_friendly_unit: {
+      subtype: 'unit_target',
+      targetFilter: (tid) => state.board[tid]?.owner === state.activePlayer,
+      execute(card, tileId) {
+        const unit = state.board[tileId];
+        const tile = document.querySelector(`[data-id="${tileId}"]`);
+        if (!unit || !tile) { powerCardDone(); return; }
+        const amt = card.value ?? 2;
+        unit.maxHp = (unit.maxHp ?? unit.hp ?? 0) + amt;
+        unit.hp = (unit.hp ?? 0) + amt;
+        renderUnit(tile, unit);
+        tile.classList.add('confirm-tile');
+        setTimeout(() => tile.classList.remove('confirm-tile'), 700);
+        showToastMsg(`${formatCardName(card.name)}: +${amt} HP`);
+        powerCardDone();
+      }
+    },
+
+    damage_enemy_lane: {
+      subtype: 'lane_target',
+      execute(card, lane) {
+        const ap  = card.weapon?.ap ?? 0;
+        const dmg = card.weapon?.damage ?? card.value ?? 1;
+        const targets = Object.entries(state.board)
+          .filter(([tid, unit]) => unitLane(tid) === lane && unit.owner !== state.activePlayer)
+          .sort(([a],[b]) => parseInt(a.split('-')[1]) - parseInt(b.split('-')[1]));
+        if (!targets.length) { showToastMsg('No enemy units in lane'); powerCardDone(); return; }
+        let i = 0;
+        function resolveNext() {
+          if(i >= targets.length) { powerCardDone(); return; }
+          const [tileId, unit] = targets[i++];
+          const tile = document.querySelector(`[data-id="${tileId}"]`);
+          if(!tile || !state.board[tileId]) { resolveNext(); return; }
+          tile.classList.add('highlight-target');
+          const result = saveRollAgainst(unit, ap);
+          showDiceFloat(tileId, result.roll, result.saved);
+          setTimeout(()=>{
+            tile.classList.remove('highlight-target');
+            if(!result.saved && state.board[tileId]) damageUnitByPower(tileId, dmg, `${formatCardName(card.name)}: ${dmg} damage`);
+            setTimeout(resolveNext, 650);
+          }, 800);
+        }
+        resolveNext();
       }
     },
 
@@ -3745,37 +4253,114 @@ window.addEventListener('unhandledrejection', e => {
     artEl.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') resetTilt(); });
   }
 
+  function formatFactionHeader(faction) {
+    const raw = String(faction || '').replace(/^order_of_/, 'Order of ').replace(/_/g, ' ').trim();
+    return raw ? raw.replace(/\b\w/g, c => c.toUpperCase()) : 'Universal';
+  }
+
+  function zoomPowerSubtypeLabel(card) {
+    const subtype = POWER_REGISTRY?.[card?.effect]?.subtype;
+    if (subtype === 'instant') return 'Instant Power';
+    if (subtype === 'lane_target') return 'Target Lane';
+    if (subtype === 'unit_target') return 'Target Unit';
+    if (subtype === 'tile_target') return 'Target Tile';
+    return 'Power';
+  }
+
+  function zoomPowerProfileHtml(card) {
+    const label = zoomPowerSubtypeLabel(card);
+    const value = card?.value != null ? String(card.value) : '';
+    return `<div class="card-zoom-attack-pill power-pill">
+      <div class="card-zoom-weapon-icon">✦</div>
+      <div class="card-zoom-statpair"><span class="cz-icon">◎</span><span class="cz-val">${escapeHtml(label)}</span></div>
+      ${value ? `<div class="card-zoom-statpair"><span class="cz-icon">#</span><span class="cz-val">${escapeHtml(value)}</span></div>` : ''}
+    </div>`;
+  }
+
+  function zoomSequenceForCard(card) {
+    if (!card) return [];
+    const uid = card.uid;
+    const hand = state.players[state.activePlayer]?.hand || [];
+    if (uid && hand.some(c => c.uid === uid)) return hand;
+    const boardEntries = Object.entries(state.board || {})
+      .filter(([, unit]) => !!unit)
+      .sort(([a], [b]) => a.localeCompare(b));
+    const boardCards = boardEntries.map(([, unit]) => unit);
+    if (uid && boardCards.some(c => c.uid === uid)) return boardCards;
+    return [];
+  }
+
+  function bindCardZoomSwipe(overlay, card) {
+    if (!overlay || !card) return;
+    let startX = 0, startY = 0, tracking = false;
+    const start = e => {
+      const t = e.touches?.[0];
+      if (!t) return;
+      startX = t.clientX; startY = t.clientY; tracking = true;
+    };
+    const end = e => {
+      if (!tracking) return;
+      tracking = false;
+      const t = e.changedTouches?.[0];
+      if (!t) return;
+      const dx = t.clientX - startX;
+      const dy = t.clientY - startY;
+      if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      const seq = zoomSequenceForCard(card);
+      if (seq.length < 2) return;
+      const idx = seq.findIndex(c => c.uid && c.uid === card.uid);
+      if (idx === -1) return;
+      const nextIdx = dx < 0 ? (idx + 1) % seq.length : (idx - 1 + seq.length) % seq.length;
+      e.preventDefault?.();
+      openCardZoom(seq[nextIdx]);
+    };
+    overlay.addEventListener('touchstart', start, { passive:true });
+    overlay.addEventListener('touchend', end, { passive:false });
+  }
+
   function openCardZoom(card) {
     const existing = document.getElementById('card-zoom-overlay');
     if (existing) existing.remove();
-    const col = card.owner === 1 ? 'p1' : card.owner === 2 ? 'p2' : '';
+    if (!card) return;
+    const owner = card.owner || state.activePlayer || 1;
+    const col = owner === 1 ? 'p1' : owner === 2 ? 'p2' : '';
     const isPower = normalisedCardType(card) === 'Power';
+    const factionIcon = FACTION_ICONS[card.faction] || (isPower ? '✦' : '');
+    const header = isPower ? zoomPowerSubtypeLabel(card) : formatFactionHeader(card.faction);
+    const subtitle = !isPower && card.weapon?.name ? `w/ ${card.weapon.name}` : '';
+    const quoteHtml = card.flavour ? `<div class="card-zoom-quote">${escapeHtml(card.flavour)}</div>` : '';
+    const profileHtml = isPower ? zoomPowerProfileHtml(card) : zoomAttackProfileHtml(card);
+
     const ov = document.createElement('div');
     ov.id = 'card-zoom-overlay';
     ov.className = 'card-zoom-overlay';
     ov.innerHTML = `
       <div class="card-zoom-shell" onclick="event.stopPropagation()">
+        <button class="card-zoom-close-btn" onclick="document.getElementById('card-zoom-overlay').remove()">×</button>
         <div class="card-zoom-art ${col}-unit" id="czoom-art">
-          <button class="card-zoom-close-btn" onclick="document.getElementById('card-zoom-overlay').remove()">×</button>
           <div class="card-zoom-cost"><span>${escapeHtml(card.cost ?? '')}</span></div>
           ${!isPower ? `<div class="card-zoom-stat-rail">
-            <div class="card-zoom-stat hp">${escapeHtml(card.hp ?? '')}</div>
-            <div class="card-zoom-stat move">${escapeHtml(card.move === -1 ? '—' : card.move ?? '')}</div>
-            <div class="card-zoom-stat save">${escapeHtml(card.save ?? '')}</div>
+            <div class="card-zoom-stat hp"><span class="czs-icon">♥</span><span class="czs-val">${escapeHtml(card.hp ?? '')}</span></div>
+            <div class="card-zoom-stat save"><span class="czs-icon">🛡</span><span class="czs-val">${escapeHtml(card.save ?? '')}</span></div>
+            <div class="card-zoom-stat move"><span class="czs-icon">➤</span><span class="czs-val">${escapeHtml(card.move === -1 ? '—' : card.move ?? '')}</span></div>
           </div>` : ''}
           <div class="card-zoom-fallback-name" id="czoom-fallback-name">${expectedArtLabel(card)}</div>
           <div class="card-zoom-shine" id="czoom-shine"></div>
-        </div>
-        <div class="card-zoom-info">
-          <div style="display:flex;align-items:center;justify-content:center;gap:4px;max-width:100%;">
-            <span class="card-zoom-faction">${FACTION_ICONS[card.faction]||''}</span>
-            <span class="card-zoom-name">${formatCardName(card.name)}</span>
+          <div class="card-zoom-bottom">
+            ${quoteHtml}
+            <div class="card-zoom-titleband">
+              <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
+              <div class="card-zoom-title">
+                <div class="card-zoom-order">${escapeHtml(header)}</div>
+                <div class="card-zoom-name">${formatCardName(card.name)}</div>
+                ${subtitle ? `<div class="card-zoom-weapon">${escapeHtml(subtitle)}</div>` : ''}
+              </div>
+              <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
+            </div>
+            ${profileHtml}
+            ${zoomSpecialHtml(card)}
           </div>
-          ${card.weapon?.name ? `<div class="card-zoom-weapon">${escapeHtml(card.weapon.name)}</div>` : ''}
         </div>
-        ${zoomAttackProfileHtml(card)}
-        ${zoomSpecialHtml(card)}
-        ${card.flavour ? `<div class="card-zoom-flavour">${escapeHtml(card.flavour)}</div>` : ''}
       </div>`;
     document.body.appendChild(ov);
     const artEl = document.getElementById('czoom-art');
@@ -3786,7 +4371,7 @@ window.addEventListener('unhandledrejection', e => {
     }
     updateZoomCardNameFallback(card);
     setupZoomTilt(artEl);
-    ov.addEventListener('click', e => { if(e.target===ov) ov.remove(); });
+    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
   }
 
   // ── BOARD TILE LONG PRESS ──
@@ -3971,7 +4556,9 @@ window.addEventListener('unhandledrejection', e => {
 
   function clearConfirm() {
     document.querySelectorAll('.confirm-tile').forEach(t=>t.classList.remove('confirm-tile'));
+    document.querySelectorAll('.power-confirm-tile').forEach(t=>t.classList.remove('power-confirm-tile'));
     document.querySelectorAll('.pending-deploy-preview').forEach(e=>e.remove());
+    state._pendingPowerDrop = null;
     const btn=document.getElementById('confirm-btn');
     if(btn) btn.remove();
     if (!state.activeUnit) setBarState('default');
@@ -4061,18 +4648,29 @@ window.addEventListener('unhandledrejection', e => {
     document.getElementById('prof-cv-diamond')?.classList.toggle('res-pulse', on);
   }
 
+  function syncBoardSelectionHighlight() {
+    document.querySelectorAll('.tile.unit-selected').forEach(t => t.classList.remove('unit-selected'));
+    const tileId = state.selectedBoardTile;
+    if (!tileId) return;
+    const unit = state.board[tileId];
+    if (!unit || unit.owner !== state.activePlayer) {
+      state.selectedBoardTile = null;
+      return;
+    }
+    const tile = document.querySelector(`[data-id="${tileId}"]`);
+    if (tile) tile.classList.add('unit-selected');
+  }
+
   function openProfile(card, context, tileId=null, opts={}) {
     profileCard=card; profileContext=context; profileTileId=tileId;
 
-    // Clear previous selected tile
-    document.querySelectorAll('.tile.unit-selected').forEach(t=>t.classList.remove('unit-selected'));
-    if (context==='board' && tileId) {
-      const tile=document.querySelector(`[data-id="${tileId}"]`);
-      if(tile) tile.classList.add('unit-selected');
+    // Gold selection is only for the currently selected friendly board unit.
+    if (context === 'board' && tileId && state.board[tileId]?.owner === state.activePlayer) {
       state.selectedBoardTile = tileId;
     } else {
       state.selectedBoardTile = null;
     }
+    syncBoardSelectionHighlight();
     document.getElementById('prof-cost').textContent = (context === 'board') ? '1' : card.cost;
     document.getElementById('prof-cv-hp').textContent = card.hp ?? '';
     document.getElementById('prof-cv-save').textContent = card.save ?? '';
@@ -4246,8 +4844,8 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   function closeProfile() {
-    document.querySelectorAll('.tile.unit-selected').forEach(t=>t.classList.remove('unit-selected'));
     state.selectedBoardTile = null;
+    syncBoardSelectionHighlight();
     setResPulse(false);
     document.getElementById('inspector-card-view').className='inspector-card-view';
     const uInfo = document.getElementById('hub-unit-info');
@@ -4630,7 +5228,9 @@ window.addEventListener('unhandledrejection', e => {
     if (target) {
       state.activeUnit = { tileId: targetTileId, card: target };
       document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
-      document.querySelector(`[data-id="${targetTileId}"]`)?.classList.add('unit-active','unit-selected');
+      document.querySelector(`[data-id="${targetTileId}"]`)?.classList.add('unit-active');
+      state.selectedBoardTile = targetTileId;
+      syncBoardSelectionHighlight();
       openProfile(target, 'board', targetTileId);
     }
   }
@@ -5005,7 +5605,10 @@ window.addEventListener('unhandledrejection', e => {
     }
     else if (state._ctaAction === 'deploy' && state.pendingTile && !state.deployModeFromInspector) executeDeployTo(state.pendingTile);
     else if (state._ctaAction === 'activate') activateUnit();
-    else if (state._ctaAction === 'cast') { state.selectedHandCard = profileCard; castPowerCard(profileCard); }
+    else if (state._ctaAction === 'cast') {
+      if (state._pendingPowerDrop) executeConfirmedPowerCard();
+      else { state.selectedHandCard = profileCard; castPowerCard(profileCard); }
+    }
     else if (state._ctaAction === 'draw') { /* draw now requires hold */ }
     else if (state._ctaAction === 'pass') { /* pass now requires hold */ }
   }
@@ -5117,7 +5720,9 @@ window.addEventListener('unhandledrejection', e => {
     state.activeUnit={tileId:profileTileId, card:unit};
     document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
     const tile = document.querySelector(`[data-id="${profileTileId}"]`);
-    if(tile) { tile.classList.add('unit-active','unit-selected'); }
+    if(tile) { tile.classList.add('unit-active'); }
+    state.selectedBoardTile = profileTileId;
+    syncBoardSelectionHighlight();
     renderUnit(tile, unit);
     renderHub();
     showActionBar(unit);
@@ -5278,7 +5883,9 @@ window.addEventListener('unhandledrejection', e => {
       state.activeUnit = ret;
       document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
       const retTile = document.querySelector(`[data-id="${ret.tileId}"]`);
-      if (retTile) retTile.classList.add('unit-active','unit-selected');
+      if (retTile) retTile.classList.add('unit-active');
+      state.selectedBoardTile = ret.tileId;
+      syncBoardSelectionHighlight();
       openProfile(ret.card, 'board', ret.tileId);
       setUILock(false);
       return;
