@@ -1337,6 +1337,39 @@ box-shadow: 0 0 16px rgba(200,160,60,0.3);
   line-height: 1.25;
   max-width: 280px;
 }
+
+.setup-toggle-row {
+  width:min(280px,86vw);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:14px;
+  padding:10px 14px;
+  border:1px solid rgba(200,160,96,0.5);
+  background:rgba(10,8,6,0.78);
+  border-radius:10px;
+  color:#e8d6b0;
+  font-family:'Spectral', Georgia, serif;
+  font-size:var(--fs-xs);
+  letter-spacing:0.08em;
+}
+.setup-toggle-meta {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.setup-toggle-status {
+  font-size:10px;
+  opacity:0.72;
+  letter-spacing:0.12em;
+}
+.prototype-toggle {
+  width:20px;
+  height:20px;
+  accent-color:#c8a060;
+}
+
 .splash-actions {
   width: min(280px, 86vw);
   display: flex;
@@ -2022,7 +2055,21 @@ pointer-events: none;
   <div class="splash-copy">
     <div class="req-title">Revenant</div>
   </div>
-  <div class="splash-actions">
+  
+  <label class="setup-toggle-row">
+    <div class="setup-toggle-meta">
+      <span>Draft Cards</span>
+      <span class="setup-toggle-status" id="prototype-toggle-status">TEST MODE</span>
+    </div>
+    <input
+      type="checkbox"
+      id="prototype-toggle"
+      class="prototype-toggle"
+      checked
+    />
+  </label>
+
+<div class="splash-actions">
     <button class="splash-btn" onclick="beginGame()">New Game</button>
     <button class="splash-btn secondary" id="quick-load-btn" onclick="quickLoad()">Continue</button>
     <button class="splash-btn ghost" onclick="skipToGame()">Skip</button>
@@ -2288,34 +2335,34 @@ window.addEventListener('unhandledrejection', e => {
       weapon:null, effect:'add_resources', value:2,
       special:'Reinforce: Immediately gain 2 resources. Discard after use.' },
 
-    // Prototype powers — mechanic test cards. These are appended into decks for playtesting.
+    // Draft powers — mechanic test cards. These are appended into decks for playtesting.
     { id:'proto_power_ember_bolt', name:'Ember Bolt', internalName:'ember_bolt', variant:'prototype', artId:'ember_bolt_prototype', type:'Power', faction:'order_of_flame', cost:2,
       hp:null, maxHp:null, move:null, save:null,
       weapon:{name:'Ember Bolt', range:null, attacks:null, hit:null, ap:0, damage:2}, effect:'direct_damage_enemy', value:2,
-      special:'Prototype: Target an enemy unit. Deal 2 damage.' },
+      special:'Draft: Target an enemy unit. Deal 2 damage.' },
     { id:'proto_power_burning_front', name:'Burning Front', internalName:'burning_front', variant:'prototype', artId:'burning_front_prototype', type:'Power', faction:'order_of_flame', cost:3,
       hp:null, maxHp:null, move:null, save:null,
       weapon:{name:'Burning Front', range:null, attacks:null, hit:null, ap:1, damage:1}, effect:'damage_enemy_lane', value:1,
-      special:'Prototype: Target a lane. Enemy units in that lane each make a save at AP 1 or suffer 1 damage.' },
+      special:'Draft: Target a lane. Enemy units in that lane each make a save at AP 1 or suffer 1 damage.' },
     { id:'proto_power_rallying_horn', name:'Rallying Horn', internalName:'rallying_horn', variant:'prototype', artId:'rallying_horn_prototype', type:'Power', faction:'order_of_iron', cost:2,
       hp:null, maxHp:null, move:null, save:null,
       weapon:null, effect:'rally_friendly_unit', value:1,
-      special:'Prototype: Target a friendly deployed unit. It gains +1 action, up to 2.' },
+      special:'Draft: Target a friendly deployed unit. It gains +1 action, up to 2.' },
     { id:'proto_power_mending_light', name:'Mending Light', internalName:'mending_light', variant:'prototype', artId:'mending_light_prototype', type:'Power', faction:'order_of_light', cost:2,
       hp:null, maxHp:null, move:null, save:null,
       weapon:null, effect:'heal_friendly_unit', value:3,
-      special:'Prototype: Target a friendly unit. Restore 3 HP, not above max HP.' },
+      special:'Draft: Target a friendly unit. Restore 3 HP, not above max HP.' },
     { id:'proto_power_iron_bastion', name:'Iron Bastion', internalName:'iron_bastion', variant:'prototype', artId:'iron_bastion_prototype', type:'Power', faction:'order_of_iron', cost:2,
       hp:null, maxHp:null, move:null, save:null,
       weapon:null, effect:'fortify_friendly_unit', value:2,
-      special:'Prototype: Target a friendly unit. It gains +2 max HP and +2 current HP.' },
+      special:'Draft: Target a friendly unit. It gains +2 max HP and +2 current HP.' },
     { id:'proto_power_black_market', name:'Black Market', internalName:'black_market', variant:'prototype', artId:'black_market_prototype', type:'Power', faction:'universal', cost:0,
       hp:null, maxHp:null, move:null, save:null,
       weapon:null, effect:'add_resources_random', value:[1,3],
-      special:'Prototype: Instant. Gain 1-3 resources.' },
+      special:'Draft: Instant. Gain 1-3 resources.' },
   ];
 
-  const PROTOTYPE_POWER_CARD_IDS = [
+  const DRAFTTYPE_POWER_CARD_IDS = [
     'ember_bolt_prototype',
     'burning_front_prototype',
     'rallying_horn_prototype',
@@ -2326,22 +2373,22 @@ window.addEventListener('unhandledrejection', e => {
 
   function prototypePowerCardsFrom(repo) {
     const cleanRepo = normaliseCardRepo(repo) || [];
-    return PROTOTYPE_POWER_CARD_IDS
+    return DRAFTTYPE_POWER_CARD_IDS
       .map(id => cleanRepo.find(c => c.id === id || c.artId === id))
       .filter(Boolean);
   }
 
-  function mergePrototypePowerCards(repo) {
+  function mergeDraftPowerCards(repo) {
     const cleanRepo = normaliseCardRepo(repo) || [];
     const existingIds = new Set(cleanRepo.map(c => c.id));
-    const builtIns = normaliseCardRepo(CARDS).filter(c => PROTOTYPE_POWER_CARD_IDS.includes(c.id));
+    const builtIns = normaliseCardRepo(CARDS).filter(c => DRAFTTYPE_POWER_CARD_IDS.includes(c.id));
     builtIns.forEach(card => {
       if (!existingIds.has(card.id)) cleanRepo.push(card);
     });
     return cleanRepo;
   }
 
-  function injectPrototypePowerCards(deck, repo, player) {
+  function injectDraftPowerCards(deck, repo, player) {
     const existing = new Set((deck || []).map(c => c.id));
     let uid = deck.length;
     prototypePowerCardsFrom(repo).forEach(card => {
@@ -2531,7 +2578,7 @@ window.addEventListener('unhandledrejection', e => {
       const ld = localStorage.getItem('grim_lane_deck');
       if (ld) laneDeck = JSON.parse(ld);
     } catch(e) { console.warn('Card data load failed', e); }
-    repo = mergePrototypePowerCards(repo);
+    repo = mergeDraftPowerCards(repo);
     return { repo, lists, laneDeck };
   }
 
@@ -2585,7 +2632,10 @@ window.addEventListener('unhandledrejection', e => {
   const DEBUG = false;
   function dbg(msg){ if(DEBUG) console.log(msg); }
 
-  const state = {
+  let ENABLE_DRAFTTYPE_CARDS =
+  localStorage.getItem('grim_proto_cards') !== 'false';
+
+const state = {
     round:1, maxRounds:5, activePlayer:1,
     phase: 'setup', // 'setup' | 'requisition' | 'battle'
     players:{
@@ -2629,7 +2679,9 @@ window.addEventListener('unhandledrejection', e => {
         console.warn(`Deck build failed for P${p}, using default`, e);
         state.players[p].deck = makeDeck();
       }
-      state.players[p].deck = injectPrototypePowerCards(state.players[p].deck, repo, p);
+      if (ENABLE_DRAFTTYPE_CARDS) {
+        state.players[p].deck = injectDraftPowerCards(state.players[p].deck, repo, p);
+      }
       state.players[p].hand=[];
       state.players[p].graveyard=[];
       state.players[p].resources=3;
@@ -2651,6 +2703,30 @@ window.addEventListener('unhandledrejection', e => {
       continueBtn.setAttribute('aria-disabled', String(!hasSave));
       continueBtn.title = hasSave ? 'Load saved game' : 'No saved game found';
     }
+
+    const protoToggle = document.getElementById('prototype-toggle');
+    const protoStatus = document.getElementById('prototype-toggle-status');
+    if (protoToggle) {
+      protoToggle.checked = ENABLE_DRAFTTYPE_CARDS;
+
+      const syncDraftToggle = () => {
+        protoStatus.textContent = ENABLE_DRAFTTYPE_CARDS ? 'TEST MODE' : 'JSON ONLY';
+      };
+
+      syncDraftToggle();
+
+      protoToggle.onchange = (e) => {
+        ENABLE_DRAFTTYPE_CARDS = e.target.checked;
+
+        localStorage.setItem(
+          'grim_proto_cards',
+          String(ENABLE_DRAFTTYPE_CARDS)
+        );
+
+        syncDraftToggle();
+      };
+    }
+
     loadSplashArt();
     requestAnimationFrame(() => document.getElementById('start-overlay').classList.add('show'));
   }
@@ -6434,6 +6510,2324 @@ window.addEventListener('unhandledrejection', e => {
     if(e.touches.length<2)lastDist=null;
     if(e.touches.length===0){ isPinching=false; snapBack(); }
   },{passive:true});
+</script>
+
+
+<script>
+(function(){
+
+console.log('[Revenant] minimal runtime patch active');
+
+const STORAGE = {
+OFFICIAL:'grim_repo_official',
+DRAFTTYPE:'grim_repo_drafts'
+};
+
+const DEFAULT_DRAFTTYPES = [
+{id:'ember_bolt',name:'Ember Bolt',type:'Power',source:'prototype'},
+{id:'burning_front',name:'Burning Front',type:'Power',source:'prototype'},
+{id:'rallying_horn',name:'Rallying Horn',type:'Power',source:'prototype'},
+{id:'mending_light',name:'Mending Light',type:'Power',source:'prototype'},
+{id:'iron_bastion',name:'Iron Bastion',type:'Power',source:'prototype'},
+{id:'black_market',name:'Black Market',type:'Power',source:'prototype'}
+];
+
+function readJSON(key,fallback){
+try{
+return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
+}catch(err){
+return fallback;
+}
+}
+
+function writeJSON(key,value){
+localStorage.setItem(key, JSON.stringify(value));
+}
+
+function ensureDraftRepo(){
+
+let prototype = readJSON(STORAGE.DRAFTTYPE, []);
+
+if(!prototype.length){
+prototype = DEFAULT_DRAFTTYPES;
+writeJSON(STORAGE.DRAFTTYPE, prototype);
+}
+
+return prototype;
+}
+
+function rebuildMergedRepo(){
+
+const official = readJSON(STORAGE.OFFICIAL, []);
+const prototype = ensureDraftRepo();
+
+const merged = [...official, ...prototype];
+
+writeJSON('grim_card_repo', merged);
+
+window.repo = merged;
+window.cardRepo = merged;
+
+console.log('[Revenant] merged repo rebuilt', merged.length);
+
+}
+
+function patchCSVImport(){
+
+const original = Storage.prototype.setItem;
+
+if(window.__revenantCSVPatched) return;
+window.__revenantCSVPatched = true;
+
+Storage.prototype.setItem = function(key,value){
+
+if(key === 'grim_card_repo'){
+
+try{
+
+const imported = JSON.parse(value || '[]');
+
+const official = imported.filter(card =>
+card && card.source !== 'prototype'
+);
+
+writeJSON(STORAGE.OFFICIAL, official);
+
+const merged = [
+...official,
+...ensureDraftRepo()
+];
+
+original.call(
+this,
+'grim_card_repo',
+JSON.stringify(merged)
+);
+
+console.log('[Revenant] csv import merged');
+
+return;
+
+}catch(err){
+console.warn(err);
+}
+
+}
+
+return original.call(this,key,value);
+
+};
+
+}
+
+function injectEditorButton(){
+
+const menu = document.body;
+
+if(document.getElementById('open-editor-btn')) return;
+
+const btn = document.createElement('button');
+
+btn.id = 'open-editor-btn';
+btn.innerText = 'EDITOR';
+
+btn.style.position = 'fixed';
+btn.style.top = '12px';
+btn.style.right = '12px';
+btn.style.zIndex = '9999';
+btn.style.padding = '10px 14px';
+btn.style.background = '#1a1408';
+btn.style.border = '1px solid #c08020';
+btn.style.color = '#d8c49a';
+
+btn.onclick = function(){
+
+const official = readJSON(STORAGE.OFFICIAL, []);
+const prototype = readJSON(STORAGE.DRAFTTYPE, []);
+
+alert(
+'Official Cards: ' + official.length +
+'\nDraft Cards: ' + prototype.length
+);
+
+};
+
+menu.appendChild(btn);
+
+}
+
+ensureDraftRepo();
+rebuildMergedRepo();
+patchCSVImport();
+
+window.addEventListener('load', () => {
+setTimeout(injectEditorButton, 1200);
+});
+
+})();
+</script>
+
+
+<style>
+#revSafeEditor{
+position:fixed;
+inset:0;
+background:#0b0907;
+z-index:99999;
+display:none;
+flex-direction:column;
+font-family:Arial,sans-serif;
+}
+
+#revSafeEditorHeader{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px;
+background:#181109;
+border-bottom:1px solid #4a3310;
+color:#d8c49a;
+font-weight:900;
+}
+
+#revSafeEditorBody{
+flex:1;
+overflow:auto;
+padding:16px;
+color:#d8c49a;
+}
+
+.revSafeCard{
+padding:10px;
+margin-bottom:8px;
+background:#17110a;
+border:1px solid #5c4520;
+border-radius:6px;
+position:relative;
+}
+
+.revSafeProto{
+outline:2px solid #8b5cf6;
+}
+
+.revSafeBadge{
+position:absolute;
+top:4px;
+right:4px;
+font-size:9px;
+padding:2px 4px;
+background:#8b5cf6;
+border-radius:4px;
+color:white;
+font-weight:700;
+}
+
+.revSafeBtn{
+padding:8px 12px;
+background:#1e150b;
+border:1px solid #c28a28;
+color:#d8c49a;
+border-radius:6px;
+}
+</style>
+
+<div id="revSafeEditor">
+<div id="revSafeEditorHeader">
+<div>REVENANT EDITOR</div>
+<div style="display:flex;gap:8px;">
+<button id="revSafeRefresh" class="revSafeBtn">Refresh</button>
+<button id="revSafeClose" class="revSafeBtn">Close</button>
+</div>
+</div>
+<div id="revSafeEditorBody"></div>
+</div>
+
+<script>
+(function(){
+
+if(window.__revSafeEditorLoaded) return;
+window.__revSafeEditorLoaded = true;
+
+function readJSON(key,fallback){
+try{
+return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
+}catch(err){
+return fallback;
+}
+}
+
+function buildSafeEditor(){
+
+const body = document.getElementById('revSafeEditorBody');
+if(!body) return;
+
+body.innerHTML = '';
+
+const official = readJSON('grim_repo_official', []);
+const prototype = readJSON('grim_repo_drafts', []);
+
+const offTitle = document.createElement('h2');
+offTitle.innerText = 'Official Cards (' + official.length + ')';
+body.appendChild(offTitle);
+
+official.forEach(card=>{
+
+const el = document.createElement('div');
+el.className = 'revSafeCard';
+el.innerText = card.name || card.id || 'Unnamed Card';
+
+body.appendChild(el);
+
+});
+
+const protoTitle = document.createElement('h2');
+protoTitle.innerText = 'Draft Cards (' + prototype.length + ')';
+protoTitle.style.marginTop = '24px';
+
+body.appendChild(protoTitle);
+
+prototype.forEach(card=>{
+
+const el = document.createElement('div');
+el.className = 'revSafeCard revSafeProto';
+el.innerText = card.name || card.id || 'Draft';
+
+const badge = document.createElement('div');
+badge.className = 'revSafeBadge';
+badge.innerText = 'DRAFT';
+
+el.appendChild(badge);
+
+body.appendChild(el);
+
+});
+
+}
+
+function injectEditorModal(){
+
+const existing = document.getElementById('open-editor-btn');
+if(!existing) return;
+
+existing.onclick = function(){
+
+buildSafeEditor();
+
+document.getElementById('revSafeEditor').style.display = 'flex';
+
+};
+
+const close = document.getElementById('revSafeClose');
+const refresh = document.getElementById('revSafeRefresh');
+
+if(close){
+close.onclick = function(){
+document.getElementById('revSafeEditor').style.display = 'none';
+};
+}
+
+if(refresh){
+refresh.onclick = function(){
+buildSafeEditor();
+};
+}
+
+}
+
+window.addEventListener('load', function(){
+
+setTimeout(function(){
+
+injectEditorModal();
+
+}, 1200);
+
+});
+
+})();
+</script>
+
+
+<script>
+(function(){
+
+if(window.__revEditorImportExtension) return;
+window.__revEditorImportExtension = true;
+
+function readJSON(key,fallback){
+try{
+return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
+}catch(err){
+return fallback;
+}
+}
+
+function writeJSON(key,value){
+localStorage.setItem(key, JSON.stringify(value));
+}
+
+function syncMergedRepo(){
+
+const official =
+readJSON('grim_repo_official', []);
+
+const prototype =
+readJSON('grim_repo_drafts', []);
+
+const merged = [
+...official,
+...prototype
+];
+
+writeJSON('grim_card_repo', merged);
+
+window.repo = merged;
+window.cardRepo = merged;
+window.cards = merged;
+
+}
+
+function parseCSV(text){
+
+const lines =
+text.split(/\r?\n/).filter(Boolean);
+
+if(lines.length < 2) return [];
+
+const headers =
+lines[0].split(',').map(h=>h.trim());
+
+return lines.slice(1).map(line => {
+
+const values = line.split(',');
+
+const card = {};
+
+headers.forEach((header,index) => {
+card[header] = (values[index] || '').trim();
+});
+
+return card;
+
+});
+
+}
+
+function rebuildEditorLists(){
+
+const body =
+document.getElementById('revSafeEditorBody');
+
+if(!body) return;
+
+body.innerHTML = '';
+
+const official =
+readJSON('grim_repo_official', []);
+
+const prototype =
+readJSON('grim_repo_drafts', []);
+
+const offTitle =
+document.createElement('h2');
+
+offTitle.innerText =
+'Official Cards (' + official.length + ')';
+
+body.appendChild(offTitle);
+
+official.forEach(card=>{
+
+const el =
+document.createElement('div');
+
+el.className = 'revSafeCard';
+
+el.innerHTML =
+'<strong>' +
+(card.name || card.id || 'Unnamed Card') +
+'</strong><br>' +
+(card.type || 'Unknown');
+
+body.appendChild(el);
+
+});
+
+const protoTitle =
+document.createElement('h2');
+
+protoTitle.innerText =
+'Draft Cards (' + prototype.length + ')';
+
+protoTitle.style.marginTop = '24px';
+
+body.appendChild(protoTitle);
+
+prototype.forEach(card=>{
+
+const el =
+document.createElement('div');
+
+el.className =
+'revSafeCard revSafeProto';
+
+el.innerHTML =
+'<strong>' +
+(card.name || card.id || 'Draft') +
+'</strong><br>' +
+(card.type || 'Unknown');
+
+const badge =
+document.createElement('div');
+
+badge.className = 'revSafeBadge';
+badge.innerText = 'DRAFT';
+
+el.appendChild(badge);
+
+body.appendChild(el);
+
+});
+
+}
+
+function importCSV(file){
+
+const reader = new FileReader();
+
+reader.onload = function(event){
+
+try{
+
+const text =
+event.target.result || '';
+
+const cards =
+parseCSV(text);
+
+writeJSON(
+'grim_repo_official',
+cards
+);
+
+syncMergedRepo();
+
+rebuildEditorLists();
+
+console.log(
+'[Revenant] official cards imported',
+cards.length
+);
+
+}catch(err){
+console.error(err);
+}
+
+};
+
+reader.readAsText(file);
+
+}
+
+window.addEventListener('load', function(){
+
+setTimeout(function(){
+
+const header =
+document.getElementById(
+'revSafeEditorHeader'
+);
+
+if(!header) return;
+
+if(
+document.getElementById(
+'revCsvImportBtn'
+)
+) return;
+
+const controls =
+header.querySelector('div:last-child');
+
+if(!controls) return;
+
+const importBtn =
+document.createElement('button');
+
+importBtn.id = 'revCsvImportBtn';
+importBtn.className = 'revSafeBtn';
+importBtn.innerText = 'Import CSV';
+
+const input =
+document.createElement('input');
+
+input.type = 'file';
+input.accept = '.csv';
+input.style.display = 'none';
+
+importBtn.onclick = function(){
+input.click();
+};
+
+input.onchange = function(e){
+
+const file = e.target.files[0];
+
+if(file){
+importCSV(file);
+}
+
+};
+
+controls.prepend(importBtn);
+
+header.appendChild(input);
+
+}, 1200);
+
+});
+
+})();
+</script>
+
+
+<script>
+(function(){
+
+if(window.__revInlineTabEditor) return;
+window.__revInlineTabEditor = true;
+
+function readJSON(key,fallback){
+try{
+return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
+}catch(err){
+return fallback;
+}
+}
+
+function writeJSON(key,value){
+localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getVisibleRepo(){
+
+const official =
+readJSON('grim_repo_official', []);
+
+const prototype =
+readJSON('grim_repo_drafts', []);
+
+return [...official, ...prototype];
+
+}
+
+function getDeck(player){
+
+return readJSON(
+player === 2
+? 'grim_deck_p2'
+: 'grim_deck_p1',
+{}
+);
+
+}
+
+function saveDeck(player, deck){
+
+writeJSON(
+player === 2
+? 'grim_deck_p2'
+: 'grim_deck_p1',
+deck
+);
+
+}
+
+function buildTabbedEditor(){
+
+const body =
+document.getElementById('revSafeEditorBody');
+
+if(!body) return;
+
+body.innerHTML = '';
+
+const tabBar =
+document.createElement('div');
+
+tabBar.style.display = 'flex';
+tabBar.style.gap = '8px';
+tabBar.style.marginBottom = '20px';
+
+const repoBtn =
+document.createElement('button');
+
+repoBtn.className = 'revSafeBtn';
+repoBtn.innerText = 'Repo';
+
+const p1Btn =
+document.createElement('button');
+
+p1Btn.className = 'revSafeBtn';
+p1Btn.innerText = 'P1 Deck';
+
+const p2Btn =
+document.createElement('button');
+
+p2Btn.className = 'revSafeBtn';
+p2Btn.innerText = 'P2 Deck';
+
+tabBar.appendChild(repoBtn);
+tabBar.appendChild(p1Btn);
+tabBar.appendChild(p2Btn);
+
+body.appendChild(tabBar);
+
+const content =
+document.createElement('div');
+
+body.appendChild(content);
+
+function renderRepo(){
+
+content.innerHTML = '';
+
+const repo = getVisibleRepo();
+
+const title =
+document.createElement('h2');
+
+title.innerText =
+'All Cards (' + repo.length + ')';
+
+content.appendChild(title);
+
+repo.forEach(card=>{
+
+const el =
+document.createElement('div');
+
+el.className = 'revSafeCard';
+
+if(card.source === 'prototype'){
+el.className += ' revSafeProto';
+}
+
+el.innerHTML =
+'<strong>' +
+(card.name || card.id || 'Card') +
+'</strong><br>' +
+(card.type || 'Unknown');
+
+if(card.source === 'prototype'){
+
+const badge =
+document.createElement('div');
+
+badge.className = 'revSafeBadge';
+badge.innerText = 'DRAFT';
+
+el.appendChild(badge);
+
+}
+
+content.appendChild(el);
+
+});
+
+}
+
+function renderDeck(player){
+
+content.innerHTML = '';
+
+const repo = getVisibleRepo();
+const deck = getDeck(player);
+
+const title =
+document.createElement('h2');
+
+title.innerText =
+(player === 2 ? 'P2 Deck' : 'P1 Deck');
+
+content.appendChild(title);
+
+repo.forEach(card=>{
+
+const id =
+card.id || card.name;
+
+const qty =
+deck[id] || 0;
+
+const row =
+document.createElement('div');
+
+row.className = 'revSafeCard';
+
+if(card.source === 'prototype'){
+row.className += ' revSafeProto';
+}
+
+const info =
+document.createElement('div');
+
+info.innerHTML =
+'<strong>' +
+(card.name || id) +
+'</strong><br>' +
+(card.type || 'Unknown');
+
+row.appendChild(info);
+
+const controls =
+document.createElement('div');
+
+controls.style.display = 'flex';
+controls.style.alignItems = 'center';
+controls.style.gap = '8px';
+controls.style.marginTop = '10px';
+
+const minus =
+document.createElement('button');
+
+minus.className = 'revSafeBtn';
+minus.innerText = '-';
+
+const qtyLabel =
+document.createElement('div');
+
+qtyLabel.innerText = qty;
+qtyLabel.style.minWidth = '24px';
+qtyLabel.style.textAlign = 'center';
+
+const plus =
+document.createElement('button');
+
+plus.className = 'revSafeBtn';
+plus.innerText = '+';
+
+minus.onclick = function(){
+
+const latest =
+getDeck(player);
+
+latest[id] =
+Math.max(
+0,
+(latest[id] || 0) - 1
+);
+
+if(latest[id] <= 0){
+delete latest[id];
+}
+
+saveDeck(player, latest);
+
+renderDeck(player);
+
+};
+
+plus.onclick = function(){
+
+const latest =
+getDeck(player);
+
+latest[id] =
+(latest[id] || 0) + 1;
+
+saveDeck(player, latest);
+
+renderDeck(player);
+
+};
+
+controls.appendChild(minus);
+controls.appendChild(qtyLabel);
+controls.appendChild(plus);
+
+row.appendChild(controls);
+
+if(card.source === 'prototype'){
+
+const badge =
+document.createElement('div');
+
+badge.className = 'revSafeBadge';
+badge.innerText = 'DRAFT';
+
+row.appendChild(badge);
+
+}
+
+content.appendChild(row);
+
+});
+
+}
+
+repoBtn.onclick = renderRepo;
+p1Btn.onclick = ()=>renderDeck(1);
+p2Btn.onclick = ()=>renderDeck(2);
+
+renderRepo();
+
+}
+
+window.addEventListener('load', function(){
+
+setTimeout(function(){
+
+const existingOpen =
+document.getElementById('open-editor-btn');
+
+if(existingOpen){
+
+const original =
+existingOpen.onclick;
+
+existingOpen.onclick = function(){
+
+if(original){
+original();
+}
+
+setTimeout(buildTabbedEditor, 100);
+
+};
+
+}
+
+}, 1200);
+
+});
+
+})();
+</script>
+
+
+<style>
+.revTileGrid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:12px;
+}
+
+.revTile{
+position:relative;
+padding:12px;
+border-radius:10px;
+background:#17110a;
+border:2px solid #4a3720;
+color:#d8c49a;
+}
+
+.revTilePower{
+background:#261630;
+border-color:#8b5cf6;
+}
+
+.revTileHero{
+border-color:#d4af37;
+box-shadow:0 0 10px rgba(212,175,55,0.25);
+}
+
+.revTileUncommon{
+border-color:#b8b8b8;
+}
+
+.revTileProto{
+outline:2px solid #8b5cf6;
+}
+
+.revTileName{
+font-size:16px;
+font-weight:700;
+margin-bottom:6px;
+}
+
+.revTileMeta{
+font-size:12px;
+opacity:0.8;
+margin-bottom:8px;
+}
+
+.revTileControls{
+display:flex;
+gap:8px;
+align-items:center;
+margin-top:10px;
+}
+
+.revTileQty{
+min-width:20px;
+text-align:center;
+font-weight:700;
+}
+
+.revEditorTabs{
+display:flex;
+gap:8px;
+margin-bottom:18px;
+}
+
+.revEditorPanel{
+margin-top:8px;
+}
+
+.revTileExpand{
+margin-top:12px;
+padding-top:12px;
+border-top:1px solid rgba(255,255,255,0.1);
+display:none;
+}
+
+.revTileExpand input,
+.revTileExpand textarea{
+width:100%;
+box-sizing:border-box;
+margin-top:4px;
+margin-bottom:8px;
+background:#0d0906;
+border:1px solid #4a3720;
+color:#d8c49a;
+padding:6px;
+border-radius:6px;
+}
+
+.revProtoBadge{
+position:absolute;
+top:6px;
+right:6px;
+background:#8b5cf6;
+color:white;
+padding:2px 5px;
+font-size:9px;
+border-radius:4px;
+font-weight:700;
+}
+</style>
+
+<script>
+(function(){
+
+if(window.__revHardOverrideEditor) return;
+window.__revHardOverrideEditor = true;
+
+function readJSON(key,fallback){
+try{
+return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
+}catch(err){
+return fallback;
+}
+}
+
+function writeJSON(key,value){
+localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getRepo(){
+
+return [
+...readJSON('grim_repo_official', []),
+...readJSON('grim_repo_drafts', [])
+];
+
+}
+
+function getDeck(player){
+
+return readJSON(
+player === 2
+? 'grim_deck_p2'
+: 'grim_deck_p1',
+{}
+);
+
+}
+
+function saveDeck(player,deck){
+
+writeJSON(
+player === 2
+? 'grim_deck_p2'
+: 'grim_deck_p1',
+deck
+);
+
+}
+
+function cardClass(card){
+
+const type = (card.type || '').toLowerCase();
+const rarity = (
+card.rarity ||
+card.unitType ||
+''
+).toLowerCase();
+
+let cls = 'revTile';
+
+if(type.includes('power')){
+cls += ' revTilePower';
+}else if(rarity.includes('hero')){
+cls += ' revTileHero';
+}else if(rarity.includes('uncommon')){
+cls += ' revTileUncommon';
+}
+
+if(card.source === 'prototype'){
+cls += ' revTileProto';
+}
+
+return cls;
+
+}
+
+function makeTile(card,mode,player){
+
+const tile = document.createElement('div');
+
+tile.className = cardClass(card);
+
+const id = card.id || card.name || 'card';
+
+tile.innerHTML =
+'<div class="revTileName">' +
+(card.name || id) +
+'</div>' +
+
+'<div class="revTileMeta">' +
+(card.type || '-') +
+'</div>' +
+
+'<div>' +
+'Cost: ' + (card.cost || '-') +
+' | HP: ' + (card.hp || '-') +
+'</div>';
+
+if(card.source === 'prototype'){
+
+const badge = document.createElement('div');
+
+badge.className = 'revProtoBadge';
+badge.innerText = 'DRAFT';
+
+tile.appendChild(badge);
+
+}
+
+if(mode === 'deck'){
+
+const deck = getDeck(player);
+
+const controls =
+document.createElement('div');
+
+controls.className = 'revTileControls';
+
+const minus =
+document.createElement('button');
+
+minus.className = 'revSafeBtn';
+minus.innerText = '-';
+
+const qty =
+document.createElement('div');
+
+qty.className = 'revTileQty';
+qty.innerText = deck[id] || 0;
+
+const plus =
+document.createElement('button');
+
+plus.className = 'revSafeBtn';
+plus.innerText = '+';
+
+minus.onclick = function(e){
+
+e.stopPropagation();
+
+const latest = getDeck(player);
+
+latest[id] = Math.max(
+0,
+(latest[id] || 0) - 1
+);
+
+if(latest[id] <= 0){
+delete latest[id];
+}
+
+saveDeck(player, latest);
+
+qty.innerText = latest[id] || 0;
+
+};
+
+plus.onclick = function(e){
+
+e.stopPropagation();
+
+const latest = getDeck(player);
+
+latest[id] = (latest[id] || 0) + 1;
+
+saveDeck(player, latest);
+
+qty.innerText = latest[id];
+
+};
+
+controls.appendChild(minus);
+controls.appendChild(qty);
+controls.appendChild(plus);
+
+tile.appendChild(controls);
+
+}
+
+const expand =
+document.createElement('div');
+
+expand.className = 'revTileExpand';
+
+expand.innerHTML =
+'<label>Name</label>' +
+'<input value="' + (card.name || '') + '">' +
+
+'<label>Type</label>' +
+'<input value="' + (card.type || '') + '">' +
+
+'<label>Faction</label>' +
+'<input value="' + (card.faction || '') + '">' +
+
+'<label>Cost</label>' +
+'<input value="' + (card.cost || '') + '">' +
+
+'<label>HP</label>' +
+'<input value="' + (card.hp || '') + '">' +
+
+'<label>Special</label>' +
+'<textarea>' + (card.special || '') + '</textarea>' +
+
+(card.source === 'draft'
+? '<button class="revSafeBtn revDeleteDraftBtn" ' +
+'data-cardid="' + id + '" ' +
+'style="margin-top:12px;background:#3a1010;border-color:#a33;">Delete Draft</button>'
+: '');
+
+tile.appendChild(expand);
+
+tile.onclick = function(){
+
+expand.style.display =
+expand.style.display === 'block'
+? 'none'
+: 'block';
+
+};
+
+return tile;
+
+}
+
+function renderEditorView(view){
+
+const body =
+document.getElementById('revSafeEditorBody');
+
+if(!body) return;
+
+body.innerHTML = '';
+
+const tabs =
+document.createElement('div');
+
+tabs.className = 'revEditorTabs';
+
+const repoBtn =
+document.createElement('button');
+
+repoBtn.className = 'revSafeBtn';
+repoBtn.innerText = 'Repo';
+
+const p1Btn =
+document.createElement('button');
+
+p1Btn.className = 'revSafeBtn';
+p1Btn.innerText = 'P1 Deck';
+
+const p2Btn =
+document.createElement('button');
+
+p2Btn.className = 'revSafeBtn';
+p2Btn.innerText = 'P2 Deck';
+
+const mechBtn =
+document.createElement('button');
+
+mechBtn.className = 'revSafeBtn';
+mechBtn.innerText = 'Mechanics';
+
+tabs.appendChild(repoBtn);
+tabs.appendChild(p1Btn);
+tabs.appendChild(p2Btn);
+tabs.appendChild(mechBtn);
+
+body.appendChild(tabs);
+
+const panel =
+document.createElement('div');
+
+panel.className = 'revEditorPanel revTileGrid';
+
+body.appendChild(panel);
+
+const repo = getRepo();
+
+repo.forEach(card=>{
+
+panel.appendChild(
+makeTile(
+card,
+view === 'repo' ? 'repo' : 'deck',
+view === 'p2' ? 2 : 1
+)
+);
+
+});
+
+function renderMechanics(){
+
+panel.className = 'revEditorPanel';
+
+panel.innerHTML = '';
+
+const triggerSection =
+document.createElement('div');
+
+triggerSection.className =
+'revMechanicSection';
+
+triggerSection.innerHTML =
+'<h2>Triggers</h2>';
+
+const triggerGrid =
+document.createElement('div');
+
+triggerGrid.className =
+'revMechanicGrid';
+
+window.REV_MECHANIC_REGISTRY.triggers
+.forEach(trigger=>{
+
+const card =
+document.createElement('div');
+
+card.className =
+'revMechanicCard';
+
+card.innerHTML =
+'<div class="revMechanicTitle">' +
+trigger.id +
+'</div>' +
+
+'<div>' +
+trigger.description +
+'</div>' +
+
+'<div class="revMechanicSyntax">' +
+'trigger: ' + trigger.id +
+'</div>';
+
+triggerGrid.appendChild(card);
+
+});
+
+triggerSection.appendChild(triggerGrid);
+
+panel.appendChild(triggerSection);
+
+const effectSection =
+document.createElement('div');
+
+effectSection.className =
+'revMechanicSection';
+
+effectSection.innerHTML =
+'<h2>Effects</h2>';
+
+const effectGrid =
+document.createElement('div');
+
+effectGrid.className =
+'revMechanicGrid';
+
+window.REV_MECHANIC_REGISTRY.effects
+.forEach(effect=>{
+
+const card =
+document.createElement('div');
+
+card.className =
+'revMechanicCard';
+
+card.innerHTML =
+'<div class="revMechanicTitle">' +
+effect.id +
+'</div>' +
+
+'<div>' +
+effect.description +
+'</div>' +
+
+'<div class="revMechanicSyntax">' +
+'effect: ' + effect.id +
+'\nvalue: ?' +
+'</div>';
+
+effectGrid.appendChild(card);
+
+});
+
+effectSection.appendChild(effectGrid);
+
+panel.appendChild(effectSection);
+
+}
+
+repoBtn.onclick = ()=>renderEditorView('repo');
+p1Btn.onclick = ()=>renderEditorView('p1');
+p2Btn.onclick = ()=>renderEditorView('p2');
+mechBtn.onclick = renderMechanics;
+
+}
+
+window.addEventListener('load', function(){
+
+setTimeout(function(){
+
+const openBtn =
+document.getElementById('open-editor-btn');
+
+if(!openBtn) return;
+
+const original = openBtn.onclick;
+
+openBtn.onclick = function(){
+
+if(original){
+original();
+}
+
+setTimeout(function(){
+
+renderEditorView('repo');
+
+}, 100);
+
+};
+
+}, 1200);
+
+});
+
+})();
+</script>
+
+
+<script>
+(function(){
+
+if(window.__revMechanicRegistry) return;
+window.__revMechanicRegistry = true;
+
+window.REV_MECHANIC_REGISTRY = {
+  triggers: [
+    {
+      id:'onPlay',
+      description:'Executes when a power card is played.'
+    },
+    {
+      id:'onDeploy',
+      description:'Executes when a unit enters the battlefield.'
+    },
+    {
+      id:'onAttack',
+      description:'Executes when this unit attacks.'
+    },
+    {
+      id:'onDefend',
+      description:'Executes when this unit defends.'
+    },
+    {
+      id:'onDeath',
+      description:'Executes when this unit dies.'
+    },
+    {
+      id:'onTurnStart',
+      description:'Executes at the start of the turn.'
+    },
+    {
+      id:'onTurnEnd',
+      description:'Executes at the end of the turn.'
+    },
+    {
+      id:'passive',
+      description:'Always-active passive effect.'
+    },
+    {
+      id:'action',
+      description:'Player-triggered activated ability.'
+    }
+  ],
+
+  effects: [
+    {
+      id:'heal',
+      description:'Restore health to a target.'
+    },
+    {
+      id:'damage',
+      description:'Deal damage to a target.'
+    },
+    {
+      id:'draw',
+      description:'Draw cards.'
+    },
+    {
+      id:'addResource',
+      description:'Add resources to the player.'
+    },
+  ]
+};
+
+})();
+</script>
+
+<style>
+.revMechanicSection{
+margin-bottom:28px;
+}
+
+.revMechanicGrid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+gap:12px;
+}
+
+.revMechanicCard{
+background:#17110a;
+border:2px solid #4a3720;
+border-radius:10px;
+padding:12px;
+color:#d8c49a;
+}
+
+.revMechanicTitle{
+font-size:15px;
+font-weight:700;
+margin-bottom:6px;
+}
+
+.revMechanicSyntax{
+margin-top:10px;
+padding-top:10px;
+border-top:1px solid rgba(255,255,255,0.08);
+font-size:11px;
+opacity:0.8;
+font-family:monospace;
+white-space:pre-wrap;
+}
+</style>
+
+
+<script>
+(function(){
+
+if(window.__revDraftArchitecture) return;
+window.__revDraftArchitecture = true;
+
+function readJSON(key,fallback){
+try{
+return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
+}catch(err){
+return fallback;
+}
+}
+
+function writeJSON(key,value){
+localStorage.setItem(key, JSON.stringify(value));
+}
+
+function syncRuntimeRepo(){
+
+const official =
+readJSON('grim_repo_official', []);
+
+const drafts =
+readJSON('grim_repo_drafts', []);
+
+const merged = [
+...official,
+...drafts
+];
+
+writeJSON('grim_card_repo', merged);
+
+window.repo = merged;
+window.cardRepo = merged;
+window.cards = merged;
+
+}
+
+window.addEventListener('load', function(){
+
+setTimeout(function(){
+
+const header =
+document.getElementById('revSafeEditorHeader');
+
+if(!header) return;
+
+if(document.getElementById('revCreateDraftBtn')) return;
+
+const controls =
+header.querySelector('div:last-child');
+
+if(!controls) return;
+
+const createBtn =
+document.createElement('button');
+
+createBtn.id = 'revCreateDraftBtn';
+createBtn.className = 'revSafeBtn';
+createBtn.innerText = 'New Draft';
+
+createBtn.onclick = function(){
+
+const drafts =
+readJSON('grim_repo_drafts', []);
+
+const timestamp = Date.now();
+
+drafts.push({
+id:'draft_' + timestamp,
+name:'New Draft Card',
+type:'Unit',
+cost:1,
+hp:1,
+move:1,
+save:'6+',
+status:'draft',
+source:'draft'
+});
+
+writeJSON(
+'grim_repo_drafts',
+drafts
+);
+
+syncRuntimeRepo();
+
+alert(
+'Draft card created. Reopen the editor tab to view.'
+);
+
+};
+
+controls.prepend(createBtn);
+
+syncRuntimeRepo();
+
+}, 1200);
+
+});
+
+})();
+</script>
+
+
+<script>
+(function(){
+
+if(window.__revDraftDeleteHandler) return;
+window.__revDraftDeleteHandler = true;
+
+function readJSON(key,fallback){
+try{
+return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback));
+}catch(err){
+return fallback;
+}
+}
+
+function writeJSON(key,value){
+localStorage.setItem(key, JSON.stringify(value));
+}
+
+function syncRepo(){
+
+const official =
+readJSON('grim_repo_official', []);
+
+const drafts =
+readJSON('grim_repo_drafts', []);
+
+const merged = [
+...official,
+...drafts
+];
+
+writeJSON('grim_card_repo', merged);
+
+window.repo = merged;
+window.cardRepo = merged;
+window.cards = merged;
+
+}
+
+document.addEventListener('click', function(e){
+
+const btn =
+e.target.closest('.revDeleteDraftBtn');
+
+if(!btn) return;
+
+e.stopPropagation();
+
+const id =
+btn.dataset.cardid;
+
+let drafts =
+readJSON('grim_repo_drafts', []);
+
+drafts =
+drafts.filter(card =>
+(card.id || '') !== id
+);
+
+writeJSON(
+'grim_repo_drafts',
+drafts
+);
+
+syncRepo();
+
+alert(
+'Draft deleted. Reopen editor to refresh view.'
+);
+
+});
+
+})();
+</script>
+
+
+
+<style>
+/* Editor hardening patch v91 */
+.revDataStatus {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:8px;
+  margin:0 0 14px;
+}
+.revDataPill {
+  border:1px solid #4a3720;
+  background:#120d08;
+  border-radius:8px;
+  padding:8px 10px;
+  color:#d8c49a;
+}
+.revDataPillLabel {
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  opacity:0.62;
+  margin-bottom:2px;
+}
+.revDataPillValue {
+  font-size:18px;
+  font-weight:900;
+}
+.revTileSource {
+  display:inline-flex;
+  margin-top:6px;
+  padding:2px 6px;
+  border-radius:999px;
+  border:1px solid rgba(216,196,154,0.28);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  opacity:0.82;
+}
+.revTileActions {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.revSaveDraftBtn {
+  background:#102814 !important;
+  border-color:#42a35d !important;
+}
+.revReadOnlyNote {
+  margin-top:8px;
+  font-size:11px;
+  line-height:1.35;
+  color:#9b8260;
+  opacity:0.86;
+}
+.revFieldGrid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.revFieldGrid label.full { grid-column:1 / -1; }
+.revTileExpand label { display:block; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; opacity:0.76; }
+.revEditorSubhead { margin:0 0 12px; color:#d8c49a; }
+.revEditorHint { margin:0 0 12px; color:#9b8260; font-size:12px; line-height:1.35; }
+</style>
+
+<script>
+(function(){
+
+if (window.__revEditorHardeningV91) return;
+window.__revEditorHardeningV91 = true;
+
+let currentView = 'repo';
+let nativeSetItem = null;
+
+function getNativeSetItem(){
+  if (nativeSetItem) return nativeSetItem;
+  try {
+    const frame = document.createElement('iframe');
+    frame.style.display = 'none';
+    document.documentElement.appendChild(frame);
+    nativeSetItem = frame.contentWindow.Storage.prototype.setItem;
+    frame.remove();
+  } catch(err) {
+    nativeSetItem = null;
+  }
+  return nativeSetItem;
+}
+
+function readJSON(key, fallback){
+  try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+  catch(err) { return fallback; }
+}
+
+function writeRaw(key, value){
+  const native = getNativeSetItem();
+  if (native) native.call(localStorage, key, value);
+  else localStorage.setItem(key, value);
+}
+
+function writeJSON(key, value){
+  writeRaw(key, JSON.stringify(value));
+}
+
+function slug(value){
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function normaliseDraft(card){
+  const base = slug(card.internalName || card.name || card.id || 'draft_card');
+  const variant = slug(card.variant || '');
+  const identity = variant ? `${base}_${variant}` : base;
+  const type = String(card.type || 'Unit').trim();
+  const weapon = card.weapon && typeof card.weapon === 'object' ? { ...card.weapon } : card.weapon;
+  return {
+    ...card,
+    id: identity || card.id || ('draft_' + Date.now()),
+    artId: card.artId || identity || card.id,
+    internalName: card.internalName || card.name || identity,
+    type,
+    faction: card.faction || 'universal',
+    cost: Number.isFinite(Number(card.cost)) ? Number(card.cost) : (card.cost || 0),
+    hp: type === 'Power' ? null : (Number.isFinite(Number(card.hp)) ? Number(card.hp) : (card.hp || 1)),
+    maxHp: type === 'Power' ? null : (Number.isFinite(Number(card.maxHp ?? card.hp)) ? Number(card.maxHp ?? card.hp) : (card.maxHp ?? card.hp ?? 1)),
+    move: type === 'Power' ? null : (Number.isFinite(Number(card.move)) ? Number(card.move) : (card.move ?? 1)),
+    save: type === 'Power' ? null : (card.save || '6+'),
+    weapon,
+    status: 'draft',
+    source: 'draft'
+  };
+}
+
+function officialRepo(){ return readJSON('grim_repo_official', []); }
+function draftRepo(){ return readJSON('grim_repo_drafts', []); }
+function mergedRepo(){ return [...officialRepo(), ...draftRepo()]; }
+function deckKey(player){ return player === 2 ? 'grim_deck_p2' : 'grim_deck_p1'; }
+function getDeck(player){ return readJSON(deckKey(player), {}); }
+
+function repoIdSet(repo){
+  return new Set((repo || []).map(c => c && c.id).filter(Boolean));
+}
+
+function cleanDeckAgainstRepo(deck, repo){
+  const ids = repoIdSet(repo || mergedRepo());
+  const cleaned = {};
+  Object.entries(deck || {}).forEach(([id, count]) => {
+    const n = Math.max(0, Number(count) || 0);
+    if (ids.has(id) && n > 0) cleaned[id] = n;
+  });
+  return cleaned;
+}
+
+function saveDeck(player, deck){
+  writeJSON(deckKey(player), cleanDeckAgainstRepo(deck, mergedRepo()));
+}
+
+function cleanAllDecks(repo=mergedRepo()){
+  [1,2].forEach(player => {
+    const raw = getDeck(player);
+    const cleaned = cleanDeckAgainstRepo(raw, repo);
+    const rawText = JSON.stringify(raw || {});
+    const cleanText = JSON.stringify(cleaned || {});
+    if (rawText !== cleanText) writeJSON(deckKey(player), cleaned);
+  });
+}
+
+function syncRuntimeRepo(){
+  const official = officialRepo().filter(Boolean);
+  const drafts = draftRepo().filter(Boolean);
+  const merged = [...official, ...drafts];
+  writeJSON('grim_repo_official', official);
+  writeJSON('grim_repo_drafts', drafts);
+  writeJSON('grim_card_repo', merged);
+  window.repo = merged;
+  window.cardRepo = merged;
+  window.cards = merged;
+  return merged;
+}
+
+function countDeckCards(deck, repo=null){
+  const source = repo ? cleanDeckAgainstRepo(deck, repo) : (deck || {});
+  return Object.values(source || {}).reduce((sum, n) => sum + (Number(n) || 0), 0);
+}
+
+function deckCountLabel(deck, repo){
+  const stored = countDeckCards(deck);
+  const valid = countDeckCards(deck, repo);
+  return stored === valid ? String(valid) : `${valid} / ${stored} stored`;
+}
+
+function removeFromDecks(cardId){
+  [1,2].forEach(player => {
+    const deck = getDeck(player);
+    if (deck && Object.prototype.hasOwnProperty.call(deck, cardId)) {
+      delete deck[cardId];
+      saveDeck(player, deck);
+    }
+  });
+}
+
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function renderStatus(parent){
+  const official = officialRepo();
+  const drafts = draftRepo();
+  const repo = [...official, ...drafts];
+  const p1 = getDeck(1);
+  const p2 = getDeck(2);
+  const wrap = document.createElement('div');
+  wrap.className = 'revDataStatus';
+  wrap.innerHTML = [
+    ['Official', official.length],
+    ['Drafts', drafts.length],
+    ['Runtime Repo', repo.length],
+    ['P1 Deck', deckCountLabel(p1, repo)],
+    ['P2 Deck', deckCountLabel(p2, repo)],
+    ['Draft Mode', localStorage.getItem('grim_proto_cards') === 'false' ? 'Off' : 'On']
+  ].map(([label, value]) => `<div class="revDataPill"><div class="revDataPillLabel">${label}</div><div class="revDataPillValue">${value}</div></div>`).join('');
+  parent.appendChild(wrap);
+}
+
+function cardLimit(card){
+  const type = String(card?.type || '').trim();
+  if (type === 'Hero') return 1;
+  if (type === 'Uncommon') return 3;
+  if (type === 'Power') return 2;
+  return 16;
+}
+
+function cardClass(card, isDraft){
+  const type = String(card.type || '').toLowerCase();
+  const rarity = String(card.rarity || card.unitType || '').toLowerCase();
+  let cls = 'revTile';
+  if (type.includes('power')) cls += ' revTilePower';
+  else if (rarity.includes('hero') || String(card.type || '') === 'Hero') cls += ' revTileHero';
+  else if (rarity.includes('uncommon') || String(card.type || '') === 'Uncommon') cls += ' revTileUncommon';
+  if (isDraft) cls += ' revTileProto';
+  return cls;
+}
+
+function field(label, key, value, full=false, textarea=false){
+  const safeVal = escapeHtml(value ?? '');
+  return `<label class="${full ? 'full' : ''}">${label}${textarea
+    ? `<textarea data-field="${key}">${safeVal}</textarea>`
+    : `<input data-field="${key}" value="${safeVal}">`}</label>`;
+}
+
+function collectDraftFields(tile, original){
+  const get = key => tile.querySelector(`[data-field="${key}"]`)?.value ?? '';
+  const type = get('type') || original.type || 'Unit';
+  const card = {
+    ...original,
+    name: get('name') || original.name,
+    internalName: get('internalName') || get('name') || original.internalName,
+    variant: get('variant') || '',
+    type,
+    faction: get('faction') || 'universal',
+    cost: get('cost'),
+    hp: get('hp'),
+    move: get('move'),
+    save: get('save'),
+    special: get('special'),
+    effect: get('effect') || original.effect || null,
+    value: get('value') || original.value || null,
+    weapon: original.weapon || (type === 'Power' ? null : { name:'', range:1, attacks:1, hit:'4+', ap:0, damage:1 }),
+    source: 'draft',
+    status: 'draft'
+  };
+  return normaliseDraft(card);
+}
+
+function makeTile(card, mode, player, isDraft){
+  const tile = document.createElement('div');
+  const id = card.id || card.name || 'card';
+  tile.className = cardClass(card, isDraft);
+  tile.dataset.cardid = id;
+  tile.dataset.draft = isDraft ? '1' : '0';
+
+  tile.innerHTML = `
+    <div class="revTileName">${escapeHtml(card.name || id)}</div>
+    <div class="revTileMeta">${escapeHtml(card.type || '-')}</div>
+    <div>Cost: ${escapeHtml(card.cost ?? '-')} | HP: ${escapeHtml(card.hp ?? '-')}</div>
+    <div class="revTileSource">${isDraft ? 'Draft' : 'Official'}</div>
+  `;
+
+  if (isDraft) {
+    const badge = document.createElement('div');
+    badge.className = 'revProtoBadge';
+    badge.innerText = 'DRAFT';
+    tile.appendChild(badge);
+  }
+
+  if (mode === 'deck') {
+    const deck = getDeck(player);
+    const controls = document.createElement('div');
+    controls.className = 'revTileControls';
+
+    const minus = document.createElement('button');
+    minus.className = 'revSafeBtn';
+    minus.innerText = '-';
+
+    const qty = document.createElement('div');
+    qty.className = 'revTileQty';
+    qty.innerText = deck[id] || 0;
+
+    const plus = document.createElement('button');
+    plus.className = 'revSafeBtn';
+    plus.innerText = '+';
+
+    minus.onclick = function(e){
+      e.stopPropagation();
+      const latest = getDeck(player);
+      latest[id] = Math.max(0, (Number(latest[id]) || 0) - 1);
+      if (latest[id] <= 0) delete latest[id];
+      saveDeck(player, latest);
+      qty.innerText = latest[id] || 0;
+      renderEditorView(mode === 'deck' && player === 2 ? 'p2' : 'p1');
+    };
+
+    plus.onclick = function(e){
+      e.stopPropagation();
+      const latest = getDeck(player);
+      const limit = cardLimit(card);
+      latest[id] = Math.min(limit, (Number(latest[id]) || 0) + 1);
+      saveDeck(player, latest);
+      qty.innerText = latest[id] || 0;
+      renderEditorView(mode === 'deck' && player === 2 ? 'p2' : 'p1');
+    };
+
+    controls.appendChild(minus);
+    controls.appendChild(qty);
+    controls.appendChild(plus);
+    tile.appendChild(controls);
+  }
+
+  const expand = document.createElement('div');
+  expand.className = 'revTileExpand';
+
+  if (isDraft && card.source === 'draft') {
+    expand.innerHTML = `
+      <div class="revFieldGrid">
+        ${field('Name','name',card.name)}
+        ${field('Internal Name','internalName',card.internalName || card.name)}
+        ${field('Variant','variant',card.variant || '')}
+        ${field('Type','type',card.type || 'Unit')}
+        ${field('Faction','faction',card.faction || 'universal')}
+        ${field('Cost','cost',card.cost ?? 1)}
+        ${field('HP','hp',card.hp ?? '')}
+        ${field('Move','move',card.move ?? '')}
+        ${field('Save','save',card.save ?? '')}
+        ${field('Effect','effect',card.effect ?? '')}
+        ${field('Value','value',Array.isArray(card.value) ? card.value.join('-') : (card.value ?? ''))}
+        ${field('Special / Rules Text','special',card.special ?? '',true,true)}
+      </div>
+      <div class="revTileActions">
+        <button class="revSafeBtn revSaveDraftBtn" data-cardid="${escapeHtml(id)}">Save Card</button>
+        <button class="revSafeBtn revDeleteDraftBtn" data-cardid="${escapeHtml(id)}" style="background:#3a1010;border-color:#a33;">Delete Draft</button>
+      </div>
+    `;
+  } else {
+    expand.innerHTML = `
+      <div class="revReadOnlyNote">Imported/default cards are read-only here for now. Create a New Draft card for fast mechanics testing.</div>
+    `;
+  }
+
+  tile.appendChild(expand);
+
+  tile.onclick = function(e){
+    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea')) return;
+    expand.style.display = expand.style.display === 'block' ? 'none' : 'block';
+  };
+
+  return tile;
+}
+
+function renderMechanics(panel){
+  panel.className = 'revEditorPanel';
+  panel.innerHTML = '';
+  const registry = window.REV_MECHANIC_REGISTRY || { triggers:[], effects:[] };
+  const triggerSection = document.createElement('div');
+  triggerSection.className = 'revMechanicSection';
+  triggerSection.innerHTML = '<h2>Triggers</h2>';
+  const triggerGrid = document.createElement('div');
+  triggerGrid.className = 'revMechanicGrid';
+  registry.triggers.forEach(trigger => {
+    const card = document.createElement('div');
+    card.className = 'revMechanicCard';
+    card.innerHTML = `<div class="revMechanicTitle">${escapeHtml(trigger.id)}</div><div>${escapeHtml(trigger.description)}</div><div class="revMechanicSyntax">trigger: ${escapeHtml(trigger.id)}</div>`;
+    triggerGrid.appendChild(card);
+  });
+  triggerSection.appendChild(triggerGrid);
+  panel.appendChild(triggerSection);
+
+  const effectSection = document.createElement('div');
+  effectSection.className = 'revMechanicSection';
+  effectSection.innerHTML = '<h2>Effects</h2>';
+  const effectGrid = document.createElement('div');
+  effectGrid.className = 'revMechanicGrid';
+  registry.effects.forEach(effect => {
+    const card = document.createElement('div');
+    card.className = 'revMechanicCard';
+    card.innerHTML = `<div class="revMechanicTitle">${escapeHtml(effect.id)}</div><div>${escapeHtml(effect.description)}</div><div class="revMechanicSyntax">effect: ${escapeHtml(effect.id)}\nvalue: ?</div>`;
+    effectGrid.appendChild(card);
+  });
+  effectSection.appendChild(effectGrid);
+  panel.appendChild(effectSection);
+}
+
+function renderEditorView(view){
+  currentView = view || currentView || 'repo';
+  const repo = syncRuntimeRepo();
+  cleanAllDecks(repo);
+  const body = document.getElementById('revSafeEditorBody');
+  if (!body) return;
+  body.innerHTML = '';
+
+  renderStatus(body);
+
+  const tabs = document.createElement('div');
+  tabs.className = 'revEditorTabs';
+  const repoBtn = document.createElement('button'); repoBtn.className = 'revSafeBtn'; repoBtn.innerText = 'Repo';
+  const p1Btn = document.createElement('button'); p1Btn.className = 'revSafeBtn'; p1Btn.innerText = 'P1 Deck';
+  const p2Btn = document.createElement('button'); p2Btn.className = 'revSafeBtn'; p2Btn.innerText = 'P2 Deck';
+  const mechBtn = document.createElement('button'); mechBtn.className = 'revSafeBtn'; mechBtn.innerText = 'Mechanics';
+  const cleanBtn = document.createElement('button'); cleanBtn.className = 'revSafeBtn'; cleanBtn.innerText = 'Clean Decks';
+  tabs.appendChild(repoBtn); tabs.appendChild(p1Btn); tabs.appendChild(p2Btn); tabs.appendChild(mechBtn); tabs.appendChild(cleanBtn);
+  body.appendChild(tabs);
+
+  const title = document.createElement('h2');
+  title.className = 'revEditorSubhead';
+  title.innerText = currentView === 'p1' ? 'P1 Deck' : currentView === 'p2' ? 'P2 Deck' : currentView === 'mechanics' ? 'Mechanics Registry' : 'Card Repo';
+  body.appendChild(title);
+
+  const hint = document.createElement('div');
+  hint.className = 'revEditorHint';
+  hint.innerText = currentView === 'repo'
+    ? 'Tap a draft card to edit. Imported/default cards are read-only for now.'
+    : currentView === 'mechanics'
+      ? 'Reference list for wiring future card abilities.'
+      : 'Use + / - to build decks. Counts are saved immediately.';
+  body.appendChild(hint);
+
+  const panel = document.createElement('div');
+  panel.className = 'revEditorPanel revTileGrid';
+  body.appendChild(panel);
+
+  repoBtn.onclick = () => renderEditorView('repo');
+  p1Btn.onclick = () => renderEditorView('p1');
+  p2Btn.onclick = () => renderEditorView('p2');
+  mechBtn.onclick = () => renderEditorView('mechanics');
+  cleanBtn.onclick = () => { cleanAllDecks(mergedRepo()); renderEditorView(currentView); };
+
+  if (currentView === 'mechanics') {
+    renderMechanics(panel);
+    return;
+  }
+
+  const official = officialRepo().map(card => ({ card, isDraft:false }));
+  const drafts = draftRepo().map(card => ({ card, isDraft:true }));
+  [...official, ...drafts].forEach(({card,isDraft}) => {
+    panel.appendChild(makeTile(card, currentView === 'repo' ? 'repo' : 'deck', currentView === 'p2' ? 2 : 1, isDraft));
+  });
+}
+
+function createDraftCard(){
+  const drafts = draftRepo();
+  const timestamp = Date.now();
+  const card = normaliseDraft({
+    id:'draft_' + timestamp,
+    name:'New Draft Card',
+    internalName:'new_draft_card_' + timestamp,
+    variant:'',
+    type:'Unit',
+    faction:'universal',
+    cost:1,
+    hp:1,
+    maxHp:1,
+    move:1,
+    save:'6+',
+    weapon:{ name:'Draft Weapon', range:1, attacks:1, hit:'4+', ap:0, damage:1 },
+    special:'Draft: Add rules text here.',
+    status:'draft',
+    source:'draft'
+  });
+  drafts.push(card);
+  writeJSON('grim_repo_drafts', drafts);
+  syncRuntimeRepo();
+  renderEditorView('repo');
+}
+
+function saveDraftFromButton(btn){
+  const originalId = btn.dataset.cardid;
+  const tile = btn.closest('.revTile');
+  if (!tile) return;
+  const drafts = draftRepo();
+  const original = drafts.find(c => (c.id || '') === originalId);
+  if (!original) { alert('Draft not found. Refreshing editor.'); renderEditorView('repo'); return; }
+  const updated = collectDraftFields(tile, original);
+  const duplicate = drafts.find(c => c.id === updated.id && c.id !== originalId);
+  if (duplicate) {
+    alert('Another draft already uses that generated ID. Change the name or variant.');
+    return;
+  }
+  const nextDrafts = drafts.map(c => (c.id || '') === originalId ? updated : c);
+  writeJSON('grim_repo_drafts', nextDrafts);
+  if (updated.id !== originalId) {
+    [1,2].forEach(player => {
+      const deck = getDeck(player);
+      if (deck[originalId] != null) {
+        deck[updated.id] = (Number(deck[updated.id]) || 0) + (Number(deck[originalId]) || 0);
+        delete deck[originalId];
+        saveDeck(player, deck);
+      }
+    });
+  }
+  syncRuntimeRepo();
+  renderEditorView('repo');
+}
+
+function deleteDraftFromButton(btn){
+  const id = btn.dataset.cardid;
+  const drafts = draftRepo();
+  const card = drafts.find(c => (c.id || '') === id);
+  if (!card) { renderEditorView('repo'); return; }
+  if (!confirm(`Delete draft card "${card.name || id}"?`)) return;
+  writeJSON('grim_repo_drafts', drafts.filter(c => (c.id || '') !== id));
+  removeFromDecks(id);
+  syncRuntimeRepo();
+  renderEditorView('repo');
+}
+
+function installHeaderButton(){
+  const header = document.getElementById('revSafeEditorHeader');
+  if (!header) return;
+  const controls = header.querySelector('div:last-child');
+  if (!controls) return;
+  let btn = document.getElementById('revCreateDraftBtn');
+  if (!btn) {
+    btn = document.createElement('button');
+    btn.id = 'revCreateDraftBtn';
+    btn.className = 'revSafeBtn';
+    btn.innerText = 'New Draft';
+    controls.prepend(btn);
+  }
+  btn.onclick = function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    createDraftCard();
+  };
+}
+
+function openEditor(){
+  const editor = document.getElementById('revSafeEditor');
+  if (!editor) return;
+  editor.style.display = 'flex';
+  installHeaderButton();
+  renderEditorView(currentView || 'repo');
+}
+
+function install(){
+  installHeaderButton();
+  cleanAllDecks(syncRuntimeRepo());
+  const openBtn = document.getElementById('open-editor-btn');
+  if (openBtn) openBtn.onclick = openEditor;
+  const refresh = document.getElementById('revSafeRefresh');
+  if (refresh) refresh.onclick = () => renderEditorView(currentView || 'repo');
+  const close = document.getElementById('revSafeClose');
+  if (close) close.onclick = () => { const editor = document.getElementById('revSafeEditor'); if (editor) editor.style.display = 'none'; };
+}
+
+window.revRenderEditorView = renderEditorView;
+window.revSyncRuntimeRepo = syncRuntimeRepo;
+
+window.addEventListener('load', function(){
+  setTimeout(install, 1500);
+});
+
+// Delegated handlers override older delete/save behaviour and refresh in-place.
+document.addEventListener('click', function(e){
+  const saveBtn = e.target.closest('.revSaveDraftBtn');
+  if (saveBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    saveDraftFromButton(saveBtn);
+    return;
+  }
+  const delBtn = e.target.closest('.revDeleteDraftBtn');
+  if (delBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    deleteDraftFromButton(delBtn);
+    return;
+  }
+}, true);
+
+})();
 </script>
 
 </body>
