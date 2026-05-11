@@ -2105,6 +2105,114 @@ pointer-events: none;
 
 
 
+
+
+/* Patch 137 — draw-card reveal before hand add */
+.draw-reveal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 46%, rgba(0,0,0,0.16), rgba(0,0,0,0.56));
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+.draw-reveal-overlay.show { opacity: 1; }
+.draw-reveal-card {
+  position: fixed;
+  width: min(263px,70.5vw);
+  aspect-ratio: 5 / 7;
+  transform-origin: center center;
+  opacity: 0;
+  perspective: 1100px;
+  transition: left .58s cubic-bezier(.18,.84,.28,1), top .58s cubic-bezier(.18,.84,.28,1), transform .58s cubic-bezier(.18,.84,.28,1), opacity .22s ease;
+  will-change: left, top, transform, opacity;
+}
+.draw-reveal-card.reveal-in {
+  opacity: 1;
+  transform: translate(-50%,-50%) scale(1);
+}
+.draw-reveal-card.reveal-out {
+  opacity: 0;
+  transform: translate(-50%,-50%) scale(.92);
+  transition: transform .24s ease, opacity .24s ease;
+}
+.draw-reveal-flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  transition: transform .48s cubic-bezier(.2,.78,.24,1);
+}
+.draw-reveal-card.flipped .draw-reveal-flipper { transform: rotateY(180deg); }
+.draw-reveal-face {
+  position: absolute !important;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.draw-reveal-front { transform: rotateY(180deg); }
+.draw-reveal-back {
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(240,192,32,.18), rgba(0,0,0,0) 30%),
+    linear-gradient(145deg, rgba(44,32,20,.98), rgba(12,10,8,.99));
+  border: 2px solid rgba(210,150,72,.72);
+  box-shadow: inset 0 0 0 3px rgba(0,0,0,.48), inset 0 0 28px rgba(0,0,0,.92), 0 14px 34px rgba(0,0,0,.76);
+  display: grid;
+  place-items: center;
+  color: #f0d080;
+  font-family: 'Cinzel', 'Spectral', Georgia, serif;
+  text-align: center;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.draw-reveal-back::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(240,192,96,.42);
+  border-radius: 10px;
+  box-shadow: inset 0 0 22px rgba(146,84,220,.18);
+}
+.draw-reveal-back::after {
+  content: '✦';
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%,-50%);
+  font-size: 72px;
+  color: rgba(240,192,80,.62);
+  text-shadow: 0 0 20px rgba(146,84,220,.45);
+}
+.draw-reveal-back-title {
+  position: relative;
+  z-index: 1;
+  margin-top: 118px;
+  font-size: 18px;
+  font-weight: 900;
+  text-shadow: 0 2px 10px rgba(0,0,0,.85);
+}
+.draw-reveal-label {
+  position: fixed;
+  left: 50%;
+  top: calc(50% + min(263px,70.5vw) * .74);
+  transform: translateX(-50%);
+  color: #f0d080;
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: 12px;
+  text-shadow: 0 2px 10px rgba(0,0,0,.9);
+  opacity: 0;
+  transition: opacity .24s ease .18s;
+}
+.draw-reveal-overlay.show .draw-reveal-label { opacity: .92; }
+.draw-reveal-overlay.revealed .draw-reveal-label::after { content: ' Revealed'; }
 /* Patch 132 — floating hand + hub-only panel */
 .player-bar {
   background: transparent !important;
@@ -2142,6 +2250,260 @@ pointer-events: none;
   padding: 14px 22px !important;
 }
 
+
+
+/* ── PATCH 142: top score rails + bottom CTA breathing room ── */
+.top-bar {
+  padding: 4px 6px;
+  overflow: visible;
+}
+.player-side {
+  position: relative;
+  gap: 8px;
+  padding: 0 4px;
+  min-height: 32px;
+  overflow: visible;
+}
+.player-side::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  height: 28px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, rgba(8,7,5,0.88), rgba(18,14,8,0.78));
+  border: 1px solid rgba(84,62,28,0.55);
+  box-shadow: 0 0 12px rgba(0,0,0,0.45);
+  pointer-events: none;
+  z-index: 0;
+}
+.player-side.left::before {
+  left: -6px;
+  right: 14px;
+  border-left: 0;
+  border-radius: 0 4px 4px 0;
+}
+.player-side.right::before {
+  left: 14px;
+  right: -6px;
+  border-right: 0;
+  border-radius: 4px 0 0 4px;
+  background: linear-gradient(270deg, rgba(8,7,5,0.88), rgba(18,14,8,0.78));
+}
+.player-side > * {
+  position: relative;
+  z-index: 1;
+}
+.avatar {
+  width: 30px;
+  height: 30px;
+}
+.score-num {
+  font-size: 46px;
+  min-width: 48px;
+  padding: 0 2px;
+  line-height: 0.9;
+}
+.res-badge {
+  position: relative;
+  z-index: 2;
+}
+
+/* Keep skewed/action buttons from being clipped by the hub row edge. */
+.hub-row,
+.hub-row.activated,
+.hub-row.activated .hub-right,
+.hub-actions,
+.hub-actions.active {
+  overflow: visible;
+}
+.hub-row.activated .hub-right {
+  padding-top: 2px;
+}
+.hub-actions.active {
+  height: calc(100% + 4px);
+  margin-top: -2px;
+}
+.act-btn {
+  min-height: 100%;
+}
+
+/* Main bottom CTAs: narrower, with text that scales down but never below 11px. */
+.hub-btn,
+.hub-pass-btn {
+  width: 75%;
+  max-width: 118px;
+  min-width: 92px;
+  box-sizing: border-box;
+}
+.hub-btn-label,
+.hub-pass-label,
+.hub-btn.state-pass .hub-btn-label,
+.hub-btn.state-ready .hub-btn-label {
+  font-size: clamp(11px, 3.25vw, 16px);
+  letter-spacing: clamp(0.03em, 0.9vw, 0.08em);
+  white-space: nowrap;
+}
+.hub-btn-sub,
+.hub-pass-sub {
+  font-size: clamp(9px, 2.5vw, 10px);
+}
+.hub-btn-cost,
+.hub-pass-icon {
+  width: 26px;
+  height: 26px;
+}
+.hub-btn-cost span {
+  font-size: clamp(16px, 5vw, 24px);
+}
+
+/* ── PATCH 143: board name wrap + deck count + pass HUD ── */
+.unit-on-tile {
+  overflow: hidden;
+}
+.unit-on-tile .unit-name {
+  width: calc(100% - 8px);
+  max-width: calc(100% - 8px);
+  max-height: 2.35em;
+  padding: 0 2px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-wrap: balance;
+  pointer-events: none;
+}
+.res-badge.player-passed {
+  opacity: 0.34;
+  filter: saturate(0.35) brightness(0.72);
+  box-shadow: none;
+}
+.hub-deck-count {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-right: 6px;
+  color: #c8a060;
+  font-weight: 900;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+.hub-deck-count.show { display: flex; }
+.hub-deck-icon {
+  width: 15px;
+  height: 20px;
+  display: inline-block;
+  border: 1px solid rgba(200,160,96,0.82);
+  border-radius: 2px;
+  background: linear-gradient(160deg, rgba(42,32,16,0.96), rgba(12,9,6,0.96));
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.22), 0 0 6px rgba(200,160,96,0.16);
+  position: relative;
+}
+.hub-deck-icon::after {
+  content: '';
+  position: absolute;
+  inset: 4px 3px;
+  border-top: 1px solid rgba(200,160,96,0.45);
+  border-bottom: 1px solid rgba(200,160,96,0.25);
+}
+.hub-deck-num {
+  min-width: 16px;
+  text-align: left;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 6px rgba(200,160,96,0.35);
+}
+.hub-row.activated .hub-deck-count { display: none !important; }
+@media (max-width: 330px) {
+  .hub-deck-count { gap: 3px; margin-right: 4px; }
+  .hub-deck-icon { width: 13px; height: 18px; }
+  .hub-deck-num { font-size: 11px; min-width: 13px; }
+}
+
+</style>
+
+
+<style id="rev-hud-deck-ghost-v144">
+/* v144: quieter pass HUD, clearer deck count indicator, unclipped CTAs, hand removal ghost. */
+.top-pass-pip { display: none !important; }
+.hub-row:not(.activated),
+.hub-row:not(.activated) .hub-left,
+.hub-row:not(.activated) .hub-right,
+.player-bar,
+.inspector,
+.inspector-deck {
+  overflow: visible !important;
+}
+.hub-row:not(.activated) #hub-pass-btn,
+.hub-row:not(.activated) #hub-btn {
+  position: relative;
+  z-index: 6;
+}
+.hub-deck-count {
+  margin-right: 4px !important;
+  margin-left: 0 !important;
+  gap: 0 !important;
+  pointer-events: none;
+  opacity: .95;
+}
+.hub-deck-icon {
+  width: 24px !important;
+  height: 31px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(200,160,96,0.9) !important;
+  background:
+    linear-gradient(180deg, rgba(240,208,128,0.12), rgba(0,0,0,0) 38%),
+    linear-gradient(160deg, rgba(42,32,16,0.96), rgba(10,7,4,0.98)) !important;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.28), 0 0 8px rgba(200,160,96,0.22) !important;
+  transform: rotate(-2deg);
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hub-deck-icon::before {
+  content: '';
+  position: absolute;
+  inset: 4px 5px auto 5px;
+  height: 3px;
+  border-top: 1px solid rgba(200,160,96,0.42);
+  border-bottom: 1px solid rgba(200,160,96,0.22);
+}
+.hub-deck-icon::after {
+  inset: auto 5px 5px 5px !important;
+  height: 5px;
+  border-top: 1px solid rgba(200,160,96,0.34) !important;
+  border-bottom: 1px solid rgba(200,160,96,0.18) !important;
+}
+.hub-deck-num {
+  position: relative;
+  z-index: 2;
+  min-width: 0 !important;
+  text-align: center !important;
+  font-size: 12px !important;
+  font-weight: 900;
+  line-height: 1;
+  color: #f0d080;
+  text-shadow: 0 0 5px #000, 0 0 7px rgba(200,160,96,0.45);
+}
+.hand-removal-ghost {
+  pointer-events: none !important;
+  opacity: .38;
+  filter: saturate(.45) brightness(.82);
+  background: linear-gradient(160deg, rgba(42,32,16,.82), rgba(6,5,4,.94)) !important;
+  border: 1px dashed rgba(200,160,96,.62) !important;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.25), 0 0 10px rgba(200,160,96,.12) !important;
+}
+.hand-removal-ghost-inner {
+  position: absolute;
+  inset: 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(200,160,96,.26);
+  background: linear-gradient(160deg, rgba(200,160,96,.08), rgba(0,0,0,.18));
+}
 </style>
 
 </head>
@@ -2382,6 +2744,9 @@ pointer-events: none;
         <button class="act-btn" id="act-btn-skip" onclick="skipAction()">
           <span class="act-label">Done</span>
         </button>
+      </div>
+      <div class="hub-deck-count" id="hub-deck-count" aria-label="Cards left in deck">
+        <span class="hub-deck-icon"><span class="hub-deck-num" id="hub-deck-num">0</span></span>
       </div>
       <button class="hub-btn" id="hub-btn" onclick="onHubBtn()">
         <div class="hub-btn-main">
@@ -2935,6 +3300,7 @@ const state = {
     board:{},
     structures:{}, // { tileId: { type, owner, card } }
     selectedHandCard: null,
+    _handGhostRemoval: null,
     selectedBoardTile: null,
     pendingTile: null,
     activeUnit: null,
@@ -3462,6 +3828,15 @@ const state = {
     renderLaneEffects();
   }
 
+  function syncTopPassHud() {
+    [1,2].forEach(pid => {
+      const player = state.players?.[pid];
+      const passed = !!player?.passed;
+      const resBadge = document.getElementById(`res-badge-p${pid}`);
+      if (resBadge) resBadge.classList.toggle('player-passed', passed);
+    });
+  }
+
   // ── RENDER HUB ──
   function renderHub() {
     // Scores + round always update
@@ -3469,6 +3844,7 @@ const state = {
     document.getElementById('score-p2').textContent=state.players[2].score;
     document.getElementById('res-badge-p1').querySelector('span').textContent=state.players[1].resources;
     document.getElementById('res-badge-p2').querySelector('span').textContent=state.players[2].resources;
+    syncTopPassHud();
     document.getElementById('turn-num').textContent=`${state.round}/${state.maxRounds}`;
 
     if(state.phase==='scoring') {
@@ -3482,6 +3858,13 @@ const state = {
 
     const p=state.players[state.activePlayer];
     const opp=state.players[state.activePlayer===1?2:1];
+    const hubDeckNum = document.getElementById('hub-deck-num');
+    if (hubDeckNum) hubDeckNum.textContent = p.deck.length;
+    const hubDeckCount = document.getElementById('hub-deck-count');
+    if (hubDeckCount) {
+      hubDeckCount.classList.toggle('p1-deck-indicator', state.activePlayer === 1);
+      hubDeckCount.classList.toggle('p2-deck-indicator', state.activePlayer === 2);
+    }
     const col=p.color;
     // hub-name replaced by hub-unit-info
     document.getElementById('hub-res').textContent=p.resources;
@@ -3516,13 +3899,40 @@ const state = {
     renderHand();
   }
 
+  function beginHandRemovalGhost(card, player = state.activePlayer) {
+    if (!card || !state.players?.[player]) return;
+    const hand = state.players[player].hand || [];
+    const index = hand.findIndex(c => c.uid === card.uid);
+    state._handGhostRemoval = {
+      player,
+      index: index >= 0 ? index : hand.length,
+      card: { ...card },
+      until: Date.now() + 850
+    };
+    setTimeout(() => {
+      const ghost = state._handGhostRemoval;
+      if (ghost?.card?.uid === card.uid && ghost?.player === player) {
+        state._handGhostRemoval = null;
+        if (state.activePlayer === player) renderHand();
+      }
+    }, 900);
+  }
+
   const MAX_HAND = 10;
   function renderHand() {
     const p = state.players[state.activePlayer];
     const scroll = document.getElementById('hand-scroll');
     scroll.innerHTML = '';
     scroll.classList.add('hand-fanned');
-    const count = p.hand.length;
+    const ghostInfo = state._handGhostRemoval;
+    const useGhost = ghostInfo && ghostInfo.player === state.activePlayer && Date.now() < ghostInfo.until;
+    if (ghostInfo && ghostInfo.player === state.activePlayer && Date.now() >= ghostInfo.until) state._handGhostRemoval = null;
+    const handItems = p.hand.map(card => ({ kind:'card', card }));
+    if (useGhost) {
+      const ghostIndex = Math.max(0, Math.min(ghostInfo.index ?? handItems.length, handItems.length));
+      handItems.splice(ghostIndex, 0, { kind:'ghost', card: ghostInfo.card });
+    }
+    const count = handItems.length;
     const existingLabel = document.getElementById('hand-full-label');
     if (existingLabel) existingLabel.remove();
     if (count >= MAX_HAND) {
@@ -3549,16 +3959,20 @@ const state = {
     const maxAngle = count >= 10 ? 5 : count >= 8 ? 6 : count >= 6 ? 7 : 9;
     const angleStep = count >= 10 ? 2.2 : count >= 8 ? 2.8 : 3.6;
 
-    p.hand.forEach((card, idx) => {
-      const canAfford = p.resources >= card.cost;
-      const isSelected = state.selectedHandCard?.uid === card.uid;
+    handItems.forEach((item, idx) => {
+      const card = item.card;
+      const isGhost = item.kind === 'ghost';
+      const canAfford = isGhost || p.resources >= card.cost;
+      const isSelected = !isGhost && state.selectedHandCard?.uid === card.uid;
       const col = p.color;
       const el = document.createElement('div');
       const offset = idx - center;
       const lift = Math.abs(offset) < 0.25 ? -4 : Math.abs(offset) < 1.25 ? -2 : 0;
       const angle = Math.max(-maxAngle, Math.min(maxAngle, offset * angleStep));
       const baseTransform = `translateY(${lift}px) rotate(${angle}deg)`;
-      el.className = `card ${col}-card hand-fan-card${isSelected ? ' selected' : ''}${!canAfford ? ' unavailable' : ''}`;
+      el.className = isGhost
+        ? `card ${col}-card hand-fan-card hand-removal-ghost`
+        : `card ${col}-card hand-fan-card${isSelected ? ' selected' : ''}${!canAfford ? ' unavailable' : ''}`;
       el.style.width = cw + 'px';
       el.style.height = ch + 'px';
       el.style.flexShrink = '0';
@@ -3566,15 +3980,20 @@ const state = {
       el.style.zIndex = String(20 + idx);
       el.style.transform = baseTransform;
       el.dataset.baseTransform = baseTransform;
-      el.dataset.uid = card.uid;
-      el.dataset.handIndex = String(idx);
-      el.innerHTML = cardInnerHTML(card, col);
-      const art = artStyle(card);
-      if (art) {
-        el.setAttribute('style', (el.getAttribute('style') || '') + ';' + art);
-        attachArtNameFallback(el, card);
+      if (isGhost) {
+        el.setAttribute('aria-label', 'Card leaving hand');
+        el.innerHTML = '<div class="hand-removal-ghost-inner"></div>';
+      } else {
+        el.dataset.uid = card.uid;
+        el.dataset.handIndex = String(p.hand.findIndex(c => c.uid === card.uid));
+        el.innerHTML = cardInnerHTML(card, col);
+        const art = artStyle(card);
+        if (art) {
+          el.setAttribute('style', (el.getAttribute('style') || '') + ';' + art);
+          attachArtNameFallback(el, card);
+        }
+        el.addEventListener('touchstart', e => onHandCardTouchStart(e, card, el), { passive:false });
       }
-      el.addEventListener('touchstart', e => onHandCardTouchStart(e, card, el), { passive:false });
       scroll.appendChild(el);
     });
 
@@ -4063,6 +4482,7 @@ const state = {
     const p = state.players[state.activePlayer];
     if (!card || p.resources < card.cost) return false;
     p.resources -= card.cost;
+    beginHandRemovalGhost(card, state.activePlayer);
     p.hand = p.hand.filter(c => c.uid !== card.uid);
     p.graveyard.push({...card});
     state.selectedHandCard = null;
@@ -4520,33 +4940,54 @@ const state = {
     castPowerCard(card);
   }
 
-  function showLaneEffectOverlay(lane, tile) {
-    // Remove any existing overlay
-    document.querySelectorAll('.lane-effect-overlay').forEach(e=>e.remove());
-    const fx = state.laneEffects?.[lane];
+  function laneEffectTriggerLabel(trigger) {
     const TRIGGER_LABELS = {
       passive:'Passive', round_start:'Round Start', on_deploy:'On Deploy',
       on_slain:'On Slain', on_attack:'On Attack', on_roll_6:'On Roll of 6', on_reveal:'On Reveal'
     };
-    const ov = document.createElement('div');
-    ov.className = 'lane-effect-overlay';
-    if (!fx) {
-      ov.innerHTML = `<div class="leo-title">No Effect</div><div class="leo-desc">No lane effect in play.</div><button class="leo-close" onclick="this.closest('.lane-effect-overlay').remove()">Close</button>`;
-    } else if (!fx.revealed) {
-      ov.innerHTML = `<div class="leo-title">Unknown Effect</div><div class="leo-desc leo-unknown">Reveals before Round 1 scoring.</div><button class="leo-close" onclick="this.closest('.lane-effect-overlay').remove()">Close</button>`;
-    } else {
-      ov.innerHTML = `
-        <div class="leo-title">${formatCardName(fx.name)}</div>
-        <div class="leo-trigger">${TRIGGER_LABELS[fx.trigger]||fx.trigger}</div>
-        <div class="leo-desc">${fx.description}</div>
-        <button class="leo-close" onclick="this.closest('.lane-effect-overlay').remove()">Close</button>`;
-    }
-    // Position near the tile
-    const rect = tile.getBoundingClientRect();
-    ov.style.top  = `${Math.min(rect.bottom + 6, window.innerHeight - 180)}px`;
-    ov.style.left = `${Math.max(4, rect.left - 80)}px`;
-    document.body.appendChild(ov);
+    return TRIGGER_LABELS[trigger] || trigger || 'Lane Effect';
   }
+
+  function laneEffectCardForZoom(lane) {
+    const fx = state.laneEffects?.[lane];
+    if (!fx) {
+      return {
+        id:`lane_${lane}_no_effect`, artId:`lane_${lane}_no_effect`, type:'Power', faction:'universal',
+        displayName:`Lane ${lane}: No Effect`, name:`Lane ${lane}: No Effect`, cost:'', effect:'lane_effect', value:'',
+        special:'No Effect: No lane effect in play.'
+      };
+    }
+    if (!fx.revealed) {
+      return {
+        id:`lane_${lane}_unknown_effect`, artId:`lane_${lane}_unknown_effect`, type:'Power', faction:'universal',
+        displayName:`Lane ${lane}: Unknown Effect`, name:`Lane ${lane}: Unknown Effect`, cost:'', effect:'lane_effect', value:'',
+        special:'Hidden: Reveals before Round 1 scoring.'
+      };
+    }
+    const triggerLabel = laneEffectTriggerLabel(fx.trigger);
+    return {
+      id: fx.id || `lane_${lane}_${cardSlug(fx.name || 'effect')}`,
+      artId: fx.artId || fx.id || `lane_${lane}_${cardSlug(fx.name || 'effect')}`,
+      type:'Power',
+      faction:'universal',
+      displayName: fx.name || `Lane ${lane} Effect`,
+      name: fx.name || `Lane ${lane} Effect`,
+      cost:'',
+      effect:'lane_effect',
+      value: fx.value ?? '',
+      special:`${triggerLabel}: ${fx.description || 'No rules text.'}`,
+      flavour: `Lane ${lane}`,
+      isLaneEffect:true
+    };
+  }
+
+  function showLaneEffectOverlay(lane, tile) {
+    document.querySelectorAll('.lane-effect-overlay').forEach(e=>e.remove());
+    openCardZoom(laneEffectCardForZoom(lane));
+    const artEl = document.getElementById('czoom-art');
+    if (artEl) artEl.classList.add('lane-effect-zoom');
+  }
+
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -4779,6 +5220,107 @@ const state = {
     ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
   }
 
+
+
+  function drawRevealCardMarkup(card, owner) {
+    const isPower = normalisedCardType(card) === 'Power';
+    const col = owner === 2 ? 'p2' : 'p1';
+    const factionIcon = FACTION_ICONS[card.faction] || (isPower ? '✦' : '');
+    const header = isPower ? zoomPowerSubtypeLabel(card) : formatFactionHeader(card.faction);
+    const subtitle = !isPower && card.weapon?.name ? `w/ ${card.weapon.name}` : '';
+    const quoteHtml = card.flavour ? `<div class="card-zoom-quote">${escapeHtml(card.flavour)}</div>` : '';
+    const profileHtml = isPower ? zoomPowerProfileHtml(card) : zoomAttackProfileHtml(card);
+    return `<div class="draw-reveal-card" id="draw-reveal-card">
+      <div class="draw-reveal-flipper">
+        <div class="draw-reveal-face draw-reveal-back"><div class="draw-reveal-back-title">Revenant</div></div>
+        <div class="draw-reveal-face draw-reveal-front card-zoom-art ${col}-unit" id="draw-reveal-front">
+          <div class="card-zoom-cost"><span>${escapeHtml(card.cost ?? '')}</span></div>
+          ${!isPower ? `<div class="card-zoom-stat-rail">
+            <div class="card-zoom-stat hp"><span class="czs-icon">♥</span><span class="czs-val">${escapeHtml(card.hp ?? '')}</span></div>
+            <div class="card-zoom-stat save"><span class="czs-icon">🛡</span><span class="czs-val">${escapeHtml(card.save ?? '')}</span></div>
+            <div class="card-zoom-stat move"><span class="czs-icon">➤</span><span class="czs-val">${escapeHtml(card.move === -1 ? '—' : card.move ?? '')}</span></div>
+          </div>` : ''}
+          <div class="card-zoom-fallback-name" id="draw-reveal-fallback-name">${expectedArtLabel(card)}</div>
+          <div class="card-zoom-shine"></div>
+          <div class="card-zoom-bottom">
+            ${quoteHtml}
+            <div class="card-zoom-titleband">
+              <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
+              <div class="card-zoom-title">
+                <div class="card-zoom-order">${escapeHtml(header)}</div>
+                <div class="card-zoom-name">${cardDisplayName(card)}</div>
+                ${subtitle ? `<div class="card-zoom-weapon">${escapeHtml(subtitle)}</div>` : ''}
+              </div>
+              <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
+            </div>
+            ${profileHtml}
+            ${zoomSpecialHtml(card)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function updateDrawRevealArtFallback(card) {
+    const nameEl = document.getElementById('draw-reveal-fallback-name');
+    if (!nameEl) return;
+    nameEl.textContent = expectedArtLabel(card);
+    nameEl.classList.remove('hidden');
+    if (!card?.artId) return;
+    artCandidates(card.artId).forEach(src => {
+      const img = new Image();
+      img.onload = () => nameEl.classList.add('hidden');
+      img.src = src;
+    });
+  }
+
+  function showDrawCardReveal(card, player, onDone) {
+    const old = document.getElementById('draw-reveal-overlay');
+    if (old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'draw-reveal-overlay';
+    ov.className = 'draw-reveal-overlay';
+    ov.innerHTML = `${drawRevealCardMarkup(card, player)}<div class="draw-reveal-label">Drawing</div>`;
+    document.body.appendChild(ov);
+    const reveal = document.getElementById('draw-reveal-card');
+    const front = document.getElementById('draw-reveal-front');
+    const drawBtnRect = document.getElementById('hub-btn')?.getBoundingClientRect();
+    const deckRect = document.getElementById('pile-deck')?.getBoundingClientRect();
+    const startRect = drawBtnRect || deckRect;
+    const startX = startRect ? startRect.left + startRect.width / 2 : window.innerWidth * .88;
+    const startY = startRect ? startRect.top + startRect.height / 2 : window.innerHeight * .86;
+    const endX = window.innerWidth / 2;
+    const endY = window.innerHeight / 2;
+    reveal.style.left = `${startX}px`;
+    reveal.style.top = `${startY}px`;
+    reveal.style.transform = 'translate(-50%,-50%) scale(.18) rotate(5deg)';
+    const art = artStyle(card, true);
+    if (art && front) {
+      const existingStyle = front.getAttribute('style') || '';
+      front.setAttribute('style', `${existingStyle}${existingStyle && !existingStyle.trim().endsWith(';') ? ';' : ''}${art}`);
+    }
+    updateDrawRevealArtFallback(card);
+    requestAnimationFrame(() => {
+      ov.classList.add('show');
+      reveal.style.left = `${endX}px`;
+      reveal.style.top = `${endY}px`;
+      reveal.style.transform = 'translate(-50%,-50%) scale(1) rotate(0deg)';
+      reveal.classList.add('reveal-in');
+    });
+    setTimeout(() => {
+      reveal.classList.add('flipped');
+      ov.classList.add('revealed');
+    }, 720);
+    setTimeout(() => {
+      reveal.style.transform = 'translate(-50%,-50%) scale(.92) rotate(-2deg)';
+      reveal.classList.add('reveal-out');
+      ov.classList.remove('show');
+      setTimeout(() => {
+        ov.remove();
+        onDone?.();
+      }, 260);
+    }, 3000);
+  }
   // ── BOARD TILE LONG PRESS ──
   let _tileTouchTimer = null;
   let _tileTouchMoved = false;
@@ -5013,6 +5555,7 @@ const state = {
 
     // Spend resources, remove from hand, place on board
     p.resources-=card.cost;
+    beginHandRemovalGhost(card, state.activePlayer);
     p.hand=p.hand.filter(c=>c.uid!==card.uid);
     state.board[tileId]={...card, owner:state.activePlayer, actionsLeft:null};
 
@@ -5397,6 +5940,8 @@ const state = {
     drawHoldPointerId = null;
     const btn = document.getElementById('hub-btn');
     if (btn) btn.classList.remove('hold-drawing','hold-complete');
+    const deckCount = document.getElementById('hub-deck-count');
+    if (deckCount) deckCount.classList.remove('draw-linked-active');
   }
 
   function startDrawHold(e) {
@@ -5413,6 +5958,8 @@ const state = {
     btn.classList.remove('hold-drawing');
     void btn.offsetWidth;
     btn.classList.add('hold-drawing');
+    const deckCount = document.getElementById('hub-deck-count');
+    if (deckCount) deckCount.classList.add('draw-linked-active');
     drawHoldTimer = setTimeout(() => {
       if (!canHoldDraw()) { clearDrawHold(); return; }
       btn.classList.remove('hold-drawing');
@@ -5502,15 +6049,27 @@ const state = {
 
   // ── DRAW ACTION ──
   function drawAction() {
-    const p = state.players[state.activePlayer];
+    const player = state.activePlayer;
+    const p = state.players[player];
+    if (state._drawRevealActive) return;
     if(p.resources < 1 || p.deck.length === 0 || p.hand.length >= MAX_HAND) return;
     p.resources -= 1;
-    drawCard(state.activePlayer);
+    const card = p.deck.shift();
+    if (!card) { renderHub(); return; }
+    if(card) card.type = (card.type||'').trim();
+    state._drawRevealActive = true;
+    clearDrawHold();
     renderHub();
-    setTimeout(()=>{
-      endCurrentTurn();
-      waitThenAdvance();
-    }, 1400);
+    showDrawCardReveal(card, player, () => {
+      const stillPlayer = state.players[player];
+      if (stillPlayer) stillPlayer.hand.push(card);
+      state._drawRevealActive = false;
+      renderHub();
+      setTimeout(()=>{
+        endCurrentTurn();
+        waitThenAdvance();
+      }, 180);
+    });
   }
   let tileMap = {};
   function buildTileMap() {
@@ -6464,7 +7023,7 @@ const state = {
     lbl.textContent = label || '';
     subEl.textContent = sub || '';
     if (cost != null) {
-      costVal.textContent = `−${cost}`;
+      costVal.textContent = `${cost}`;
       costWrap.style.display = 'flex';
     } else {
       costWrap.style.display = 'none';
@@ -6505,10 +7064,13 @@ const state = {
     btn.style.display     = '';
     hubRow.classList.remove('activated');
     if (passBtn) passBtn.classList.remove('show');
+    const deckCount = document.getElementById('hub-deck-count');
+    if (deckCount) deckCount.classList.remove('show');
 
     if (state_name === 'default') {
       if (!inspectorOpen) deck.style.display = '';
       diamond.style.display = '';
+      if (deckCount) deckCount.classList.add('show');
       if (passBtn) passBtn.classList.add('show');
       if (badges) badges.style.display = 'none';
       const drawAvailability = getDrawAvailability(state.activePlayer);
@@ -9440,6 +10002,7 @@ window.__revEditorHardeningV91 = true;
 
 let currentView = 'repo';
 let repoFilters = { all:true, official:false, draft:false, powers:false, units:false };
+let deckFilters = { all:true, inDeck:false, powers:false, units:false };
 let nativeSetItem = null;
 
 function getNativeSetItem(){
@@ -9670,6 +10233,53 @@ function renderRepoFilters(parent){
     btn.className = 'revFilterBtn' + (repoFilters[key] ? ' active' : '');
     btn.innerText = label;
     btn.onclick = () => setRepoFilter(key);
+    bar.appendChild(btn);
+  });
+  parent.appendChild(bar);
+}
+
+
+function setDeckFilter(key){
+  if (key === 'all') {
+    deckFilters = { all:true, inDeck:false, powers:false, units:false };
+  } else {
+    deckFilters.all = false;
+    deckFilters[key] = !deckFilters[key];
+    if (!Object.entries(deckFilters).some(([k,v]) => k !== 'all' && v)) deckFilters.all = true;
+  }
+  renderEditorView(currentView === 'p2' ? 'p2' : 'p1');
+}
+
+function cardMatchesDeckFilters(card, deck){
+  if (deckFilters.all) return true;
+  const id = card?.id || card?.name || '';
+  const qty = Number((deck || {})[id]) || 0;
+  if (deckFilters.inDeck && qty <= 0) return false;
+  const isPower = repoCardKind(card) === 'Power' || String(card?.type || '').trim() === 'Power';
+  const wantsPowers = !!deckFilters.powers;
+  const wantsUnits = !!deckFilters.units;
+  if (wantsPowers || wantsUnits) {
+    if (wantsPowers && wantsUnits) return true;
+    if (wantsPowers) return isPower;
+    if (wantsUnits) return !isPower;
+  }
+  return true;
+}
+
+function renderDeckFilters(parent, player){
+  const bar = document.createElement('div');
+  bar.className = 'revRepoFilterBar revDeckFilterBar';
+  const filters = [
+    ['all','All Cards'],
+    ['inDeck','Cards in Deck'],
+    ['powers','Powers'],
+    ['units','Units']
+  ];
+  filters.forEach(([key,label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'revFilterBtn' + (deckFilters[key] ? ' active' : '');
+    btn.innerText = label;
+    btn.onclick = () => setDeckFilter(key);
     bar.appendChild(btn);
   });
   parent.appendChild(bar);
@@ -10000,6 +10610,54 @@ function editorCostRune(card){
   return `<div class="revTileCostRune"><span>${escapeHtml(card?.cost ?? '-')}</span></div>`;
 }
 
+
+function readOnlyCardDetailsHtml(card){
+  const w = card?.weapon && typeof card.weapon === 'object' ? card.weapon : {};
+  const kind = editorTileKindLabel(card);
+  const isPower = kind === 'Power' || String(card?.type || '').trim() === 'Power';
+  const trigger = card?.ability?.trigger || card?.mechanic?.trigger || card?.diceTrigger?.trigger || card?.trigger || '';
+  const effect = card?.ability?.key || card?.ability?.effect || card?.mechanic?.effect || card?.diceTrigger?.effect || card?.effect || '';
+  const value = card?.ability?.value ?? card?.mechanic?.value ?? card?.diceTrigger?.value ?? card?.value ?? '';
+  const target = card?.ability?.target || card?.mechanic?.target || card?.target || null;
+  const targetSummary = target && typeof target === 'object'
+    ? Object.entries(target).filter(([,v]) => v !== undefined && v !== null && v !== '').map(([k,v]) => `${k}: ${v}`).join(' · ')
+    : '';
+  const statRows = isPower
+    ? [
+        ['Effect', effect || '—'],
+        ['Value', Array.isArray(card?.value) ? card.value.join('–') : (card?.value ?? '—')]
+      ]
+    : [
+        ['HP', card?.hp ?? '—'],
+        ['Move', card?.move ?? '—'],
+        ['Save', card?.save ?? '—'],
+        ['Weapon', w.name || '—'],
+        ['Range', w.range ?? '—'],
+        ['Attacks', w.attacks ?? '—'],
+        ['Hit', w.hit ?? '—'],
+        ['AP', w.ap ?? 0],
+        ['Damage', w.damage ?? '—']
+      ];
+  const abilityRows = [
+    ['Trigger', trigger || '—'],
+    ['Effect', effect || '—'],
+    ['Value', value === '' || value === null || value === undefined ? '—' : value],
+    ['Target', targetSummary || '—']
+  ];
+  const rowHtml = rows => rows.map(([label,value]) => `<div class="revReadOnlyStat"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`).join('');
+  return `
+    <div class="revReadOnlyNote">Imported/default cards are read-only here, but their stats and mechanics are shown for reference.</div>
+    <div class="revReadOnlyDetails">
+      <div class="revReadOnlyTitle">${escapeHtml(cardDisplayName(card, card?.name || card?.id || 'Card'))}</div>
+      <div class="revReadOnlyMeta">${escapeHtml(kind)} · ${escapeHtml(card?.faction || 'universal')} · Cost ${escapeHtml(card?.cost ?? '—')}</div>
+      <div class="revReadOnlyGrid">${rowHtml(statRows)}</div>
+      <div class="revReadOnlySectionTitle">Ability / Rules</div>
+      <div class="revReadOnlyGrid">${rowHtml(abilityRows)}</div>
+      ${card?.special ? `<div class="revReadOnlyText"><b>Rules:</b> ${escapeHtml(card.special)}</div>` : ''}
+      ${card?.flavour ? `<div class="revReadOnlyText"><b>Flavour:</b> ${escapeHtml(card.flavour)}</div>` : ''}
+    </div>`;
+}
+
 function makeTile(card, mode, player, isDraft){
   const tile = document.createElement('div');
   const id = card.id || card.name || 'card';
@@ -10014,16 +10672,30 @@ function makeTile(card, mode, player, isDraft){
   const deck = mode === 'deck' ? getDeck(player) : null;
   const qtyVal = deck ? (Number(deck[id]) || 0) : 0;
 
-  tile.innerHTML = `
-    <div class="revTileIcon" title="${escapeHtml(card.faction || 'universal')}">${icon}</div>
-    <div class="revTileName">${name}</div>
-    <div class="revTileKind">${kindLabel}</div>
-    ${mode === 'deck' ? `<div class="revTileQtyBadge">${qtyVal}</div>` : ''}
-    <div class="revTileBottom">
-      ${mode === 'deck' ? `<button class="revDeckAdjust revDeckMinus" data-dir="minus" aria-label="Remove card">−</button>` : ''}
-      ${editorCostRune(card)}
-      ${mode === 'deck' ? `<button class="revDeckAdjust revDeckPlus" data-dir="plus" aria-label="Add card">+</button>` : ''}
-    </div>`;
+  if (mode === 'deck') {
+    tile.innerHTML = `
+      <div class="revDeckListMain">
+        <div class="revTileIcon" title="${escapeHtml(card.faction || 'universal')}">${icon}</div>
+        <div class="revDeckListText">
+          <div class="revTileName">${name}</div>
+          <div class="revTileKind">${kindLabel}</div>
+        </div>
+      </div>
+      <div class="revDeckListRight">
+        ${editorCostRune(card)}
+        <button class="revDeckAdjust revDeckMinus" data-dir="minus" aria-label="Remove card">−</button>
+        <div class="revTileQtyBadge">${qtyVal}</div>
+        <button class="revDeckAdjust revDeckPlus" data-dir="plus" aria-label="Add card">+</button>
+      </div>`;
+  } else {
+    tile.innerHTML = `
+      <div class="revTileIcon" title="${escapeHtml(card.faction || 'universal')}">${icon}</div>
+      <div class="revTileName">${name}</div>
+      <div class="revTileKind">${kindLabel}</div>
+      <div class="revTileBottom">
+        ${editorCostRune(card)}
+      </div>`;
+  }
 
   if (isDraft) {
     const badge = document.createElement('div');
@@ -10064,9 +10736,7 @@ function makeTile(card, mode, player, isDraft){
     if (isDraft) {
       expand.innerHTML = draftEditorHtml(card, id);
     } else {
-      expand.innerHTML = `
-        <div class="revReadOnlyNote">Imported/default cards are read-only here for now. Create a New Draft card for fast mechanics testing.</div>
-      `;
+      expand.innerHTML = readOnlyCardDetailsHtml(card);
     }
 
     tile.appendChild(expand);
@@ -10220,13 +10890,18 @@ function renderEditorView(view){
     ? 'Tap a card to expand it. Draft cards can be edited; official cards are read-only.'
     : currentView === 'mechanics'
       ? 'Reference list for wiring future card abilities.'
-      : 'Use + / - to tune decks. The pinned bar shows count, clear, and random fill.';
+      : 'Use the list controls to tune quantities. Filter by cards in deck, powers, or units.';
   body.appendChild(hint);
 
   if (currentView === 'repo') renderRepoFilters(body);
+  if (currentView === 'p1' || currentView === 'p2') renderDeckFilters(body, currentView === 'p2' ? 2 : 1);
 
   const panel = document.createElement('div');
-  panel.className = currentView === 'repo' ? 'revEditorPanel revTileGrid revRepoGrid' : 'revEditorPanel revTileGrid';
+  panel.className = currentView === 'repo'
+    ? 'revEditorPanel revTileGrid revRepoGrid'
+    : (currentView === 'p1' || currentView === 'p2')
+      ? 'revEditorPanel revDeckListPanel'
+      : 'revEditorPanel revTileGrid';
   body.appendChild(panel);
 
   repoBtn.onclick = () => renderEditorView('repo');
@@ -10242,7 +10917,12 @@ function renderEditorView(view){
 
   const official = officialRepo().map(card => ({ card, isDraft:false }));
   const drafts = draftRepo().map(card => ({ card, isDraft:true }));
-  const cardsToRender = [...official, ...drafts].filter(({card,isDraft}) => currentView !== 'repo' || cardMatchesRepoFilters(card, isDraft));
+  const activeDeck = (currentView === 'p1' || currentView === 'p2') ? getDeck(currentView === 'p2' ? 2 : 1) : null;
+  const cardsToRender = [...official, ...drafts].filter(({card,isDraft}) => {
+    if (currentView === 'repo') return cardMatchesRepoFilters(card, isDraft);
+    if (currentView === 'p1' || currentView === 'p2') return cardMatchesDeckFilters(card, activeDeck);
+    return true;
+  });
   if (!cardsToRender.length) {
     const empty = document.createElement('div');
     empty.className = 'revNoCardsNote';
@@ -11812,6 +12492,356 @@ document.addEventListener('click', function(e){
 .battle-sequence .die.die-bonus-hit {
   box-shadow: 0 0 12px rgba(168,100,255,0.62), inset 0 0 8px rgba(232,208,255,0.16) !important;
 }
+
+
+/* Patch 139 — align draw/pass buttons with resource rune + smaller hand names */
+.hub-row:not(.activated) #hub-pass-btn,
+.hub-row:not(.activated) #hub-btn {
+  transform: translateY(-6px);
+}
+.hand-scroll .card .card-name {
+  font-size: 10px !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0.03em;
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
 </style>
+
+
+<style id="rev-hand-reveal-range-v140">
+/* v140: keep enlarged hand cards above the board, fix draw reveal back bleed-through. */
+.player-bar,
+.inspector,
+.inspector.open,
+.inspector-deck,
+#hand-scroll,
+.hand-scroll {
+  overflow: visible !important;
+}
+.player-bar {
+  z-index: 40 !important;
+}
+.inspector-deck {
+  position: relative !important;
+  z-index: 42 !important;
+}
+#hand-scroll {
+  position: relative !important;
+  z-index: 44 !important;
+}
+#hand-scroll .card,
+.hand-scroll .card {
+  position: relative;
+}
+#hand-scroll .card.hand-previewing,
+.hand-scroll .card.hand-previewing {
+  z-index: 120 !important;
+}
+.draw-reveal-card .draw-reveal-face {
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+.draw-reveal-card .draw-reveal-front {
+  opacity: 0;
+  transform: rotateY(180deg) translateZ(1px);
+}
+.draw-reveal-card .draw-reveal-back {
+  opacity: 1;
+  transform: rotateY(0deg) translateZ(1px);
+}
+.draw-reveal-card.flipped .draw-reveal-front {
+  opacity: 1;
+}
+.draw-reveal-card.flipped .draw-reveal-back {
+  opacity: 0;
+}
+</style>
+<script id="rev-range-display-v140">
+/* v140: range 1 should display as 1, not a dash, so imported weapon ranges are visible. */
+function displayRange(r) {
+  if (r == null || r === '') return '';
+  if (typeof r === 'string') return r;
+  if (Number(r) === 0) return '∞';
+  return String(r);
+}
+</script>
+
+
+<style id="rev-editor-deck-list-readonly-patch">
+#open-editor-btn.rev-menu-editor-btn,
+#start-overlay .rev-menu-editor-btn {
+  background:linear-gradient(180deg,#caa653,#7c5520) !important;
+  border:2px solid rgba(255,232,159,0.95) !important;
+  color:#160e07 !important;
+  opacity:1 !important;
+  box-shadow:0 0 18px rgba(212,175,55,0.38), inset 0 1px 0 rgba(255,255,255,0.35) !important;
+  font-weight:900 !important;
+  text-shadow:none !important;
+}
+.revDeckFilterBar {
+  position:sticky;
+  top:58px;
+  z-index:8;
+  padding:8px 0;
+  background:linear-gradient(180deg,rgba(18,13,8,0.96),rgba(18,13,8,0.82));
+  backdrop-filter:blur(8px);
+}
+.revDeckListPanel {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:8px;
+}
+.revDeckListPanel .revTile.revDeckTile {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  min-height:58px;
+  padding:8px 10px;
+  border-radius:10px;
+}
+.revDeckListMain {
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr);
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+.revDeckListText { min-width:0; }
+.revDeckListPanel .revTileName {
+  font-size:14px;
+  margin:0 0 2px;
+  white-space:normal;
+  line-height:1.12;
+}
+.revDeckListPanel .revTileKind {
+  font-size:10px;
+  opacity:0.72;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+}
+.revDeckListRight {
+  display:grid;
+  grid-template-columns:auto 32px 32px 32px;
+  align-items:center;
+  gap:6px;
+}
+.revDeckListPanel .revTileCostRune {
+  width:24px;
+  height:24px;
+  font-size:13px;
+}
+.revDeckListPanel .revDeckAdjust {
+  width:32px;
+  height:32px;
+  min-width:32px;
+  padding:0;
+  border-radius:8px;
+  font-size:22px;
+  line-height:1;
+}
+.revDeckListPanel .revTileQtyBadge {
+  position:static;
+  width:32px;
+  height:32px;
+  min-width:32px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  font-size:15px;
+}
+.revReadOnlyDetails {
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:rgba(0,0,0,0.18);
+  border:1px solid rgba(216,196,154,0.14);
+}
+.revReadOnlyTitle {
+  font-size:16px;
+  font-weight:900;
+  color:#f2dfb3;
+  margin-bottom:3px;
+}
+.revReadOnlyMeta {
+  font-size:11px;
+  opacity:0.78;
+  margin-bottom:10px;
+}
+.revReadOnlyGrid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.revReadOnlyStat {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:5px 7px;
+  border-radius:7px;
+  background:rgba(255,255,255,0.035);
+  font-size:11px;
+}
+.revReadOnlyStat span { opacity:0.68; }
+.revReadOnlyStat b { color:#f0d69d; text-align:right; }
+.revReadOnlySectionTitle {
+  margin:12px 0 6px;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  color:#d8c49a;
+  opacity:0.78;
+}
+.revReadOnlyText {
+  margin-top:8px;
+  font-size:12px;
+  line-height:1.35;
+  color:#d8c49a;
+}
+</style>
+
+
+<style id="rev-deck-indicator-lane-zoom-v145">
+/* v145: deck-count icon reads as a player-coloured indicator, not a playable button. */
+.hub-row:not(.activated) .hub-deck-count {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0 !important;
+  margin-right: 6px !important;
+  height: 40px;
+  min-width: 32px;
+  flex: 0 0 auto;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+.hub-row:not(.activated) .hub-deck-count.show { display: flex; }
+.hub-row:not(.activated) .hub-deck-icon {
+  width: 30px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid currentColor !important;
+  border-radius: 4px !important;
+  background: linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.72)) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08), 0 0 8px currentColor !important;
+  position: relative;
+  opacity: 0.92;
+}
+.hub-row:not(.activated) .hub-deck-icon::before,
+.hub-row:not(.activated) .hub-deck-icon::after {
+  content: '' !important;
+  position: absolute;
+  pointer-events: none;
+}
+.hub-row:not(.activated) .hub-deck-icon::before {
+  inset: 4px 5px auto 5px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.48;
+}
+.hub-row:not(.activated) .hub-deck-icon::after {
+  inset: auto 5px 4px 5px;
+  height: 2px;
+  border: 0 !important;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.28;
+}
+.hub-row:not(.activated) .hub-deck-num {
+  min-width: 0 !important;
+  text-align: center !important;
+  font-size: 15px !important;
+  font-weight: 1000;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: currentColor !important;
+  text-shadow: 0 0 8px currentColor !important;
+  position: relative;
+  z-index: 1;
+}
+.player-bar.p1-active .hub-row:not(.activated) .hub-deck-count { color: var(--p1); }
+.player-bar.p2-active .hub-row:not(.activated) .hub-deck-count { color: var(--p2); }
+.hub-row.activated .hub-deck-count { display: none !important; }
+.card-zoom-art.lane-effect-zoom {
+  border-color: rgba(64,168,120,0.82);
+  box-shadow: 0 0 18px rgba(64,168,120,0.26), inset 0 0 24px rgba(64,168,120,0.08);
+}
+.card-zoom-art.lane-effect-zoom .card-zoom-cost { display: none; }
+.card-zoom-art.lane-effect-zoom .card-zoom-side-icon { color: var(--lane-effect); border-color: rgba(64,168,120,0.55); }
+</style>
+
+
+<style id="rev-deck-indicator-subtle-v146">
+/* v146: make the deck-count indicator straight, quieter, and non-glowy. */
+.hub-row:not(.activated) .hub-deck-icon {
+  transform: none !important;
+  opacity: 0.78 !important;
+  background: linear-gradient(180deg, rgba(0,0,0,0.36), rgba(0,0,0,0.66)) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.055) !important;
+}
+.hub-row:not(.activated) .hub-deck-num {
+  text-shadow: none !important;
+  opacity: 0.88 !important;
+}
+.hub-row:not(.activated) .hub-deck-icon::before {
+  opacity: 0.24 !important;
+}
+.hub-row:not(.activated) .hub-deck-icon::after {
+  opacity: 0.16 !important;
+}
+</style>
+
+
+
+<style id="rev-draw-deck-link-v147">
+/* v147: deck count is a subtle linked indicator that lights while holding Draw. */
+.hub-row:not(.activated) .hub-deck-count {
+  opacity: .58 !important;
+  transition: opacity .16s ease, filter .16s ease;
+}
+.hub-row:not(.activated) .hub-deck-icon {
+  opacity: .72 !important;
+  border-width: 1.5px !important;
+  background: linear-gradient(180deg, rgba(0,0,0,0.24), rgba(0,0,0,0.54)) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.045) !important;
+  transform: none !important;
+  transition: opacity .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+.hub-row:not(.activated) .hub-deck-num {
+  opacity: .72 !important;
+  text-shadow: none !important;
+  transition: opacity .16s ease, text-shadow .16s ease, color .16s ease;
+}
+.hub-row:not(.activated) .hub-deck-count.draw-linked-active {
+  opacity: 1 !important;
+  filter: brightness(1.16) saturate(1.25);
+}
+.hub-row:not(.activated) .hub-deck-count.draw-linked-active .hub-deck-icon {
+  opacity: 1 !important;
+  border-color: currentColor !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(0,0,0,0.52)) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.09), 0 0 0 1px rgba(255,255,255,0.04) !important;
+}
+.hub-row:not(.activated) .hub-deck-count.draw-linked-active .hub-deck-num {
+  opacity: 1 !important;
+  text-shadow: 0 0 5px rgba(0,0,0,0.85) !important;
+}
+.player-bar.p1-active .hub-row:not(.activated) .hub-deck-count,
+.hub-row:not(.activated) .hub-deck-count.p1-deck-indicator { color: var(--p1); }
+.player-bar.p2-active .hub-row:not(.activated) .hub-deck-count,
+.hub-row:not(.activated) .hub-deck-count.p2-deck-indicator { color: var(--p2); }
+</style>
+
 </body>
 </html>
