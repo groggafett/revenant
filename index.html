@@ -1307,8 +1307,9 @@ box-shadow: 0 0 16px rgba(200,160,60,0.3);
 .splash-backed-overlay { background:rgba(0,0,0,0.95); background-size:cover; background-position:center; background-repeat:no-repeat; }
 .splash-backed-overlay::before { content:''; position:fixed; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.86) 58%, rgba(0,0,0,0.96) 100%); pointer-events:none; z-index:0; }
 .splash-backed-overlay > * { position:relative; z-index:1; }
-.setup-refresh-badge { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#050403; border:2px solid #c8a060; color:#f0d080; font-size:32px; font-weight:900; line-height:1; box-shadow:0 0 18px rgba(0,0,0,0.85), 0 0 14px rgba(200,160,80,0.35); pointer-events:none; z-index:8; }
-.setup-refresh-badge.lane-refresh { left:50%; top:50%; }
+.setup-refresh-badge { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#050403; border:2px solid #c8a060; color:#f0d080; font-size:32px; font-weight:900; line-height:1; box-shadow:0 0 12px rgba(0,0,0,0.72), 0 0 8px rgba(200,160,80,0.20); pointer-events:none; z-index:8; opacity:0.34; }
+.setup-refresh-badge.lane-refresh { left:50%; top:50%; opacity:0.28; }
+.dev-setup-card .card-name { background:rgba(0,0,0,0.72); border:1px solid rgba(200,160,96,0.34); border-radius:4px; color:#f4dfb8; padding:3px 4px; text-shadow:0 1px 3px rgba(0,0,0,0.95); white-space:normal; line-height:1.12; }
 .battle-begins-avatar { width:62px; height:62px; border-radius:50%; border:2px solid var(--p1); background:radial-gradient(circle at 50% 38%, #1d376a, #071126 72%); box-shadow:0 0 18px rgba(74,120,216,0.42); display:flex; align-items:center; justify-content:center; font-size:28px; color:#cfe0ff; margin:0 auto 6px; }
 .battle-begins-player-label { font-size:var(--fs-xs); color:var(--p1); text-transform:uppercase; letter-spacing:0.16em; text-align:center; margin-bottom:10px; }
 .splash-copy {
@@ -1595,6 +1596,7 @@ box-shadow: 0 0 10px rgba(200,160,60,0.7) !important;
 .tile.highlight-ability::before { display:block; background: linear-gradient(160deg, rgba(70,32,112,0.66) 0%, rgba(22,8,38,0.76) 100%) !important; }
 .tile.highlight-ability:not(.power-confirm-tile) .unit-on-tile { border-color: var(--faction-shadows) !important; box-shadow: 0 0 12px rgba(146,84,220,0.58) !important; filter: saturate(1.08) brightness(0.88); }
 .tile.highlight-ability:not(.power-confirm-tile)::after { filter: hue-rotate(45deg) saturate(1.4); }
+.tile.highlight-ability.dim-ability { opacity:0.35; box-shadow:none !important; }
 /* Ability button — full row, purple tinted like move/attack pills */
 .ability-btn {
 width: 100%; height: 100%; flex-shrink: 0; display: flex; align-items: center; gap: 4px;
@@ -2035,6 +2037,72 @@ pointer-events: none;
 .round-end-title { font-family: ‘Spectral’,serif; font-size: var(--fs-md); font-weight: 900; color: #c8a060; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 0 20px rgba(200,160,60,0.5); }
 .round-end-sub   { font-family: ‘Spectral’,serif; font-size: var(--fs-xs); color: #7a6030; letter-spacing: 0.2em; text-transform: uppercase; }
 .round-end-btn   { font-family: ‘Spectral’,serif; font-size: var(--fs-xs); font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #c8a060; background: linear-gradient(160deg,#2a2010,#1a1408); border: 1px solid #c08020; border-radius: 4px; padding: 10px 28px; cursor: pointer; box-shadow: 0 0 16px rgba(200,160,60,0.3); margin-top: 8px; }
+
+/* Jump Lane animation */
+.tile.jump-pulse::after {
+  filter: brightness(1.55) saturate(1.45);
+  box-shadow: 0 0 18px rgba(146,84,220,0.75);
+}
+.unit-jump-clone {
+  position: fixed; z-index: 260; pointer-events: none;
+  margin: 0; transform-origin: center center;
+  transition: transform var(--jump-ms, 320ms) cubic-bezier(.18,.86,.26,1.05), opacity var(--jump-ms, 320ms) ease, filter var(--jump-ms, 320ms) ease;
+  box-shadow: 0 0 18px rgba(146,84,220,.82), 0 0 30px rgba(64,180,255,.42), 0 12px 26px rgba(0,0,0,.72) !important;
+  filter: brightness(1.25) saturate(1.25);
+}
+.unit-jump-clone.jump-arrive {
+  opacity: .96; filter: brightness(1.5) saturate(1.45);
+}
+.unit-jump-hidden { opacity: 0 !important; }
+
+
+/* Patch 123 — active action panel compact stats + action costs */
+.hub-row.activated .hub-left {
+  flex: 0 0 108px;
+  width: 108px;
+  max-width: 108px;
+  padding-left: 6px;
+  padding-right: 2px;
+  overflow: hidden;
+}
+.hub-row.activated .hub-right {
+  width: calc(100vw - 108px);
+  max-width: calc(100vw - 108px);
+}
+.hub-row.activated .hub-stat-badges {
+  width: 100%;
+  padding: 0;
+  gap: 2px;
+  justify-content: flex-start;
+}
+.hub-row.activated .hub-stat-badge {
+  width: 30px;
+  height: 30px;
+  font-size: 16px;
+  font-weight: 900;
+  border-width: 1.5px;
+}
+.hub-row.activated .badge-move { padding-right: 3px; }
+.hub-actions.active { min-width: 0; }
+.act-btn { min-width: 0; }
+.act-btn .act-icon { font-size: 17px; }
+.act-btn .act-label { font-size: 8px; }
+.act-btn .act-cost {
+  transform: skewX(18deg);
+  display: block;
+  min-height: 10px;
+  font-size: 9px;
+  line-height: 1;
+  color: #f0c020;
+  text-shadow: 0 0 5px rgba(240,192,32,0.72);
+  letter-spacing: 0.02em;
+}
+.act-btn.act-unavailable .act-cost {
+  color: rgba(90,72,40,0.55);
+  text-shadow: none;
+}
+#act-btn-skip .act-label { font-size: 9px; }
+
 </style>
 
 </head>
@@ -2260,17 +2328,20 @@ pointer-events: none;
         <button class="act-btn" id="act-btn-move" onclick="selectAction('move')">
           <span class="act-icon">➤</span>
           <span class="act-label">Move</span>
+          <span class="act-cost" id="act-cost-move">✦</span>
         </button>
         <button class="act-btn" id="act-btn-attack" onclick="selectAction('attack')">
           <span class="act-icon">⚔</span>
           <span class="act-label">Fight</span>
+          <span class="act-cost" id="act-cost-attack">✦</span>
         </button>
         <button class="act-btn" id="act-btn-ability" onclick="selectAction('ability')" style="display:none">
           <span class="act-icon">✦</span>
           <span class="act-label">Ability</span>
+          <span class="act-cost" id="act-cost-ability">✦</span>
         </button>
         <button class="act-btn" id="act-btn-skip" onclick="skipAction()">
-          <span class="act-label">Skip</span>
+          <span class="act-label">Done</span>
         </button>
       </div>
       <button class="hub-btn" id="hub-btn" onclick="onHubBtn()">
@@ -2324,7 +2395,7 @@ window.addEventListener('unhandledrejection', e => {
     { id:'cmoklh74h6', name:'iron commander', internalName:'iron_commander', variant:'', artId:'iron_commander', type:'Hero', faction:'order_of_iron', cost:3, hp:4, maxHp:4, move:1, save:'2+',
       weapon:{name:'blade & shield', range:1, attacks:3, hit:'2+', ap:2, damage:1},
       special:'inspire (1AP) Pick a friendly non-hero unit in this lane. they get to make a free move or attack action',
-      ability:{ key:'inspire', apCost:1, target:{ side:'friendly', location:'lane', state:'any', type:'non_hero' } } },
+      ability:{ key:'command_unit', apCost:1, target:{ side:'friendly', location:'lane', state:'any', type:'unit', unitType:'non_hero' } } },
     { id:'power001', name:'Raging Inferno', internalName:'raging_inferno', variant:'', artId:'raging_inferno', type:'Power', faction:'order_of_iron', cost:3,
       hp:null, maxHp:null, move:null, save:null,
       weapon:{name:null, range:null, attacks:null, hit:null, ap:1, damage:2},
@@ -2507,19 +2578,194 @@ window.addEventListener('unhandledrejection', e => {
     return variant ? `${base}_${variant}` : base;
   }
 
+  function normaliseMechanicKey(value) {
+    return String(value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/\+/g,'plus')
+      .replace(/[^a-z0-9]+/g,'');
+  }
+
+  function normaliseAbilityTriggerValue(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw || raw === 'none') return '';
+    const key = normaliseMechanicKey(raw);
+    const map = {
+      none:'', no:'', na:'', blank:'',
+      action:'action', activated:'action', activatedaction:'action', activatedability:'action', onaction:'action',
+      onplay:'on_play', play:'on_play', whenplayed:'on_play',
+      ondeploy:'on_deploy', deploy:'on_deploy', whendeployed:'on_deploy',
+      onattack:'on_attack', attack:'on_attack',
+      onattackroll:'on_attack_roll', attackroll:'on_attack_roll', onroll:'on_attack_roll', dice:'on_attack_roll', diceroll:'on_attack_roll',
+      onsaveroll:'on_save_roll', saveroll:'on_save_roll',
+      ondefend:'on_defend', defend:'on_defend',
+      ondeath:'on_death', death:'on_death', onslain:'on_death',
+      onturnstart:'on_turn_start', turnstart:'on_turn_start',
+      onturnend:'on_turn_end', turnend:'on_turn_end',
+      passive:'passive', aura:'passive'
+    };
+    return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw;
+  }
+
+  function normaliseAbilityEffectValue(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    const key = normaliseMechanicKey(raw);
+    const map = {
+      none:'none', no:'none', na:'none',
+      inspire:'command_unit', command:'command_unit', commandunit:'command_unit', order:'command_unit', giveaction:'command_unit', addaction:'add_action', rallyunit:'command_unit',
+      jumplane:'jump_lane', jump:'jump_lane',
+      explodinghits:'exploding_hits', explodinghit:'exploding_hits', explodehits:'exploding_hits', explodehit:'exploding_hits', exploding:'exploding_hits',
+      chainhits:'chain_hits', chainhit:'chain_hits', chains:'chain_hits', chain:'chain_hits',
+      damage:'damage', dealdamage:'damage',
+      heal:'heal', healing:'heal',
+      draw:'draw', drawcards:'draw',
+      addresource:'add_resource', addresources:'add_resource', resource:'add_resource', resources:'add_resource'
+    };
+    return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw;
+  }
+
+  function normaliseCardTypeValue(value) {
+    const raw = String(value ?? '').trim();
+    const key = normaliseMechanicKey(raw);
+    const map = {
+      power:'Power', spell:'Power', tactic:'Power',
+      hero:'Hero', leader:'Hero',
+      uncommon:'Uncommon', elite:'Uncommon',
+      common:'Common', unit:'Common'
+    };
+    return map[key] || raw;
+  }
+
+  function normaliseFactionValue(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return 'universal';
+    const key = normaliseMechanicKey(raw);
+    const map = {
+      universal:'universal', neutral:'universal', none:'universal',
+      orderofiron:'order_of_iron', iron:'order_of_iron',
+      orderofflame:'order_of_flame', orderofflames:'order_of_flame', flame:'order_of_flame', flames:'order_of_flame',
+      orderofshadows:'order_of_shadows', shadows:'order_of_shadows', shadow:'order_of_shadows',
+      orderofveil:'order_of_veil', orderoftheveil:'order_of_veil', veil:'order_of_veil',
+      orderoflight:'order_of_light', light:'order_of_light',
+      orderofhunt:'order_of_hunt', orderofthehunt:'order_of_hunt', orderofbeasts:'order_of_hunt', hunt:'order_of_hunt', beasts:'order_of_hunt',
+      orderofartifice:'order_of_artifice', artifice:'order_of_artifice'
+    };
+    return map[key] || raw;
+  }
+
+  function normaliseAbilityTargetValue(value, fallback='') {
+    const raw = String(value ?? '').trim();
+    if (!raw) return fallback;
+    return raw.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+  }
+
+  function normaliseAbilityTarget(target={}, card={}) {
+    const base = target && typeof target === 'object' ? target : {};
+    let side = normaliseAbilityTargetValue(base.side ?? base.targetSide ?? base.ability_target_side, 'friendly');
+    let type = normaliseAbilityTargetValue(base.type ?? base.targetType ?? base.ability_target_type, 'unit');
+    let location = normaliseAbilityTargetValue(base.location ?? base.targetLocation ?? base.ability_target_location, 'same_lane');
+    let stateValue = normaliseAbilityTargetValue(base.state ?? base.targetState ?? base.ability_target_state, 'any');
+    let count = normaliseAbilityTargetValue(base.count ?? base.targetCount ?? base.ability_target_count, 'single');
+    let unitType = normaliseAbilityTargetValue(base.unitType ?? base.unit_type ?? base.targetUnitType ?? base.ability_target_unit_type, 'any');
+    let faction = normaliseFactionValue(base.faction ?? base.targetFaction ?? base.ability_target_faction ?? 'any');
+    const rangeRaw = base.range ?? base.targetRange ?? base.ability_target_range;
+
+    if (location === 'lane') location = 'same_lane';
+    if (location === 'opposite_lane') location = 'opposite_lane_same_row';
+    if (side === 'empty') { type = 'tile'; stateValue = stateValue || 'empty'; }
+    if (side === 'self') { type = 'unit'; location = 'self'; }
+    // Backwards compatibility: older hand-authored abilities used target.type for hero/non-hero filters.
+    if (['hero','non_hero','common','uncommon'].includes(type)) {
+      unitType = type;
+      type = 'unit';
+    }
+
+    return {
+      side,
+      type,
+      location,
+      range: rangeRaw === '' || rangeRaw == null ? null : Number(rangeRaw),
+      count,
+      state: stateValue,
+      unitType,
+      faction
+    };
+  }
+
+  function makeRuntimeAbilityFromEffect(effectKey, card={}) {
+    effectKey = normaliseAbilityEffectValue(effectKey);
+    if (!effectKey || effectKey === 'none') return null;
+    const apCost = Number.isFinite(Number(card.apCost ?? card.abilityCost)) ? Number(card.apCost ?? card.abilityCost) : 1;
+    const value = card.value ?? card.unitValue ?? card.abilityValue ?? null;
+    const labels = {
+      command_unit: 'Command Unit',
+      add_action: 'Add Action',
+      jump_lane: 'Jump Lane',
+      damage: 'Damage',
+      heal: 'Heal',
+      draw: 'Draw',
+      add_resource: 'Add Resource'
+    };
+    const target = card.abilityTarget || card.target || abilityTargetForEffect(effectKey);
+    return {
+      key: effectKey,
+      apCost,
+      value,
+      name: labels[effectKey] || effectKey,
+      target: normaliseAbilityTarget(target, card)
+    };
+  }
+
+  function abilityTargetForEffect(effectKey) {
+    effectKey = normaliseAbilityEffectValue(effectKey);
+    if (effectKey === 'jump_lane') return { side:'empty', location:'opposite_lane_same_row', state:'empty', type:'tile' };
+    if (effectKey === 'command_unit') return { side:'friendly', location:'same_lane', state:'any', type:'unit', unitType:'non_hero', faction:'any' };
+    if (effectKey === 'add_action') return { side:'friendly', location:'same_lane', state:'any', type:'unit', unitType:'any', faction:'any' };
+    if (effectKey === 'heal') return { side:'friendly', location:'same_lane', state:'damaged', type:'unit' };
+    if (effectKey === 'damage') return { side:'enemy', location:'same_lane', state:'any', type:'unit' };
+    return { side:'friendly', location:'same_lane', state:'any', type:'unit' };
+  }
+
   function normaliseImportedCard(card) {
     if (!card || typeof card !== 'object') return card;
     const identity = generatedCardIdentity(card);
     const weapon = card.weapon && typeof card.weapon === 'object' ? { ...card.weapon } : card.weapon;
+    const type = normaliseCardTypeValue(card.type || '');
+    const triggerKey = normaliseAbilityTriggerValue(card.trigger || card.mechanic?.trigger || card.abilityTrigger || '');
+    const effectKey = type === 'Power'
+      ? (card.effect || card.powerEffect || null)
+      : normaliseAbilityEffectValue(card.unitEffect || card.mechanic?.effect || card.effect || card.abilityEffect || '');
+    const abilityTarget = normaliseAbilityTarget(card.abilityTarget || card.target || card.mechanic?.target || abilityTargetForEffect(effectKey), card);
+    const diceTrigger = card.diceTrigger || card.mechanic?.diceTrigger || (triggerKey === 'on_attack_roll' && (effectKey === 'exploding_hits' || effectKey === 'chain_hits') ? {
+      trigger:'on_attack_roll',
+      condition:'natural_gte',
+      threshold: Math.max(1, Math.min(6, Number(card.threshold ?? card.abilityRoll ?? 6) || 6)),
+      effect: effectKey,
+      value: Math.max(1, Number(card.unitValue ?? card.value ?? card.abilityValue ?? 1) || 1)
+    } : null);
+    const existingAbility = card.ability && typeof card.ability === 'object'
+      ? { ...card.ability, key: normaliseAbilityEffectValue(card.ability.key), target: normaliseAbilityTarget(card.ability.target || abilityTarget, card) }
+      : null;
+    const ability = existingAbility || ((type !== 'Power' && triggerKey === 'action' && effectKey && effectKey !== 'none')
+      ? makeRuntimeAbilityFromEffect(effectKey, { ...card, abilityTarget, value: card.value ?? card.unitValue, apCost: card.apCost ?? card.abilityCost })
+      : null);
     return {
       ...card,
       id: identity,
-      artId: identity,
-      internalName: card.internalName || card.name || identity,
-      type: String(card.type || '').trim(),
-      faction: card.faction || 'universal',
-      maxHp: card.maxHp ?? card.hp,
-      weapon
+      artId: card.artId || identity,
+      internalName: card.internalName || card.internal_name || card.name || identity,
+      type,
+      faction: normaliseFactionValue(card.faction || 'universal'),
+      trigger: triggerKey,
+      effect: type === 'Power' ? effectKey : (effectKey === 'none' ? null : effectKey),
+      unitEffect: type === 'Power' ? null : (effectKey === 'none' ? null : effectKey),
+      unitValue: type === 'Power' ? null : (card.unitValue ?? card.value ?? card.abilityValue ?? null),
+      maxHp: card.maxHp ?? card.max_hp ?? card.hp,
+      weapon,
+      abilityTarget,
+      diceTrigger,
+      ability
     };
   }
 
@@ -2898,7 +3144,7 @@ const state = {
       const uid = `sc-${player}-${idx}-${Date.now()}`;
       const art = artStyle(card, true);
       setTimeout(()=>attachArtNameFallback(document.getElementById(uid), card), 0);
-      return `<div id="${uid}" class="card ${col}-card" onclick="${showRefresh ? `devSwapCard(${player},${idx})` : ``}" style="width:75px;height:105px;flex-shrink:0;${art}">${cardInnerHTML(card, col)}${showRefresh ? `<div class="setup-refresh-badge">↻</div>` : ``}</div>`;
+      return `<div id="${uid}" class="card ${col}-card dev-setup-card" onclick="${showRefresh ? `devSwapCard(${player},${idx})` : ``}" style="width:75px;height:105px;flex-shrink:0;${art}">${cardInnerHTML(card, col)}${showRefresh ? `<div class="setup-refresh-badge">↻</div>` : ``}</div>`;
     }
 
     function renderOverlay() {
@@ -2913,7 +3159,7 @@ const state = {
         </div>
 
         <div style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player I — Starting Hand</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i,false)).join('')}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;">${state.players[1].hand.map((_,i)=>makeHandCard(1,i,true)).join('')}</div>
 
         <div style="font-size:var(--fs-xs);color:#cc3030;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;margin-top:4px;">Player II — Starting Hand</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;">${state.players[2].hand.map((_,i)=>makeHandCard(2,i)).join('')}</div>
@@ -3198,9 +3444,10 @@ const state = {
     document.getElementById('pile-graveyard-count').textContent=p.graveyard.length;
     const deckPile=document.getElementById('pile-deck');
     deckPile.classList.toggle('p2-deck', state.activePlayer===2);
-    const canDraw=p.resources>=1&&p.deck.length>0&&!p.drawnThisRound;
-    deckPile.classList.toggle('can-draw',canDraw);
-    deckPile.classList.toggle('draw-exhausted',p.drawnThisRound);
+    const drawAvailability = getDrawAvailability(state.activePlayer);
+    deckPile.classList.toggle('can-draw', drawAvailability.can);
+    deckPile.classList.toggle('draw-exhausted', !drawAvailability.can);
+    deckPile.dataset.drawReason = drawAvailability.reason || '';
     deckPile.onclick=null;
     // Pass widget — update pass button label if already passed
     const myPassed = state.players[state.activePlayer].passed;
@@ -3236,7 +3483,6 @@ const state = {
       lbl.style.cssText = 'font-size:10px;font-family:Spectral,Georgia,serif;color:#5a4828;letter-spacing:0.15em;text-transform:uppercase;text-align:center;padding:2px 0;flex-shrink:0;width:100%;';
       scroll.parentElement.insertBefore(lbl, scroll);
     }
-
     let cw = 78;
     if (count >= 10)      cw = 52;
     else if (count >= 9)  cw = 54;
@@ -4554,9 +4800,19 @@ const state = {
       return;
     }
 
-    // Ability targeting mode — tapping a highlighted unit resolves the ability
+    // Ability targeting mode — tapping a highlighted tile/unit resolves or confirms the ability
     if (state.activeAction==='ability' && tile.classList.contains('highlight-ability')) {
-      if (state.board[tileId]) { resolveAbility(tileId); return; }
+      const ability = getUnitAbility(state.activeUnit?.card);
+      const isJumpLane = ability?.key === 'jump_lane' || ability?.target?.location === 'opposite_lane_same_row';
+      if (isJumpLane) {
+        if (pendingJumpTile === tileId) { clearJumpConfirm(); return; }
+        clearJumpConfirm();
+        pendingJumpTile = tileId;
+        showJumpConfirm(tileId);
+        return;
+      }
+      resolveAbility(tileId);
+      return;
     }
 
     // Attack mode — enemy highlighted tile triggers battle
@@ -4724,6 +4980,7 @@ const state = {
   }
 
   let pendingMoveTile = null;
+  let pendingJumpTile = null;
 
   function showMoveConfirm(tileId) {
     // Dim other move options
@@ -4750,6 +5007,41 @@ const state = {
     const btn=document.getElementById('move-confirm-btn');
     if(btn) btn.remove();
     pendingMoveTile=null;
+  }
+
+  function showJumpConfirm(tileId) {
+    document.querySelectorAll('.highlight-ability').forEach(t=>{
+      if(t.dataset.id!==tileId) t.classList.add('dim-ability');
+    });
+    const srcTile=document.querySelector(`[data-id="${state.activeUnit?.tileId}"]`);
+    if(srcTile){
+      const ic=document.createElement('div');
+      ic.className='move-src-icon jump-src-icon';
+      ic.textContent='⇄';
+      srcTile.appendChild(ic);
+    }
+    const tile=document.querySelector(`[data-id="${tileId}"]`);
+    if(!tile) return;
+    tile.classList.add('confirm-tile','jump-confirm-tile');
+    const btn=document.createElement('div');
+    btn.className='confirm-btn'; btn.id='jump-confirm-btn';
+    btn.innerHTML='<span>⇄✓</span>';
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const targetId = tileId;
+      clearJumpConfirm();
+      resolveAbility(targetId);
+    });
+    tile.appendChild(btn);
+  }
+
+  function clearJumpConfirm() {
+    document.querySelectorAll('.highlight-ability.dim-ability').forEach(t=>t.classList.remove('dim-ability'));
+    document.querySelectorAll('.jump-src-icon').forEach(e=>e.remove());
+    document.querySelectorAll('.jump-confirm-tile').forEach(t=>t.classList.remove('confirm-tile','jump-confirm-tile'));
+    const btn=document.getElementById('jump-confirm-btn');
+    if(btn) btn.remove();
+    pendingJumpTile=null;
   }
 
   let profileContext = null;
@@ -4846,7 +5138,7 @@ const state = {
     const isEnemy     = context==='board' && card.owner && card.owner!==state.activePlayer;
     const isBoard     = context==='board';
 
-    const ab = card.ability || CARDS.find(c => c.id === card.id)?.ability;
+    const ab = getUnitAbility(card);
     const isActiveUnit = isOwnUnit && state.activeUnit?.card?.uid === card.uid;
     const canUseAbility = isActiveUnit && ab && (state.activeUnit.card.actionsLeft ?? 0) >= ab.apCost;
     const isAbilityActive = state.activeAction === 'ability';
@@ -5032,14 +5324,22 @@ const state = {
     tile.appendChild(el);
   }
 
+  function getDrawAvailability(player = state.activePlayer) {
+    const p = state.players[player];
+    if (!p) return { can: false, label: 'Draw', sub: '', cost: null, reason: 'No Player' };
+    if (p.hand.length >= MAX_HAND) return { can: false, label: 'Hand Full', sub: '', cost: null, reason: 'Hand Full' };
+    if (p.resources < 1) return { can: false, label: 'Draw', sub: 'No Resources', cost: 1, reason: 'No Resources' };
+    if (p.deck.length <= 0) return { can: false, label: 'Draw', sub: 'Deck Empty', cost: 1, reason: 'Deck Empty' };
+    return { can: true, label: 'Draw', sub: '(Hold)', cost: 1, reason: '' };
+  }
+
   // ── HOLD TO DRAW ──
   const DRAW_HOLD_MS = 600;
   let drawHoldTimer = null;
   let drawHoldPointerId = null;
 
   function canHoldDraw() {
-    const p = state.players[state.activePlayer];
-    return state._ctaAction === 'draw' && p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound && p.hand.length < MAX_HAND;
+    return state._ctaAction === 'draw' && getDrawAvailability(state.activePlayer).can;
   }
 
   function clearDrawHold() {
@@ -5154,9 +5454,8 @@ const state = {
   // ── DRAW ACTION ──
   function drawAction() {
     const p = state.players[state.activePlayer];
-    if(p.resources < 1 || p.deck.length === 0 || p.drawnThisRound) return;
+    if(p.resources < 1 || p.deck.length === 0 || p.hand.length >= MAX_HAND) return;
     p.resources -= 1;
-    p.drawnThisRound = true;
     drawCard(state.activePlayer);
     renderHub();
     setTimeout(()=>{
@@ -5264,15 +5563,17 @@ const state = {
 
   function clearHighlights() {
     document.querySelectorAll('.highlight-move,.highlight-attack,.highlight-ability').forEach(t=>{
-      t.classList.remove('highlight-move','highlight-attack','highlight-ability');
+      t.classList.remove('highlight-move','highlight-attack','highlight-ability','dim-ability');
     });
     document.querySelectorAll('.highlight-target').forEach(u=>u.classList.remove('highlight-target'));
     clearMoveConfirm();
+    if (typeof clearJumpConfirm === 'function') clearJumpConfirm();
   }
 
   function selectAbility() {
     const unit = state.activeUnit?.card;
-    if (!unit?.ability) return;
+    const ability = getUnitAbility(unit);
+    if (!ability) return;
     clearHighlights();
     // Toggle off if already active
     if (state.activeAction === 'ability') {
@@ -5281,104 +5582,458 @@ const state = {
       const btn = document.querySelector('.ability-btn');
       if (btn) btn.className = 'ability-btn ability-idle';
       refreshActionButtons();
+      updateActionBar();
       return;
     }
     // Clear move/attack state
     state.activeAction = 'ability';
-    state.activeAbility = unit.ability || CARDS.find(c => c.id === unit.id)?.ability;
+    state.activeAbility = ability;
     const btn = document.querySelector('.ability-btn');
     if (btn) btn.className = 'ability-btn ability-active';
+    const actionBtn = document.getElementById('act-btn-ability');
+    if (actionBtn) actionBtn.className = 'act-btn act-selected';
     const targets = getAbilityTargets(state.activeAbility, state.activeUnit.tileId);
     targets.forEach(tid => {
       document.querySelector(`[data-id="${tid}"]`)?.classList.add('highlight-ability');
     });
     refreshActionButtons();
+    updateActionBar();
+  }
+
+
+  function normaliseAbilityTriggerValue(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw || raw === 'none') return '';
+    const key = String(raw).trim().toLowerCase().replace(/\+/g,'plus').replace(/[^a-z0-9]+/g,'');
+    const map = {
+      action:'action', activated:'action', activatedability:'action', onaction:'action',
+      onplay:'on_play', play:'on_play', ondeploy:'on_deploy', deploy:'on_deploy',
+      onattack:'on_attack', attack:'on_attack', onattackroll:'on_attack_roll', attackroll:'on_attack_roll',
+      ondefend:'on_defend', defend:'on_defend', ondeath:'on_death', death:'on_death',
+      onturnstart:'on_turn_start', turnstart:'on_turn_start', onturnend:'on_turn_end', turnend:'on_turn_end',
+      passive:'passive', none:''
+    };
+    return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw;
+  }
+
+  function normaliseAbilityEffectValue(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    const key = String(raw).trim().toLowerCase().replace(/\+/g,'plus').replace(/[^a-z0-9]+/g,'');
+    const map = {
+      none:'none', inspire:'command_unit', command:'command_unit', commandunit:'command_unit', giveaction:'command_unit', addaction:'add_action',
+      jumplane:'jump_lane', jump:'jump_lane', explodinghits:'exploding_hits', chainhits:'chain_hits',
+      damage:'damage', heal:'heal', draw:'draw', addresource:'add_resource', addresources:'add_resource'
+    };
+    return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw;
+  }
+
+  function getUnitAbility(unit) {
+    if (!unit) return null;
+    const storedAbility = unit.ability || CARDS.find(c => c.id === unit.id)?.ability || null;
+    if (storedAbility) {
+      const key = normaliseAbilityEffectValue(storedAbility.key || storedAbility.effect || '');
+      return {
+        ...storedAbility,
+        key,
+        apCost: Number.isFinite(Number(storedAbility.apCost ?? storedAbility.abilityCost)) ? Number(storedAbility.apCost ?? storedAbility.abilityCost) : 1,
+        value: storedAbility.value ?? unit.value ?? unit.unitValue ?? 1,
+        target: normaliseAbilityTarget(storedAbility.target || unit.abilityTarget || abilityTargetForEffect(key), unit)
+      };
+    }
+
+    const triggerKey = normaliseAbilityTriggerValue(unit.trigger || unit.mechanic?.trigger || '');
+    const effectKey = normaliseAbilityEffectValue(unit.effect || unit.unitEffect || unit.mechanic?.effect || '');
+    const isActivatedTrigger = triggerKey === 'action';
+
+    // Only player-triggered action abilities become action bar buttons.
+    // Passive, on-play and attack-roll mechanics resolve automatically elsewhere.
+    if (isActivatedTrigger && effectKey && effectKey !== 'none') {
+      const runtimeAbility = makeRuntimeAbilityFromEffect(effectKey, unit);
+      if (runtimeAbility) return runtimeAbility;
+    }
+    return null;
+  }
+
+  function actionCostPips(cost=1) {
+    const n = Math.max(1, Math.min(4, Number(cost) || 1));
+    return Array.from({ length:n }, () => '✦').join('');
+  }
+
+  function setActionButtonCost(id, cost=1) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = actionCostPips(cost);
+  }
+
+  function getJumpLaneTargets(casterTileId) {
+    const src = tileMap[casterTileId];
+    if (!src) return [];
+    const otherLane = src.lane === 'A' ? 'B' : 'A';
+    return Object.keys(tileMap).filter(tid => {
+      const t = tileMap[tid];
+      return t && t.lane === otherLane && t.row === src.row && t.zone !== 'centre' && !state.board[tid];
+    });
+  }
+
+  function abilityTargetDistanceTiles(casterTileId, range) {
+    const max = Math.max(0, Number(range) || 0);
+    if (!max) return [];
+    const dist = new Map([[casterTileId,0]]);
+    const queue = [casterTileId];
+    while (queue.length) {
+      const cur = queue.shift();
+      const d = dist.get(cur);
+      if (d >= max) continue;
+      for (const nid of getNeighbors(cur, true)) {
+        if (dist.has(nid)) continue;
+        dist.set(nid, d + 1);
+        queue.push(nid);
+      }
+    }
+    dist.delete(casterTileId);
+    return [...dist.keys()].filter(id => tileMap[id]?.zone !== 'centre');
+  }
+
+  function abilityTargetMatchesLocation(tid, casterTileId, target) {
+    const location = target.location || 'same_lane';
+    if (location === 'anywhere') return tileMap[tid]?.zone !== 'centre';
+    if (location === 'self' || location === 'same_tile') return tid === casterTileId;
+    if (location === 'same_lane' || location === 'lane') return unitLane(tid) === unitLane(casterTileId);
+    if (location === 'adjacent') return getNeighbors(casterTileId, true).includes(tid);
+    if (location === 'range') return abilityTargetDistanceTiles(casterTileId, target.range || 1).includes(tid);
+    if (location === 'opposite_lane_same_row') return getJumpLaneTargets(casterTileId).includes(tid);
+    return true;
+  }
+
+  function unitMatchesTargetFilters(unit, target, caster) {
+    const targetState = target.state || 'any';
+    const unitType = target.unitType || 'any';
+    const faction = target.faction || 'any';
+    const rawType = String(unit.type || '').trim();
+
+    if (targetState === 'damaged' && !(Number(unit.hp) < Number(unit.maxHp ?? unit.hp))) return false;
+    if (targetState === 'undamaged' && Number(unit.hp) < Number(unit.maxHp ?? unit.hp)) return false;
+    if (targetState === 'activated' && !(unit.actionsLeft > 0)) return false;
+    if (targetState === 'unactivated' && unit.actionsLeft !== null) return false;
+    if (targetState === 'exhausted' && unit.actionsLeft !== 0) return false;
+    if (targetState === 'ready' && !(unit.actionsLeft > 0)) return false;
+
+    if (unitType === 'hero' && rawType !== 'Hero') return false;
+    if (unitType === 'non_hero' && rawType === 'Hero') return false;
+    if (unitType === 'common' && rawType !== 'Common') return false;
+    if (unitType === 'uncommon' && rawType !== 'Uncommon') return false;
+
+    const unitFaction = normaliseFactionValue(unit.faction || 'universal');
+    const casterFaction = normaliseFactionValue(caster?.faction || 'universal');
+    if (faction === 'same_faction' && unitFaction !== casterFaction) return false;
+    if (faction === 'different_faction' && unitFaction === casterFaction) return false;
+    if (faction && faction !== 'any' && faction !== 'same_faction' && faction !== 'different_faction' && unitFaction !== faction) return false;
+
+    return true;
   }
 
   function getAbilityTargets(ability, casterTileId) {
-    const { side, location, state: targetState, type } = ability.target;
-    const casterLane = unitLane(casterTileId);
-    const casterOwner = state.activePlayer;
+    if (!ability || !casterTileId) return [];
+    const caster = state.board[casterTileId] || state.activeUnit?.card;
+    const target = normaliseAbilityTarget(ability.target || abilityTargetForEffect(ability.key), caster || {});
+    const casterOwner = caster?.owner ?? state.activePlayer;
+
+    if (target.location === 'self' || target.side === 'self') return [casterTileId];
+    if (ability?.key === 'jump_lane' || target.location === 'opposite_lane_same_row') {
+      return getJumpLaneTargets(casterTileId);
+    }
+
+    const wantsTile = target.type === 'tile' || target.side === 'empty' || target.state === 'empty' || target.state === 'occupied';
+    if (wantsTile) {
+      return Object.keys(tileMap).filter(tid => {
+        if (tileMap[tid]?.zone === 'centre') return false;
+        if (!abilityTargetMatchesLocation(tid, casterTileId, target)) return false;
+        const occupant = state.board[tid];
+        if ((target.side === 'empty' || target.state === 'empty') && occupant) return false;
+        if (target.state === 'occupied' && !occupant) return false;
+        if (occupant) {
+          if (target.side === 'friendly' && occupant.owner !== casterOwner) return false;
+          if (target.side === 'enemy' && occupant.owner === casterOwner) return false;
+          if (!unitMatchesTargetFilters(occupant, target, caster)) return false;
+        }
+        return true;
+      });
+    }
+
     return Object.keys(state.board).filter(tid => {
       if (tid === casterTileId) return false;
+      if (!abilityTargetMatchesLocation(tid, casterTileId, target)) return false;
       const unit = state.board[tid];
-      // Side
-      if (side === 'friendly' && unit.owner !== casterOwner) return false;
-      if (side === 'enemy'    && unit.owner === casterOwner) return false;
-      // Location
-      if (location === 'lane' && unitLane(tid) !== casterLane) return false;
-      if (location === 'adjacent') {
-        const neighbours = getNeighbors(casterTileId, true);
-        if (!neighbours.includes(tid)) return false;
-      }
-      // State
-      if (targetState === 'activated'   && !(unit.actionsLeft > 0)) return false;
-      if (targetState === 'unactivated' && unit.actionsLeft !== null) return false;
-      if (targetState === 'exhausted'   && unit.actionsLeft !== 0) return false;
-      // Type
-      if (type === 'non_hero' && unit.type === 'Hero') return false;
-      if (type === 'hero'     && unit.type !== 'Hero') return false;
+      if (target.side === 'friendly' && unit.owner !== casterOwner) return false;
+      if (target.side === 'enemy' && unit.owner === casterOwner) return false;
+      if (!unitMatchesTargetFilters(unit, target, caster)) return false;
       return true;
     });
   }
 
-  // ── ABILITY REGISTRY ──
+  function animateUnitMove(fromTileId, toTileId, options={}) {
+    const duration = options.duration ?? 320;
+    const fromTile = document.querySelector(`[data-id="${fromTileId}"]`);
+    const toTile = document.querySelector(`[data-id="${toTileId}"]`);
+    const unitEl = fromTile?.querySelector('.unit-on-tile');
+    if (!fromTile || !toTile || !unitEl) return Promise.resolve();
+
+    const fromRect = unitEl.getBoundingClientRect();
+    const toRect = toTile.getBoundingClientRect();
+    const clone = unitEl.cloneNode(true);
+    clone.classList.add('unit-jump-clone');
+    clone.style.left = `${fromRect.left}px`;
+    clone.style.top = `${fromRect.top}px`;
+    clone.style.width = `${fromRect.width}px`;
+    clone.style.height = `${fromRect.height}px`;
+    clone.style.setProperty('--jump-ms', `${duration}ms`);
+    clone.style.transform = 'translate3d(0,0,0) scale(1)';
+    document.body.appendChild(clone);
+
+    unitEl.classList.add('unit-jump-hidden');
+    fromTile.classList.add('jump-pulse');
+    toTile.classList.add('jump-pulse');
+
+    const dx = (toRect.left + toRect.width / 2) - (fromRect.left + fromRect.width / 2);
+    const dy = (toRect.top + toRect.height / 2) - (fromRect.top + fromRect.height / 2);
+
+    return new Promise(resolve => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          clone.classList.add('jump-arrive');
+          clone.style.transform = `translate3d(${dx}px, ${dy}px, 0) scale(1.08)`;
+        });
+      });
+      setTimeout(() => {
+        clone.remove();
+        unitEl.classList.remove('unit-jump-hidden');
+        fromTile.classList.remove('jump-pulse');
+        toTile.classList.remove('jump-pulse');
+        resolve();
+      }, duration + 80);
+    });
+  }
+
+// ── ABILITY REGISTRY ──
+  function spendCasterAbilityAction(caster, ability) {
+    const cost = Math.max(1, Number(ability?.apCost ?? ability?.abilityCost ?? 1) || 1);
+    caster.actionsLeft = Math.max(0, (caster.actionsLeft ?? 1) - cost);
+    const casterTile = document.querySelector(`[data-id="${state.activeUnit?.tileId}"]`);
+    if (casterTile) renderUnit(casterTile, caster);
+  }
+
+  function abilityTargetIds(ability, selectedTileId) {
+    const casterTileId = state.activeUnit?.tileId;
+    if (ability?.target?.count === 'all' && casterTileId) return getAbilityTargets(ability, casterTileId);
+    return selectedTileId ? [selectedTileId] : [];
+  }
+
   const ABILITY_REGISTRY = {
-    inspire(caster, targetTileId) {
+    command_unit(caster, targetTileId, ability) {
       const target = state.board[targetTileId];
-      if (!target) return;
-      // Give target 1 action immediately — they can now act
-      target.actionsLeft = Math.max(1, target.actionsLeft ?? 1);
+      if (!target) return { activateTarget:false };
+      const granted = Math.max(1, Number(ability?.value ?? 1) || 1);
+      target.actionsLeft = Math.max(granted, target.actionsLeft ?? granted);
       const tile = document.querySelector(`[data-id="${targetTileId}"]`);
       if (tile) renderUnit(tile, target);
-      // Caster spends 1 action
-      caster.actionsLeft--;
-      const casterTile = document.querySelector(`[data-id="${state.activeUnit.tileId}"]`);
-      if (casterTile) renderUnit(casterTile, caster);
+      spendCasterAbilityAction(caster, ability);
+      return { activateTarget:true };
+    },
+    add_action(caster, targetTileId, ability) {
+      const value = Math.max(1, Number(ability?.value ?? 1) || 1);
+      abilityTargetIds(ability, targetTileId).forEach(tid => {
+        const target = state.board[tid];
+        if (!target) return;
+        target.actionsLeft = Math.max(value, target.actionsLeft ?? value);
+        const tile = document.querySelector(`[data-id="${tid}"]`);
+        if (tile) renderUnit(tile, target);
+      });
+      spendCasterAbilityAction(caster, ability);
+      return { activateTarget:false };
+    },
+    async jump_lane(caster, targetTileId, ability) {
+      const sourceTileId = state.activeUnit?.tileId;
+      if (!sourceTileId || !targetTileId || state.board[targetTileId]) return false;
+      if (!getJumpLaneTargets(sourceTileId).includes(targetTileId)) return false;
+      const sourceTile = document.querySelector(`[data-id="${sourceTileId}"]`);
+      const targetTile = document.querySelector(`[data-id="${targetTileId}"]`);
+      await animateUnitMove(sourceTileId, targetTileId, { style:'jump', duration:320 });
+      delete state.board[sourceTileId];
+      state.board[targetTileId] = caster;
+      spendCasterAbilityAction(caster, ability);
+      if (sourceTile) sourceTile.querySelectorAll('.unit-on-tile,.act-indicator').forEach(e => e.remove());
+      if (targetTile) renderUnit(targetTile, caster);
+      state.activeUnit = caster.actionsLeft > 0 ? { tileId: targetTileId, card: caster } : null;
+      state.selectedBoardTile = caster.actionsLeft > 0 ? targetTileId : null;
+      return true;
+    },
+    damage(caster, targetTileId, ability) {
+      const value = Math.max(1, Number(ability?.value ?? 1) || 1);
+      abilityTargetIds(ability, targetTileId).forEach(tid => {
+        const target = state.board[tid];
+        if (!target) return;
+        target.hp = Math.max(0, Number(target.hp || 0) - value);
+        showDamageFloat(tid, value);
+        if (target.hp <= 0) setTimeout(()=>removeSlain(tid), 400);
+        else document.querySelector(`[data-id="${tid}"]`) && renderUnit(document.querySelector(`[data-id="${tid}"]`), target);
+      });
+      spendCasterAbilityAction(caster, ability);
+      return { activateTarget:false };
+    },
+    heal(caster, targetTileId, ability) {
+      const value = Math.max(1, Number(ability?.value ?? 1) || 1);
+      abilityTargetIds(ability, targetTileId).forEach(tid => {
+        const target = state.board[tid];
+        if (!target) return;
+        target.hp = Math.min(Number(target.maxHp ?? target.hp ?? 0), Number(target.hp || 0) + value);
+        const tile = document.querySelector(`[data-id="${tid}"]`);
+        if (tile) renderUnit(tile, target);
+      });
+      spendCasterAbilityAction(caster, ability);
+      return { activateTarget:false };
+    },
+    draw(caster, targetTileId, ability) {
+      const count = Math.max(1, Number(ability?.value ?? 1) || 1);
+      for (let i=0; i<count; i++) drawCard(state.activePlayer);
+      spendCasterAbilityAction(caster, ability);
+      renderHand();
+      return { activateTarget:false };
+    },
+    add_resource(caster, targetTileId, ability) {
+      const value = Math.max(1, Number(ability?.value ?? 1) || 1);
+      state.players[state.activePlayer].resources += value;
+      spendCasterAbilityAction(caster, ability);
+      return { activateTarget:false };
     }
   };
 
-  function resolveAbility(targetTileId) {
+  async function resolveAbility(targetTileId) {
     const caster = state.activeUnit?.card;
     const casterTileId = state.activeUnit?.tileId;
-    if (!caster?.ability) return;
+    const ability = getUnitAbility(caster);
+    if (!ability) return;
     clearHighlights();
     state.activeAction = null;
     state.activeAbility = null;
-    ABILITY_REGISTRY[caster.ability.key]?.(caster, targetTileId);
-    renderHub();
-    // If commander still has actions, store as return unit
-    if (caster.actionsLeft > 0) {
-      state.pendingReturnUnit = { tileId: casterTileId, card: caster };
-    }
-    // Switch activeUnit to target so their turn flows normally
-    const target = state.board[targetTileId];
-    if (target) {
-      state.activeUnit = { tileId: targetTileId, card: target };
-      document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
-      document.querySelector(`[data-id="${targetTileId}"]`)?.classList.add('unit-active');
-      state.selectedBoardTile = targetTileId;
+
+    if (ability.key === 'jump_lane') {
+      const moved = await ABILITY_REGISTRY.jump_lane(caster, targetTileId, ability);
+      renderHub();
       syncBoardSelectionHighlight();
-      openProfile(target, 'board', targetTileId);
+      if (!moved) return;
+      if (state.activeUnit?.card) {
+        openProfile(state.activeUnit.card, 'board', state.activeUnit.tileId);
+      } else {
+        closeProfile();
+        endCurrentTurn();
+        waitThenAdvance();
+      }
+      return;
+    }
+
+    const result = ABILITY_REGISTRY[ability.key]?.(caster, targetTileId, ability);
+    renderHub();
+
+    if (result?.activateTarget) {
+      if (caster.actionsLeft > 0) state.pendingReturnUnit = { tileId: casterTileId, card: caster };
+      const target = state.board[targetTileId];
+      if (target) {
+        state.activeUnit = { tileId: targetTileId, card: target };
+        document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
+        document.querySelector(`[data-id="${targetTileId}"]`)?.classList.add('unit-active');
+        state.selectedBoardTile = targetTileId;
+        syncBoardSelectionHighlight();
+        openProfile(target, 'board', targetTileId);
+        showActionBar(target);
+        updateActionBar();
+      }
+      return;
+    }
+
+    const activeTile = state.activeUnit?.tileId || casterTileId;
+    if (activeTile) {
+      const tile = document.querySelector(`[data-id="${activeTile}"]`);
+      if (tile && caster) renderUnit(tile, caster);
+    }
+    if (caster?.actionsLeft > 0) {
+      state.activeUnit = { tileId: activeTile, card: caster };
+      state.selectedBoardTile = activeTile;
+      syncBoardSelectionHighlight();
+      openProfile(caster, 'board', activeTile);
+      refreshActionButtons();
+    } else {
+      closeProfile();
+      clearHighlights();
+      endCurrentTurn();
+      waitThenAdvance();
     }
   }
 
-  function resolveCombat(atk, def, laneKey=null) {
+    function resolveCombat(atk, def, laneKey=null) {
     const fx = getLaneEffect(laneKey);
     const eff = fx ? EFFECT_REGISTRY[fx.effect] : null;
-    const hitThresh=parseInt(atk.weapon.hit);
-    const saveThresh=parseInt(def.save);
-    let modSave=saveThresh+atk.weapon.ap;
-    if(eff?.modifySave) modSave = eff.modifySave(fx, modSave);
-    const autoFail=modSave>6;
-    const attackCount = atk.weapon.attacks + (atk.bonusAttacks||0);
-    const atkDice=Array.from({length:attackCount},()=>Math.ceil(Math.random()*6));
-    const hits=atkDice.filter(d=>d>=hitThresh).length;
-    const saveDice=autoFail?[]:Array.from({length:hits},()=>Math.ceil(Math.random()*6));
-    const saved=autoFail?0:saveDice.filter(d=>d>=modSave).length;
-    let totalDmg=(hits-saved)*atk.weapon.damage;
-    if(eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
-    return {atkDice,hits,saveDice,saved,autoFail,modSave,totalDmg,hitThresh};
+    const hitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    const saveThresh = parseInt(def.save || '7', 10);
+    let modSave = saveThresh + (Number(atk.weapon?.ap) || 0);
+    if (eff?.modifySave) modSave = eff.modifySave(fx, modSave);
+    const autoFail = modSave > 6;
+    const attackCount = (Number(atk.weapon?.attacks) || 0) + (atk.bonusAttacks || 0);
+
+    const readDiceTrigger = (unit) => {
+      if (typeof window.revDiceTriggerFromUnit === 'function') {
+        const existing = window.revDiceTriggerFromUnit(unit);
+        if (existing) return existing;
+      }
+      const dt = unit?.diceTrigger || unit?.mechanic?.diceTrigger || null;
+      if (!dt) return null;
+      const trigger = dt.trigger || dt.rollTrigger || dt.type;
+      const effect = dt.effect || dt.diceEffect;
+      if (trigger !== 'on_attack_roll' && trigger !== 'onAttackRoll') return null;
+      if (effect !== 'exploding_hits' && effect !== 'chain_hits') return null;
+      return {
+        trigger:'on_attack_roll',
+        condition:'natural_gte',
+        threshold: Math.max(1, Math.min(6, Number(dt.threshold) || 6)),
+        effect,
+        value: Math.max(1, Number(dt.value) || 1)
+      };
+    };
+
+    const diceTrigger = readDiceTrigger(atk);
+    const atkDice = [];
+    let hits = 0;
+    let bonusHits = 0;
+    let chainRolls = 0;
+    const queue = Array.from({ length: Math.max(0, attackCount) }, () => 'base');
+    const MAX_ATTACK_DICE = 60;
+
+    while (queue.length && atkDice.length < MAX_ATTACK_DICE) {
+      queue.shift();
+      const d = Math.ceil(Math.random() * 6);
+      atkDice.push(d);
+      const isHit = d >= hitThresh;
+      if (isHit) hits += 1;
+
+      // Dice triggers use natural dice values, before any later modifiers.
+      // Exploding hits only apply from successful attack rolls.
+      if (diceTrigger && isHit && d >= diceTrigger.threshold) {
+        if (diceTrigger.effect === 'exploding_hits') {
+          hits += diceTrigger.value;
+          bonusHits += diceTrigger.value;
+        } else if (diceTrigger.effect === 'chain_hits') {
+          for (let i = 0; i < diceTrigger.value && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
+            queue.push('chain');
+            chainRolls += 1;
+          }
+        }
+      }
+    }
+
+    const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
+    const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
+    let totalDmg = (hits - saved) * (Number(atk.weapon?.damage) || 0);
+    if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
+    return { atkDice, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
   }
 
   function openBattleOverlay(targetTileId) {
@@ -5602,7 +6257,7 @@ const state = {
       const ap = atk.weapon?.ap ?? 0;
       if (attackProfile) attackProfile.classList.add('sequence-live');
       setRowButton('', null);
-      setupGhostRow(attackRow, atkDice.length);
+      setupGhostRow(attackRow, atkDice.length + (result.bonusHits || 0));
       setAttackSummary('');
       setPreAttackDefenceRow();
 
@@ -5613,7 +6268,15 @@ const state = {
           const isHit = d >= hitThresh;
           await fillPlaceholder(attackRow, slotIndex++, d, isHit ? 'die-hit die-hit-active' : 'die-miss');
         }
-        setAttackSummary(`${hits} hit${hits !== 1 ? 's' : ''}`, hits > 0 ? 'good' : 'bad');
+        for (let i = 0; i < (result.bonusHits || 0); i++) {
+          await fillPlaceholder(attackRow, slotIndex++, '+', 'die-hit die-hit-active');
+        }
+        const triggerNote = result.bonusHits > 0
+          ? ` · Exploding Hits +${result.bonusHits}`
+          : result.chainRolls > 0
+            ? ` · Chain Rolls +${result.chainRolls}`
+            : '';
+        setAttackSummary(`${hits} hit${hits !== 1 ? 's' : ''}${triggerNote}`, hits > 0 ? 'good' : 'bad');
         await wait(POST_ATTACK_PAUSE);
 
         if (hits <= 0) {
@@ -5764,9 +6427,14 @@ const state = {
       diamond.style.display = '';
       if (passBtn) passBtn.classList.add('show');
       if (badges) badges.style.display = 'none';
-      const p = state.players[state.activePlayer];
-      const canDraw = p.resources >= 1 && p.deck.length > 0 && !p.drawnThisRound && p.hand.length < MAX_HAND;
-      setHubBtn(canDraw ? 'state-ready' : 'state-dim', 'Draw', canDraw ? '(Hold)' : '', 1);
+      const drawAvailability = getDrawAvailability(state.activePlayer);
+      setHubBtn(
+        drawAvailability.can ? 'state-ready' : 'state-dim',
+        drawAvailability.label,
+        drawAvailability.can ? drawAvailability.sub : drawAvailability.sub,
+        drawAvailability.label === 'Hand Full' ? null : drawAvailability.cost
+      );
+      btn.dataset.drawReason = drawAvailability.reason || '';
       state._ctaAction = 'draw';
 
     } else if (state_name === 'pending') {
@@ -5791,9 +6459,13 @@ const state = {
   }
 
   function showActionBar(unit) {
-    // Show ability button only if unit has an ability
-    const ab = unit?.ability || unit?.special;
-    document.getElementById('act-btn-ability').style.display = ab ? 'flex' : 'none';
+    // Show ability button only for player-triggered activated abilities.
+    const ab = getUnitAbility(unit);
+    const btnAbility = document.getElementById('act-btn-ability');
+    if (btnAbility) btnAbility.style.display = ab ? 'flex' : 'none';
+    setActionButtonCost('act-cost-move', 1);
+    setActionButtonCost('act-cost-attack', 1);
+    setActionButtonCost('act-cost-ability', ab?.apCost || 1);
     setBarState('activated');
   }
 
@@ -5813,6 +6485,12 @@ const state = {
     const btnAttack  = document.getElementById('act-btn-attack');
     const btnAbility = document.getElementById('act-btn-ability');
     const btnEnd     = document.getElementById('act-btn-skip');
+    const ab = getUnitAbility(unit);
+
+    setActionButtonCost('act-cost-move', 1);
+    setActionButtonCost('act-cost-attack', 1);
+    setActionButtonCost('act-cost-ability', ab?.apCost || 1);
+    if (btnAbility) btnAbility.style.display = ab ? 'flex' : 'none';
 
     // Move
     if (immobile || actions === 0) btnMove.className = 'act-btn act-unavailable';
@@ -5824,9 +6502,8 @@ const state = {
     else if (current === 'attack')   btnAttack.className = 'act-btn act-selected';
     else                             btnAttack.className = 'act-btn act-available';
 
-    // Ability (only shown if unit has one)
-    if (btnAbility.style.display !== 'none') {
-      const ab = unit.ability || CARDS.find(c => c.id === unit.id)?.ability;
+    // Ability is shown only for activated/player-triggered abilities.
+    if (btnAbility && btnAbility.style.display !== 'none') {
       const canUse = ab && actions >= (ab.apCost || 1);
       if (!canUse)                    btnAbility.className = 'act-btn act-unavailable';
       else if (current === 'ability') btnAbility.className = 'act-btn act-selected';
@@ -5861,6 +6538,10 @@ const state = {
 
   // ── SELECT ACTION (Move / Attack) ──
   function selectAction(action) {
+    if (action === 'ability') {
+      selectAbility();
+      return;
+    }
     clearHighlights();
     state.activeAbility = null;
     // Reset ability button if shown
@@ -5935,6 +6616,7 @@ const state = {
     if(d2) d2.style.opacity = unit.actionsLeft >= 1 ? '1' : '0.3';
     refreshActionButtons();
     if(unit.actionsLeft <= 0) {
+      if (restorePendingReturnUnit()) return;
       closeProfile();
       clearHighlights();
       endCurrentTurn();
@@ -5980,8 +6662,10 @@ const state = {
   // ── PASS / TURN END ──
   function endUnit() {
     const unit=state.activeUnit?.card; if(!unit) return;
+    const endingTileId = state.activeUnit?.tileId;
     unit.actionsLeft=0;
     clearHighlights();
+    if (state.pendingReturnUnit && state.pendingReturnUnit.tileId !== endingTileId && restorePendingReturnUnit()) return;
     closeProfile();
     hideActionBar();
     endCurrentTurn();
@@ -5997,6 +6681,32 @@ const state = {
     document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
   }
 
+  function restorePendingReturnUnit() {
+    const ret = state.pendingReturnUnit;
+    if (!ret) return false;
+    state.pendingReturnUnit = null;
+    const retCard = state.board[ret.tileId] || ret.card;
+    if (!retCard || !(retCard.actionsLeft > 0)) return false;
+    state.activeUnit = { tileId: ret.tileId, card: retCard };
+    state.activeAction = null;
+    state.activeAbility = null;
+    clearHighlights();
+    document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
+    const retTile = document.querySelector(`[data-id="${ret.tileId}"]`);
+    if (retTile) {
+      retTile.classList.add('unit-active');
+      renderUnit(retTile, retCard);
+    }
+    state.selectedBoardTile = ret.tileId;
+    syncBoardSelectionHighlight();
+    renderHub();
+    openProfile(retCard, 'board', ret.tileId);
+    showActionBar(retCard);
+    updateActionBar();
+    setUILock(false);
+    return true;
+  }
+
   function setUILock(locked) {
     document.getElementById('ui-lock').style.display = locked ? 'block' : 'none';
   }
@@ -6004,20 +6714,8 @@ const state = {
   let _advancePending = false;
   function waitThenAdvance() {
     if(_advancePending) return;
-    // If a unit is pending return (e.g. commander after inspire), go back to them
-    if (state.pendingReturnUnit) {
-      const ret = state.pendingReturnUnit;
-      state.pendingReturnUnit = null;
-      state.activeUnit = ret;
-      document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
-      const retTile = document.querySelector(`[data-id="${ret.tileId}"]`);
-      if (retTile) retTile.classList.add('unit-active');
-      state.selectedBoardTile = ret.tileId;
-      syncBoardSelectionHighlight();
-      openProfile(ret.card, 'board', ret.tileId);
-      setUILock(false);
-      return;
-    }
+    // If a unit is pending return (e.g. commander after command_unit), go back to them
+    if (restorePendingReturnUnit()) return;
     _advancePending = true;
     setUILock(true);
     setTimeout(() => document.getElementById('turn-wait').classList.add('show'), TURN_WAIT_ICON_MS);
@@ -6887,19 +7585,321 @@ window.cards = merged;
 
 }
 
+function parseCSVLine(line){
+
+const out = [];
+let current = '';
+let quoted = false;
+
+for(let i=0;i<line.length;i++){
+const ch = line[i];
+const next = line[i+1];
+
+if(ch === '"' && quoted && next === '"'){
+current += '"';
+i++;
+continue;
+}
+
+if(ch === '"'){
+quoted = !quoted;
+continue;
+}
+
+if(ch === ',' && !quoted){
+out.push(current);
+current = '';
+continue;
+}
+
+current += ch;
+}
+
+out.push(current);
+return out;
+
+}
+
+function csvHeaderKey(value){
+return String(value || '')
+.trim()
+.toLowerCase()
+.replace(/[^a-z0-9]+/g,'');
+}
+
+function csvNumberOrString(value){
+const raw = String(value ?? '').trim();
+if(raw === '') return '';
+const num = Number(raw);
+return Number.isFinite(num) && /^-?\d+(\.\d+)?$/.test(raw) ? num : raw;
+}
+
+
+function csvMechanicKey(value){
+return String(value || '')
+.trim()
+.toLowerCase()
+.replace(/\+/g,'plus')
+.replace(/[^a-z0-9]+/g,'');
+}
+
+function normaliseCSVFaction(value){
+const raw = String(value || '').trim();
+if(!raw) return 'universal';
+const key = csvMechanicKey(raw);
+const map = {
+universal:'universal',neutral:'universal',none:'universal',
+orderofiron:'order_of_iron',iron:'order_of_iron',
+orderofflame:'order_of_flame',orderofflames:'order_of_flame',flame:'order_of_flame',flames:'order_of_flame',
+orderofshadows:'order_of_shadows',shadow:'order_of_shadows',shadows:'order_of_shadows',
+orderofveil:'order_of_veil',orderoftheveil:'order_of_veil',veil:'order_of_veil',
+orderoflight:'order_of_light',light:'order_of_light',
+orderofhunt:'order_of_hunt',orderofthehunt:'order_of_hunt',orderofbeasts:'order_of_hunt',hunt:'order_of_hunt',beasts:'order_of_hunt',
+orderofartifice:'order_of_artifice',artifice:'order_of_artifice'
+};
+return map[key] || raw;
+}
+
+function normaliseCSVCardType(value){
+const raw = String(value || '').trim();
+const key = csvMechanicKey(raw);
+const map = {power:'Power',spell:'Power',tactic:'Power',hero:'Hero',leader:'Hero',uncommon:'Uncommon',elite:'Uncommon',common:'Common',unit:'Common'};
+return map[key] || raw;
+}
+
+function normaliseCSVAbilityTrigger(value){
+const raw = String(value || '').trim();
+if(!raw) return '';
+const key = csvMechanicKey(raw);
+const map = {
+none:'',no:'',na:'',blank:'',
+action:'action',activated:'action',activatedaction:'action',activatedability:'action',onaction:'action',
+onplay:'on_play',play:'on_play',whenplayed:'on_play',
+ondeploy:'on_deploy',deploy:'on_deploy',whendeployed:'on_deploy',
+onattack:'on_attack',attack:'on_attack',
+onattackroll:'on_attack_roll',attackroll:'on_attack_roll',onroll:'on_attack_roll',dice:'on_attack_roll',diceroll:'on_attack_roll',onhithroll:'on_attack_roll',
+ondefend:'on_defend',defend:'on_defend',
+ondeath:'on_death',death:'on_death',onslain:'on_death',
+onturnstart:'on_turn_start',turnstart:'on_turn_start',
+onturnend:'on_turn_end',turnend:'on_turn_end',
+passive:'passive',aura:'passive'
+};
+return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw;
+}
+
+function normaliseCSVAbilityEffect(value){
+const raw = String(value || '').trim();
+if(!raw) return '';
+const key = csvMechanicKey(raw);
+const map = {
+none:'none',no:'none',na:'none',
+inspire:'command_unit',command:'command_unit',commandunit:'command_unit',order:'command_unit',giveaction:'command_unit',addaction:'add_action',rallyunit:'command_unit',
+explodinghits:'exploding_hits',explodinghit:'exploding_hits',explodehits:'exploding_hits',explodehit:'exploding_hits',exploding:'exploding_hits',
+chainhits:'chain_hits',chainhit:'chain_hits',chains:'chain_hits',chain:'chain_hits',
+jumplane:'jump_lane',jump:'jump_lane',
+damage:'damage',dealdamage:'damage',heal:'heal',healing:'heal',draw:'draw',drawcards:'draw',
+addresource:'add_resource',addresources:'add_resource',resource:'add_resource',resources:'add_resource'
+};
+return map[key] || raw;
+}
+
+function normaliseCSVTargetValue(value, fallback=''){
+const raw = String(value || '').trim();
+if(!raw) return fallback;
+return raw.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+}
+
+function csvAbilityLabel(effect){
+const labels = {command_unit:'Command Unit',add_action:'Add Action',jump_lane:'Jump Lane',damage:'Damage',heal:'Heal',draw:'Draw',add_resource:'Add Resource',exploding_hits:'Exploding Hits',chain_hits:'Chain Hits'};
+return labels[effect] || effect;
+}
+
+function normaliseCSVCard(raw){
+
+const lookup = {};
+Object.keys(raw || {}).forEach(key => {
+lookup[csvHeaderKey(key)] = raw[key];
+});
+
+const get = (...keys) => {
+for(const key of keys){
+const value = lookup[csvHeaderKey(key)];
+if(value !== undefined && String(value).trim() !== '') return String(value).trim();
+}
+return '';
+};
+
+const card = { ...raw };
+
+const name = get('name','cardName','card');
+const internalName = get('internalName','internal_name','internal','slug');
+const variant = get('variant');
+const artId = get('artId','art_id','art');
+const type = normaliseCSVCardType(get('type','rarity','unitType','unit_type'));
+const isPower = type === 'Power';
+const faction = normaliseCSVFaction(get('faction','order'));
+const cost = get('cost','resourceCost','resource_cost');
+const hp = get('hp','HP','health','maxHealth');
+const maxHp = get('maxHp','max_hp','maxHP','HP','hp','health','maxHealth');
+const move = get('move','Move','movement','mov','speed');
+const save = get('save','Save','armour','armor','defence','defense');
+const special = get('special','abilityText','ability_text','rules','text');
+
+if(name) card.name = name;
+if(internalName) card.internalName = internalName;
+else if(name && !card.internalName) card.internalName = name;
+if(variant) card.variant = variant;
+if(artId) card.artId = artId;
+if(type) card.type = type;
+if(faction) card.faction = faction;
+if(cost) card.cost = csvNumberOrString(cost);
+if(hp) card.hp = csvNumberOrString(hp);
+if(maxHp) card.maxHp = csvNumberOrString(maxHp);
+else if(hp) card.maxHp = csvNumberOrString(hp);
+if(move) card.move = csvNumberOrString(move);
+if(save) card.save = save;
+if(special) card.special = special;
+
+const weaponName = get('weaponName','weapon_name','weapon','weapon.name','attackName','attack_name');
+const range = get('range','weaponRange','weapon_range','weapon.range');
+const attacks = get('attacks','attackDice','attack_dice','weaponAttacks','weapon_attacks','weapon.attacks');
+const hit = get('hit','toHit','to_hit','hitRoll','hit_roll','weaponHit','weapon_hit','weapon.hit');
+const ap = get('ap','AP','armourPiercing','armorPiercing','lethality','weaponAp','weapon_ap','weapon.ap');
+const damage = get('damage','dmg','weaponDamage','weapon_damage','weapon.damage');
+
+if(weaponName || range || attacks || hit || ap || damage){
+card.weapon = {
+name: weaponName || 'Weapon',
+range: range ? csvNumberOrString(range) : 1,
+attacks: attacks ? csvNumberOrString(attacks) : 1,
+hit: hit || '4+',
+ap: ap ? csvNumberOrString(ap) : 0,
+damage: damage ? csvNumberOrString(damage) : 1
+};
+}
+
+const powerEffect = get('effect','power_effect');
+const powerValue = get('value','power_value');
+
+const trigger = normaliseCSVAbilityTrigger(get(
+'abilityTrigger','ability_trigger','trigger','mechanicTrigger','mechanic_trigger'
+));
+const abilityEffectRaw = get(
+'abilityEffect','ability_effect','unitEffect','unit_effect','mechanicEffect','mechanic_effect'
+) || (!isPower ? get('effect') : '');
+const effect = normaliseCSVAbilityEffect(abilityEffectRaw);
+const value = get(
+'abilityValue','ability_value','unitValue','unit_value','mechanicValue','mechanic_value'
+) || (!isPower ? get('value') : '');
+const abilityRoll = get(
+'abilityRoll','ability_roll','qualifyingRoll','qualifying_roll','rollThreshold','roll_threshold','threshold','diceThreshold','dice_threshold'
+);
+const abilityAmount = get(
+'abilityAmount','ability_amount','extraHits','extra_hits','extraChains','extra_chains','diceValue','dice_value','diceAmount','dice_amount','amount'
+);
+const abilityCost = get(
+'abilityCost','ability_cost','apCost','ap_cost','actionCost','action_cost'
+);
+
+if(isPower){
+if(powerEffect) card.effect = powerEffect;
+if(powerValue) card.value = csvNumberOrString(powerValue);
+card.trigger = 'on_play';
+} else {
+if(trigger) card.trigger = trigger;
+if(effect && effect !== 'none') {
+card.effect = effect;
+card.unitEffect = effect;
+}
+const resolvedValue = value || abilityAmount;
+if(resolvedValue) {
+card.value = csvNumberOrString(resolvedValue);
+card.unitValue = csvNumberOrString(resolvedValue);
+}
+if(abilityCost) {
+card.apCost = csvNumberOrString(abilityCost);
+card.abilityCost = csvNumberOrString(abilityCost);
+}
+if(abilityRoll) card.threshold = csvNumberOrString(abilityRoll);
+
+const targetSide = normaliseCSVTargetValue(get('ability_target_side','abilityTargetSide','target_side','targetSide'));
+const targetType = normaliseCSVTargetValue(get('ability_target_type','abilityTargetType','target_type','targetType'));
+const targetLocation = normaliseCSVTargetValue(get('ability_target_location','abilityTargetLocation','target_location','targetLocation'));
+const targetRange = get('ability_target_range','abilityTargetRange','target_range','targetRange');
+const targetCount = normaliseCSVTargetValue(get('ability_target_count','abilityTargetCount','target_count','targetCount'));
+const targetState = normaliseCSVTargetValue(get('ability_target_state','abilityTargetState','target_state','targetState'));
+const targetUnitType = normaliseCSVTargetValue(get('ability_target_unit_type','abilityTargetUnitType','target_unit_type','targetUnitType'));
+const targetFactionRaw = get('ability_target_faction','abilityTargetFaction','target_faction','targetFaction');
+const targetFaction = targetFactionRaw ? normaliseCSVFaction(targetFactionRaw) : '';
+
+const hasTarget = targetSide || targetType || targetLocation || targetRange || targetCount || targetState || targetUnitType || targetFaction;
+if(hasTarget){
+card.abilityTarget = {
+side: targetSide || 'friendly',
+type: targetType || 'unit',
+location: targetLocation || 'same_lane',
+range: targetRange ? csvNumberOrString(targetRange) : null,
+count: targetCount || 'single',
+state: targetState || 'any',
+unitType: targetUnitType || 'any',
+faction: targetFaction || 'any'
+};
+}
+
+if(trigger === 'on_attack_roll' && (effect === 'exploding_hits' || effect === 'chain_hits')) {
+const thresholdValue = csvNumberOrString(abilityRoll || 6);
+const amountValue = csvNumberOrString(value || abilityAmount || 1);
+card.threshold = thresholdValue;
+card.value = amountValue;
+card.unitValue = amountValue;
+card.diceTrigger = {
+trigger: 'on_attack_roll',
+condition: 'natural_gte',
+threshold: Math.max(1, Math.min(6, Number(thresholdValue) || 6)),
+effect,
+value: Math.max(1, Number(amountValue) || 1)
+};
+}
+
+if(trigger === 'action' && effect && effect !== 'none'){
+const resolvedValue = csvNumberOrString(value || abilityAmount || 1);
+card.ability = {
+key: effect,
+apCost: abilityCost ? csvNumberOrString(abilityCost) : 1,
+name: csvAbilityLabel(effect),
+value: resolvedValue,
+target: card.abilityTarget || null
+};
+}
+
+if(trigger || effect){
+card.mechanic = {
+trigger,
+effect,
+value: csvNumberOrString(value || abilityAmount || ''),
+target: card.abilityTarget || null,
+diceTrigger: card.diceTrigger || null
+};
+}
+}
+
+return card;
+
+}
+
 function parseCSV(text){
 
 const lines =
-text.split(/\r?\n/).filter(Boolean);
+text.split(/\r?\n/).filter(line => line.trim());
 
 if(lines.length < 2) return [];
 
 const headers =
-lines[0].split(',').map(h=>h.trim());
+parseCSVLine(lines[0]).map(h=>h.trim());
 
 return lines.slice(1).map(line => {
 
-const values = line.split(',');
+const values = parseCSVLine(line);
 
 const card = {};
 
@@ -6907,7 +7907,7 @@ headers.forEach((header,index) => {
 card[header] = (values[index] || '').trim();
 });
 
-return card;
+return normaliseCSVCard(card);
 
 });
 
@@ -7945,63 +8945,37 @@ window.__revMechanicRegistry = true;
 
 window.REV_MECHANIC_REGISTRY = {
   triggers: [
-    {
-      id:'onPlay',
-      description:'Executes when a power card is played.'
-    },
-    {
-      id:'onDeploy',
-      description:'Executes when a unit enters the battlefield.'
-    },
-    {
-      id:'onAttack',
-      description:'Executes when this unit attacks.'
-    },
-    {
-      id:'onDefend',
-      description:'Executes when this unit defends.'
-    },
-    {
-      id:'onDeath',
-      description:'Executes when this unit dies.'
-    },
-    {
-      id:'onTurnStart',
-      description:'Executes at the start of the turn.'
-    },
-    {
-      id:'onTurnEnd',
-      description:'Executes at the end of the turn.'
-    },
-    {
-      id:'passive',
-      description:'Always-active passive effect.'
-    },
-    {
-      id:'action',
-      description:'Player-triggered activated ability.'
-    }
+    { id:'on_play', description:'Executes when a card is played.' },
+    { id:'on_deploy', description:'Executes when a unit enters the battlefield.' },
+    { id:'on_attack', description:'Executes when this unit makes an attack action.' },
+    { id:'on_attack_roll', description:'Executes when this unit rolls attack dice.' },
+    { id:'on_defend', description:'Executes when this unit defends.' },
+    { id:'on_death', description:'Executes when this unit dies.' },
+    { id:'on_turn_start', description:'Executes at the start of the turn.' },
+    { id:'on_turn_end', description:'Executes at the end of the turn.' },
+    { id:'passive', description:'Always-active passive effect.' },
+    { id:'action', description:'Player-triggered activated ability.' }
   ],
 
   effects: [
-    {
-      id:'heal',
-      description:'Restore health to a target.'
-    },
-    {
-      id:'damage',
-      description:'Deal damage to a target.'
-    },
-    {
-      id:'draw',
-      description:'Draw cards.'
-    },
-    {
-      id:'addResource',
-      description:'Add resources to the player.'
-    },
+    { id:'command_unit', description:'Give a valid unit action(s) and immediately switch control to that unit.' },
+    { id:'add_action', description:'Add action(s) to a valid unit without immediately taking control.' },
+    { id:'heal', description:'Restore health to a target.' },
+    { id:'damage', description:'Deal damage to a target.' },
+    { id:'draw', description:'Draw cards.' },
+    { id:'add_resource', description:'Add resources to the player.' },
+    { id:'jump_lane', description:'Action ability. Move this unit to an empty tile in the same row of the opposite lane.' },
+    { id:'exploding_hits', description:'On matching attack dice, create extra hits without rolling extra dice.' },
+    { id:'chain_hits', description:'On matching attack dice, roll extra attack dice. Extra dice can continue the chain.' }
   ]
 };
+
+
+})();
+</script>
+
+<style>
+.revMechanicSection{};
 
 })();
 </script>
@@ -8298,6 +9272,7 @@ if (window.__revEditorHardeningV91) return;
 window.__revEditorHardeningV91 = true;
 
 let currentView = 'repo';
+let repoFilters = { all:true, official:false, draft:false, powers:false, units:false };
 let nativeSetItem = null;
 
 function getNativeSetItem(){
@@ -8339,24 +9314,40 @@ function slug(value){
 }
 
 function normaliseDraft(card){
+  const inferredKind = String(card.kind || card.cardKind || card.draftKind || '').trim()
+    || (String(card.type || '').trim() === 'Power' ? 'Power' : 'Unit');
+  const kind = inferredKind === 'Power' ? 'Power' : 'Unit';
+  const unitTypeRaw = String(card.unitType || card.rarity || '').trim();
+  const existingType = String(card.type || '').trim();
+  const unitType = kind === 'Power'
+    ? 'Power'
+    : (['Common','Uncommon','Hero'].includes(unitTypeRaw) ? unitTypeRaw
+      : ['Common','Uncommon','Hero'].includes(existingType) ? existingType
+      : 'Common');
+  const type = kind === 'Power' ? 'Power' : unitType;
   const base = slug(card.internalName || card.name || card.id || 'draft_card');
   const variant = slug(card.variant || '');
   const identity = variant ? `${base}_${variant}` : base;
-  const type = String(card.type || 'Unit').trim();
   const weapon = card.weapon && typeof card.weapon === 'object' ? { ...card.weapon } : card.weapon;
   return {
     ...card,
     id: identity || card.id || ('draft_' + Date.now()),
     artId: card.artId || identity || card.id,
     internalName: card.internalName || card.name || identity,
+    kind,
+    unitType: kind === 'Power' ? '' : unitType,
     type,
     faction: card.faction || 'universal',
     cost: Number.isFinite(Number(card.cost)) ? Number(card.cost) : (card.cost || 0),
-    hp: type === 'Power' ? null : (Number.isFinite(Number(card.hp)) ? Number(card.hp) : (card.hp || 1)),
-    maxHp: type === 'Power' ? null : (Number.isFinite(Number(card.maxHp ?? card.hp)) ? Number(card.maxHp ?? card.hp) : (card.maxHp ?? card.hp ?? 1)),
-    move: type === 'Power' ? null : (Number.isFinite(Number(card.move)) ? Number(card.move) : (card.move ?? 1)),
-    save: type === 'Power' ? null : (card.save || '6+'),
-    weapon,
+    hp: kind === 'Power' ? null : (Number.isFinite(Number(card.hp)) ? Number(card.hp) : (card.hp || 1)),
+    maxHp: kind === 'Power' ? null : (Number.isFinite(Number(card.maxHp ?? card.hp)) ? Number(card.maxHp ?? card.hp) : (card.maxHp ?? card.hp ?? 1)),
+    move: kind === 'Power' ? null : (Number.isFinite(Number(card.move)) ? Number(card.move) : (card.move ?? 1)),
+    save: kind === 'Power' ? null : (card.save || '6+'),
+    weapon: kind === 'Power'
+      ? (weapon && typeof weapon === 'object' ? weapon : null)
+      : (weapon && typeof weapon === 'object' ? weapon : { name:'Draft Weapon', range:1, attacks:1, hit:'4+', ap:0, damage:1 }),
+    trigger: card.trigger || (kind === 'Power' ? 'onPlay' : 'action'),
+    effect: card.effect || null,
     status: 'draft',
     source: 'draft'
   };
@@ -8454,11 +9445,8 @@ function renderStatus(parent){
 }
 
 function cardLimit(card){
-  const type = String(card?.type || '').trim();
-  if (type === 'Hero') return 1;
-  if (type === 'Uncommon') return 3;
-  if (type === 'Power') return 2;
-  return 16;
+  // Editor/deck-builder test mode: no deck-building constraints.
+  return Number.MAX_SAFE_INTEGER;
 }
 
 function cardClass(card, isDraft){
@@ -8472,35 +9460,375 @@ function cardClass(card, isDraft){
   return cls;
 }
 
-function field(label, key, value, full=false, textarea=false){
+function repoCardKind(card){
+  return String(card?.kind || '').trim() || (String(card?.type || '').trim() === 'Power' ? 'Power' : 'Unit');
+}
+
+function cardMatchesRepoFilters(card, isDraft){
+  if (repoFilters.all) return true;
+  const filters = Object.entries(repoFilters).filter(([key, on]) => key !== 'all' && on).map(([key]) => key);
+  if (!filters.length) return true;
+  return filters.every(key => {
+    if (key === 'official') return !isDraft;
+    if (key === 'draft') return !!isDraft;
+    if (key === 'powers') return repoCardKind(card) === 'Power' || String(card?.type || '').trim() === 'Power';
+    if (key === 'units') return repoCardKind(card) !== 'Power' && String(card?.type || '').trim() !== 'Power';
+    return true;
+  });
+}
+
+function setRepoFilter(key){
+  if (key === 'all') {
+    repoFilters = { all:true, official:false, draft:false, powers:false, units:false };
+  } else {
+    repoFilters.all = false;
+    repoFilters[key] = !repoFilters[key];
+    if (!Object.entries(repoFilters).some(([k,v]) => k !== 'all' && v)) repoFilters.all = true;
+  }
+  renderEditorView('repo');
+}
+
+function renderRepoFilters(parent){
+  const bar = document.createElement('div');
+  bar.className = 'revRepoFilterBar';
+  const filters = [
+    ['all','All'],
+    ['official','Official'],
+    ['draft','Draft'],
+    ['powers','Powers'],
+    ['units','Units']
+  ];
+  filters.forEach(([key,label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'revFilterBtn' + (repoFilters[key] ? ' active' : '');
+    btn.innerText = label;
+    btn.onclick = () => setRepoFilter(key);
+    bar.appendChild(btn);
+  });
+  parent.appendChild(bar);
+}
+
+function field(label, key, value, full=false, textarea=false, extraClass=''){
   const safeVal = escapeHtml(value ?? '');
-  return `<label class="${full ? 'full' : ''}">${label}${textarea
+  const numericKeys = new Set(['cost','hp','move','weaponAttacks','weaponAp','weaponDamage','unitValue']);
+  const softNumericKeys = new Set(['value']);
+  const numericAttrs = numericKeys.has(key)
+    ? ' type="number" inputmode="numeric" step="1" data-select-on-focus="1"'
+    : softNumericKeys.has(key)
+      ? ' type="text" inputmode="numeric" data-select-on-focus="1"'
+      : '';
+  return `<label class="${full ? 'full' : ''} ${extraClass}">${label}${textarea
     ? `<textarea data-field="${key}">${safeVal}</textarea>`
-    : `<input data-field="${key}" value="${safeVal}">`}</label>`;
+    : `<input data-field="${key}" value="${safeVal}"${numericAttrs}>`}</label>`;
+}
+
+function selectField(label, key, value, options, full=false, extraClass=''){
+  const val = String(value ?? '');
+  const opts = options.map(opt => {
+    const item = typeof opt === 'string' ? { value:opt, label:opt } : opt;
+    const selected = String(item.value) === val ? ' selected' : '';
+    return `<option value="${escapeHtml(item.value)}"${selected}>${escapeHtml(item.label)}</option>`;
+  }).join('');
+  return `<label class="${full ? 'full' : ''} ${extraClass}">${label}<select data-field="${key}">${opts}</select></label>`;
+}
+
+function draftCardKind(card){
+  return String(card?.kind || card?.cardKind || '').trim() || (String(card?.type || '').trim() === 'Power' ? 'Power' : 'Unit');
+}
+
+function draftUnitType(card){
+  const raw = String(card?.unitType || card?.rarity || '').trim();
+  const type = String(card?.type || '').trim();
+  if (['Common','Uncommon','Hero'].includes(raw)) return raw;
+  if (['Common','Uncommon','Hero'].includes(type)) return type;
+  return 'Common';
+}
+
+function powerEffectOptions(){
+  return [
+    {value:'add_resources', label:'Instant: Gain Resources'},
+    {value:'add_resources_random', label:'Instant: Gain Random Resources'},
+    {value:'direct_damage_enemy', label:'Target Enemy Unit: Deal Damage'},
+    {value:'damage_enemy_lane', label:'Target Lane: Damage Enemy Units'},
+    {value:'damage_lane', label:'Target Lane: Damage All Units'},
+    {value:'heal_friendly_unit', label:'Target Friendly Unit: Heal'},
+    {value:'rally_friendly_unit', label:'Target Friendly Unit: Gain Action'},
+    {value:'fortify_friendly_unit', label:'Target Friendly Unit: Fortify HP'},
+    {value:'redeploy_unit', label:'Target Friendly Unit: Redeploy'},
+    {value:'modify_lane_score', label:'Target Lane: Modify Score'},
+    {value:'place_structure', label:'Target Tile: Place Structure'}
+  ];
+}
+
+function triggerOptions(){
+  const registry = window.REV_MECHANIC_REGISTRY || { triggers:[] };
+  const base = ['on_play','on_deploy','on_attack','on_attack_roll','on_defend','on_death','on_turn_start','on_turn_end','passive','action'];
+  const ids = [...new Set([...(registry.triggers || []).map(t => t.id), ...base])];
+  return ids.map(id => ({ value:id, label:id }));
+}
+
+function simpleEffectOptions(){
+  const registry = window.REV_MECHANIC_REGISTRY || { effects:[] };
+  const base = ['none','command_unit','add_action','jump_lane','damage','heal','draw','add_resource'];
+  const ids = [...new Set([...base, ...(registry.effects || []).map(e => e.id)])];
+  return ids.map(id => ({ value:id, label:id }));
+}
+
+function factionOptions(){
+  return [
+    { value:'universal', label:'Universal' },
+    { value:'order_of_iron', label:'Order of Iron' },
+    { value:'order_of_flame', label:'Order of Flame' },
+    { value:'order_of_light', label:'Order of Light' },
+    { value:'order_of_veil', label:'Order of the Veil' },
+    { value:'order_of_shadows', label:'Order of Shadows' },
+    { value:'order_of_artifice', label:'Order of Artifice' },
+    { value:'order_of_hunt', label:'Order of the Hunt' }
+  ];
+}
+
+
+function abilityTriggerOptions(){
+  const pretty = {
+    '':'None',
+    action:'Activated / Action',
+    on_play:'On Play',
+    on_deploy:'On Deploy',
+    on_attack:'On Attack',
+    on_attack_roll:'On Attack Roll',
+    on_defend:'On Defend',
+    on_death:'On Death',
+    on_turn_start:'On Turn Start',
+    on_turn_end:'On Turn End',
+    passive:'Passive'
+  };
+  const registry = window.REV_MECHANIC_REGISTRY || { triggers:[] };
+  const base = ['', 'action','on_play','on_deploy','on_attack','on_attack_roll','on_defend','on_death','on_turn_start','on_turn_end','passive'];
+  const ids = [...new Set([...base, ...(registry.triggers || []).map(t => t.id)])];
+  return ids.map(id => ({ value:id, label:pretty[id] || id }));
+}
+
+function attackRollEffectOptions(){
+  return [
+    { value:'exploding_hits', label:'Exploding Hits' },
+    { value:'chain_hits', label:'Chain Hits' }
+  ];
+}
+
+function attackRollThresholdOptions(){
+  return [
+    { value:'2', label:'2+' },
+    { value:'3', label:'3+' },
+    { value:'4', label:'4+' },
+    { value:'5', label:'5+' },
+    { value:'6', label:'6+' }
+  ];
+}
+
+function normaliseAbilityTriggerValue(value){
+  const raw = String(value ?? '').trim();
+  if (!raw || raw === 'none') return '';
+  const key = raw.toLowerCase().replace(/[^a-z0-9]+/g,'');
+  const map = {onplay:'on_play',ondeploy:'on_deploy',onattack:'on_attack',onattackroll:'on_attack_roll',ondefend:'on_defend',ondeath:'on_death',onturnstart:'on_turn_start',onturnend:'on_turn_end'};
+  return map[key] || raw;
+}
+
+function draftAbilityState(card={}){
+  const dt = card.diceTrigger || card.mechanic?.diceTrigger || {};
+  const trigger = normaliseAbilityTriggerValue(card.trigger || card.mechanic?.trigger || dt.trigger || '');
+  const rawEffect = card.unitEffect || card.mechanic?.effect || card.effect || dt.effect || 'none';
+  const attackEffect = (rawEffect === 'chain_hits' || rawEffect === 'exploding_hits') ? rawEffect : (dt.effect || 'exploding_hits');
+  const value = card.unitValue ?? card.mechanic?.value ?? card.value ?? dt.value ?? '';
+  return {
+    trigger,
+    effect: trigger === 'on_attack_roll' ? attackEffect : rawEffect,
+    value,
+    threshold: String(dt.threshold ?? card.threshold ?? card.diceThreshold ?? 6)
+  };
+}
+
+function draftAbilityContextHtml(trigger, effect='none', value='', threshold='6'){
+  const cleanTrigger = normaliseAbilityTriggerValue(trigger);
+  if (!cleanTrigger) return '';
+
+  if (cleanTrigger === 'on_attack_roll') {
+    const cleanEffect = (effect === 'chain_hits' || effect === 'exploding_hits') ? effect : 'exploding_hits';
+    const valueLabel = cleanEffect === 'chain_hits' ? 'Extra Chains' : 'Extra Hits';
+    return `
+      ${selectField('Effect','unitEffect',cleanEffect,attackRollEffectOptions(),true,'revUnitField')}
+      ${selectField('Qualifying Roll','diceThreshold',String(threshold || 6),attackRollThresholdOptions(),true,'revUnitField')}
+      ${field(valueLabel,'unitValue',value === '' || value == null ? 1 : value,false,false,'revUnitField full')}
+    `;
+  }
+
+  return `
+    ${selectField('Effect','unitEffect',effect || 'none',simpleEffectOptions(),true,'revUnitField')}
+    ${field('Value','unitValue',value ?? '',false,false,'revUnitField full')}
+  `;
+}
+
+function updateDraftAbilityContext(editor){
+  if (!editor) return;
+  const triggerEl = editor.querySelector('label.revUnitField [data-field="trigger"]');
+  const contextEl = editor.querySelector('.revAbilityContextFields');
+  if (!triggerEl || !contextEl) return;
+  const trigger = normaliseAbilityTriggerValue(triggerEl.value);
+  const currentEffect = editor.querySelector('[data-field="unitEffect"]')?.value || 'none';
+  const currentValue = editor.querySelector('[data-field="unitValue"]')?.value || '';
+  const currentThreshold = editor.querySelector('[data-field="diceThreshold"]')?.value || '6';
+  contextEl.innerHTML = draftAbilityContextHtml(trigger, currentEffect, currentValue, currentThreshold);
+}
+
+function draftEditorHtml(card, id){
+  const kind = draftCardKind(card);
+  const unitType = draftUnitType(card);
+  const w = card.weapon && typeof card.weapon === 'object' ? card.weapon : {};
+  const abilityState = draftAbilityState(card);
+  return `
+    <div class="revDraftEditor" data-card-kind="${escapeHtml(kind)}">
+      <div class="revDraftKindRow">
+        ${selectField('Card Kind','kind',kind,['Unit','Power'],false,'revKindField')}
+        ${selectField('Unit Type','unitType',unitType,['Common','Uncommon','Hero'],false,'revUnitField')}
+      </div>
+      <div class="revFieldGrid">
+        ${field('Name','name',card.name)}
+        ${field('Internal Name','internalName',card.internalName || card.name)}
+        ${field('Variant','variant',card.variant || '')}
+        ${selectField('Faction','faction',card.faction || 'universal',factionOptions())}
+        ${field('Cost','cost',card.cost ?? 1)}
+
+        ${field('HP','hp',card.hp ?? '',false,false,'revUnitField')}
+        ${field('Move','move',card.move ?? '',false,false,'revUnitField')}
+        ${field('Save','save',card.save ?? '',false,false,'revUnitField')}
+        ${field('Weapon Name','weaponName',w.name ?? '',false,false,'revUnitField')}
+        ${field('Range','weaponRange',w.range ?? '',false,false,'revUnitField')}
+        ${field('Attacks','weaponAttacks',w.attacks ?? '',false,false,'revUnitField')}
+        ${field('Hit','weaponHit',w.hit ?? '',false,false,'revUnitField')}
+        ${field('AP','weaponAp',w.ap ?? 0,false,false,'revWeaponField')}
+        ${field('Damage','weaponDamage',w.damage ?? '',false,false,'revWeaponField')}
+
+        <div class="full revUnitField revAbilityBuilderTitle" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.12);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.9;">Ability Builder</div>
+        ${selectField('Ability Trigger','trigger',abilityState.trigger,abilityTriggerOptions(),true,'revUnitField revAbilityTriggerField')}
+        <div class="full revUnitField revAbilityContextFields">
+          ${draftAbilityContextHtml(abilityState.trigger, abilityState.effect, abilityState.value, abilityState.threshold)}
+        </div>
+
+        ${selectField('Power Trigger','trigger',card.trigger || 'on_play',triggerOptions(),false,'revPowerField')}
+        ${selectField('Power Effect','effect',card.effect || 'direct_damage_enemy',powerEffectOptions(),true,'revPowerField')}
+        ${field('Value','value',Array.isArray(card.value) ? card.value.join('-') : (card.value ?? ''),false,false,'revPowerField')}
+        ${field('Special / Rules Text','special',card.special ?? '',true,true)}
+        ${field('Flavour Text','flavour',card.flavour ?? '',true,true)}
+      </div>
+      <div class="revDraftHint">
+        Unit abilities now use one builder: choose when the ability happens, then only the relevant effect fields appear.
+      </div>
+      <div class="revTileActions">
+        <button class="revSafeBtn revSaveDraftBtn" data-cardid="${escapeHtml(id)}">Save Card</button>
+        <button class="revSafeBtn revDeleteDraftBtn" data-cardid="${escapeHtml(id)}" style="background:#3a1010;border-color:#a33;">Delete Draft</button>
+      </div>
+    </div>`;
+}
+
+function parseDraftValue(raw){
+  const text = String(raw ?? '').trim();
+  if (!text) return null;
+  if (/^-?\d+(\.\d+)?\s*-\s*-?\d+(\.\d+)?$/.test(text)) return text.split('-').map(n => Number(n.trim()));
+  if (/^-?\d+(\.\d+)?$/.test(text)) return Number(text);
+  return text;
 }
 
 function collectDraftFields(tile, original){
   const get = key => tile.querySelector(`[data-field="${key}"]`)?.value ?? '';
-  const type = get('type') || original.type || 'Unit';
+  const kind = get('kind') === 'Power' ? 'Power' : 'Unit';
+  const unitType = get('unitType') || draftUnitType(original);
+  const trigger = normaliseAbilityTriggerValue(get('trigger')) || (kind === 'Power' ? 'on_play' : '');
+  const unitEffect = get('unitEffect') || 'none';
+  const unitValue = parseDraftValue(get('unitValue'));
+  const weapon = kind === 'Power'
+    ? {
+        name: get('weaponName') || original.weapon?.name || get('effect') || 'Power',
+        range: null,
+        attacks: null,
+        hit: null,
+        ap: Number.isFinite(Number(get('weaponAp'))) ? Number(get('weaponAp')) : 0,
+        damage: Number.isFinite(Number(get('weaponDamage'))) ? Number(get('weaponDamage')) : null
+      }
+    : {
+        name: get('weaponName') || 'Draft Weapon',
+        range: get('weaponRange') || 1,
+        attacks: Number.isFinite(Number(get('weaponAttacks'))) ? Number(get('weaponAttacks')) : 1,
+        hit: get('weaponHit') || '4+',
+        ap: Number.isFinite(Number(get('weaponAp'))) ? Number(get('weaponAp')) : 0,
+        damage: Number.isFinite(Number(get('weaponDamage'))) ? Number(get('weaponDamage')) : 1
+      };
+  const diceTrigger = (kind !== 'Power' && trigger === 'on_attack_roll' && (unitEffect === 'exploding_hits' || unitEffect === 'chain_hits'))
+    ? {
+        trigger:'on_attack_roll',
+        condition:'natural_gte',
+        threshold: Math.max(1, Math.min(6, Number(get('diceThreshold')) || 6)),
+        effect: unitEffect,
+        value: Math.max(1, Number(get('unitValue')) || 1)
+      }
+    : null;
+  const mechanic = kind === 'Power' || !trigger ? null : {
+    trigger,
+    effect:unitEffect,
+    value:unitValue,
+    diceTrigger
+  };
   const card = {
     ...original,
     name: get('name') || original.name,
     internalName: get('internalName') || get('name') || original.internalName,
     variant: get('variant') || '',
-    type,
+    kind,
+    unitType: kind === 'Power' ? '' : unitType,
+    type: kind === 'Power' ? 'Power' : unitType,
     faction: get('faction') || 'universal',
     cost: get('cost'),
-    hp: get('hp'),
-    move: get('move'),
-    save: get('save'),
+    hp: kind === 'Power' ? null : get('hp'),
+    move: kind === 'Power' ? null : get('move'),
+    save: kind === 'Power' ? null : get('save'),
     special: get('special'),
-    effect: get('effect') || original.effect || null,
-    value: get('value') || original.value || null,
-    weapon: original.weapon || (type === 'Power' ? null : { name:'', range:1, attacks:1, hit:'4+', ap:0, damage:1 }),
+    flavour: get('flavour'),
+    trigger,
+    effect: kind === 'Power' ? (get('effect') || original.effect || null) : (unitEffect === 'none' ? null : unitEffect),
+    value: kind === 'Power' ? parseDraftValue(get('value')) : unitValue,
+    unitEffect: kind === 'Power' ? null : unitEffect,
+    unitValue: kind === 'Power' ? null : unitValue,
+    mechanic,
+    diceTrigger,
+    weapon,
     source: 'draft',
     status: 'draft'
   };
   return normaliseDraft(card);
+}
+
+
+function editorFactionIcon(card){
+  const faction = String(card?.faction || 'universal').trim();
+  const map = {
+    order_of_iron:'⚙', orderofiron:'⚙', iron:'⚙',
+    order_of_flames:'♨', order_of_flame:'♨', orderofflame:'♨', orderofflames:'♨', flame:'♨', flames:'♨',
+    order_of_light:'☼', orderoflight:'☼', light:'☼',
+    order_of_the_veil:'☽', order_of_veil:'☽', orderoftheveil:'☽', veil:'☽',
+    order_of_shadows:'†', orderofshadows:'†', shadows:'†', shadow:'†',
+    order_of_artifice:'◆', orderofartifice:'◆', artifice:'◆',
+    order_of_beasts:'♈', order_of_hunt:'♈', orderofthehunt:'♈', beasts:'♈', hunt:'♈',
+    universal:'✦', none:'✦', neutral:'✦'
+  };
+  return map[faction] || '✦';
+}
+
+function editorTileKindLabel(card){
+  const kind = repoCardKind(card);
+  if (kind === 'Power' || String(card?.type || '').trim() === 'Power') return 'Power';
+  return String(card?.type || card?.unitType || 'Unit').trim() || 'Unit';
+}
+
+function editorCostRune(card){
+  return `<div class="revTileCostRune"><span>${escapeHtml(card?.cost ?? '-')}</span></div>`;
 }
 
 function makeTile(card, mode, player, isDraft){
@@ -8509,13 +9837,24 @@ function makeTile(card, mode, player, isDraft){
   tile.className = cardClass(card, isDraft);
   tile.dataset.cardid = id;
   tile.dataset.draft = isDraft ? '1' : '0';
+  tile.dataset.mode = mode;
+  if (mode === 'deck') tile.classList.add('revDeckTile');
+  const name = escapeHtml(card.name || id);
+  const icon = escapeHtml(editorFactionIcon(card));
+  const kindLabel = escapeHtml(editorTileKindLabel(card));
+  const deck = mode === 'deck' ? getDeck(player) : null;
+  const qtyVal = deck ? (Number(deck[id]) || 0) : 0;
 
   tile.innerHTML = `
-    <div class="revTileName">${escapeHtml(card.name || id)}</div>
-    <div class="revTileMeta">${escapeHtml(card.type || '-')}</div>
-    <div>Cost: ${escapeHtml(card.cost ?? '-')} | HP: ${escapeHtml(card.hp ?? '-')}</div>
-    <div class="revTileSource">${isDraft ? 'Draft' : 'Official'}</div>
-  `;
+    <div class="revTileIcon" title="${escapeHtml(card.faction || 'universal')}">${icon}</div>
+    <div class="revTileName">${name}</div>
+    <div class="revTileKind">${kindLabel}</div>
+    ${mode === 'deck' ? `<div class="revTileQtyBadge">${qtyVal}</div>` : ''}
+    <div class="revTileBottom">
+      ${mode === 'deck' ? `<button class="revDeckAdjust revDeckMinus" data-dir="minus" aria-label="Remove card">−</button>` : ''}
+      ${editorCostRune(card)}
+      ${mode === 'deck' ? `<button class="revDeckAdjust revDeckPlus" data-dir="plus" aria-label="Add card">+</button>` : ''}
+    </div>`;
 
   if (isDraft) {
     const badge = document.createElement('div');
@@ -8525,84 +9864,58 @@ function makeTile(card, mode, player, isDraft){
   }
 
   if (mode === 'deck') {
-    const deck = getDeck(player);
-    const controls = document.createElement('div');
-    controls.className = 'revTileControls';
+    const controls = tile.querySelector('.revTileBottom');
+    const qtyBadge = tile.querySelector('.revTileQtyBadge');
+    const updateQty = value => { if (qtyBadge) qtyBadge.innerText = value || 0; };
 
-    const minus = document.createElement('button');
-    minus.className = 'revSafeBtn';
-    minus.innerText = '-';
-
-    const qty = document.createElement('div');
-    qty.className = 'revTileQty';
-    qty.innerText = deck[id] || 0;
-
-    const plus = document.createElement('button');
-    plus.className = 'revSafeBtn';
-    plus.innerText = '+';
-
-    minus.onclick = function(e){
+    tile.querySelector('.revDeckMinus')?.addEventListener('click', function(e){
       e.stopPropagation();
       const latest = getDeck(player);
       latest[id] = Math.max(0, (Number(latest[id]) || 0) - 1);
       if (latest[id] <= 0) delete latest[id];
       saveDeck(player, latest);
-      qty.innerText = latest[id] || 0;
+      updateQty(latest[id] || 0);
       renderEditorView(mode === 'deck' && player === 2 ? 'p2' : 'p1');
-    };
+    });
 
-    plus.onclick = function(e){
+    tile.querySelector('.revDeckPlus')?.addEventListener('click', function(e){
       e.stopPropagation();
       const latest = getDeck(player);
-      const limit = cardLimit(card);
-      latest[id] = Math.min(limit, (Number(latest[id]) || 0) + 1);
+      latest[id] = (Number(latest[id]) || 0) + 1;
       saveDeck(player, latest);
-      qty.innerText = latest[id] || 0;
+      updateQty(latest[id] || 0);
       renderEditorView(mode === 'deck' && player === 2 ? 'p2' : 'p1');
+    });
+  }
+
+  if (mode === 'repo') {
+    const expand = document.createElement('div');
+    expand.className = 'revTileExpand';
+
+    if (isDraft) {
+      expand.innerHTML = draftEditorHtml(card, id);
+    } else {
+      expand.innerHTML = `
+        <div class="revReadOnlyNote">Imported/default cards are read-only here for now. Create a New Draft card for fast mechanics testing.</div>
+      `;
+    }
+
+    tile.appendChild(expand);
+
+    tile.onclick = function(e){
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('select')) return;
+      const opening = expand.style.display !== 'block';
+      document.querySelectorAll('.revEditorPanel.revRepoGrid .revTile.revExpanded').forEach(other => {
+        if (other !== tile) {
+          other.classList.remove('revExpanded');
+          const otherExpand = other.querySelector('.revTileExpand');
+          if (otherExpand) otherExpand.style.display = 'none';
+        }
+      });
+      expand.style.display = opening ? 'block' : 'none';
+      tile.classList.toggle('revExpanded', opening);
     };
-
-    controls.appendChild(minus);
-    controls.appendChild(qty);
-    controls.appendChild(plus);
-    tile.appendChild(controls);
   }
-
-  const expand = document.createElement('div');
-  expand.className = 'revTileExpand';
-
-  if (isDraft && card.source === 'draft') {
-    expand.innerHTML = `
-      <div class="revFieldGrid">
-        ${field('Name','name',card.name)}
-        ${field('Internal Name','internalName',card.internalName || card.name)}
-        ${field('Variant','variant',card.variant || '')}
-        ${field('Type','type',card.type || 'Unit')}
-        ${field('Faction','faction',card.faction || 'universal')}
-        ${field('Cost','cost',card.cost ?? 1)}
-        ${field('HP','hp',card.hp ?? '')}
-        ${field('Move','move',card.move ?? '')}
-        ${field('Save','save',card.save ?? '')}
-        ${field('Effect','effect',card.effect ?? '')}
-        ${field('Value','value',Array.isArray(card.value) ? card.value.join('-') : (card.value ?? ''))}
-        ${field('Special / Rules Text','special',card.special ?? '',true,true)}
-      </div>
-      <div class="revTileActions">
-        <button class="revSafeBtn revSaveDraftBtn" data-cardid="${escapeHtml(id)}">Save Card</button>
-        <button class="revSafeBtn revDeleteDraftBtn" data-cardid="${escapeHtml(id)}" style="background:#3a1010;border-color:#a33;">Delete Draft</button>
-      </div>
-    `;
-  } else {
-    expand.innerHTML = `
-      <div class="revReadOnlyNote">Imported/default cards are read-only here for now. Create a New Draft card for fast mechanics testing.</div>
-    `;
-  }
-
-  tile.appendChild(expand);
-
-  tile.onclick = function(e){
-    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea')) return;
-    expand.style.display = expand.style.display === 'block' ? 'none' : 'block';
-  };
 
   return tile;
 }
@@ -8640,6 +9953,68 @@ function renderMechanics(panel){
   panel.appendChild(effectSection);
 }
 
+
+const REV_RANDOM_DECK_SIZE = 30;
+
+function makeRandomDeck(repo=mergedRepo(), targetCount=REV_RANDOM_DECK_SIZE){
+  const candidates = (repo || []).filter(card => card && card.id);
+  const deck = {};
+  if (!candidates.length) return deck;
+  const target = Math.max(1, Number(targetCount) || REV_RANDOM_DECK_SIZE);
+  for (let i = 0; i < target; i++) {
+    const card = candidates[Math.floor(Math.random() * candidates.length)];
+    if (!card || !card.id) continue;
+    deck[card.id] = (Number(deck[card.id]) || 0) + 1;
+  }
+  return deck;
+}
+
+function renderDeckActionBar(parent, player, repo){
+  const deck = getDeck(player);
+  const countLabel = deckCountLabel(deck, repo);
+  const count = countDeckCards(deck, repo);
+  const playerLabel = player === 2 ? 'P2 Deck' : 'P1 Deck';
+  const bar = document.createElement('div');
+  bar.className = 'revDeckActionBar';
+  bar.innerHTML = `
+    <div class="revDeckActionInfo">
+      <span class="revDeckActionTitle">${playerLabel}</span>
+      <span class="revDeckActionCount">${escapeHtml(countLabel)} cards</span>
+    </div>
+    <div class="revDeckActionButtons">
+      <button class="revSafeBtn revDeckClearBtn" type="button">Clear</button>
+      <button class="revSafeBtn revDeckRandomBtn" type="button">Random Fill</button>
+    </div>`;
+  parent.appendChild(bar);
+
+  const clearBtn = bar.querySelector('.revDeckClearBtn');
+  const randomBtn = bar.querySelector('.revDeckRandomBtn');
+
+  if (clearBtn) {
+    clearBtn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (count > 0 && !confirm(`Clear ${playerLabel}?`)) return;
+      saveDeck(player, {});
+      renderEditorView(player === 2 ? 'p2' : 'p1');
+    };
+  }
+
+  if (randomBtn) {
+    randomBtn.onclick = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (!(repo || []).some(card => card && card.id)) {
+        alert('No cards available to random fill this deck.');
+        return;
+      }
+      if (count > 0 && !confirm(`Replace ${playerLabel} with ${REV_RANDOM_DECK_SIZE} random cards?`)) return;
+      saveDeck(player, makeRandomDeck(repo, REV_RANDOM_DECK_SIZE));
+      renderEditorView(player === 2 ? 'p2' : 'p1');
+    };
+  }
+}
+
 function renderEditorView(view){
   currentView = view || currentView || 'repo';
   const repo = syncRuntimeRepo();
@@ -8648,17 +10023,22 @@ function renderEditorView(view){
   if (!body) return;
   body.innerHTML = '';
 
-  renderStatus(body);
-
   const tabs = document.createElement('div');
   tabs.className = 'revEditorTabs';
-  const repoBtn = document.createElement('button'); repoBtn.className = 'revSafeBtn'; repoBtn.innerText = 'Repo';
-  const p1Btn = document.createElement('button'); p1Btn.className = 'revSafeBtn'; p1Btn.innerText = 'P1 Deck';
-  const p2Btn = document.createElement('button'); p2Btn.className = 'revSafeBtn'; p2Btn.innerText = 'P2 Deck';
-  const mechBtn = document.createElement('button'); mechBtn.className = 'revSafeBtn'; mechBtn.innerText = 'Mechanics';
-  const cleanBtn = document.createElement('button'); cleanBtn.className = 'revSafeBtn'; cleanBtn.innerText = 'Clean Decks';
+  const tabClass = viewName => 'revSafeBtn revTabBtn' + (currentView === viewName ? ' active' : '');
+  const repoBtn = document.createElement('button'); repoBtn.className = tabClass('repo'); repoBtn.innerText = 'Repo';
+  const p1Btn = document.createElement('button'); p1Btn.className = tabClass('p1'); p1Btn.innerText = 'P1 Deck';
+  const p2Btn = document.createElement('button'); p2Btn.className = tabClass('p2'); p2Btn.innerText = 'P2 Deck';
+  const mechBtn = document.createElement('button'); mechBtn.className = tabClass('mechanics'); mechBtn.innerText = 'Rules';
+  const cleanBtn = document.createElement('button'); cleanBtn.className = 'revSafeBtn revUtilityBtn'; cleanBtn.innerText = 'Clean';
   tabs.appendChild(repoBtn); tabs.appendChild(p1Btn); tabs.appendChild(p2Btn); tabs.appendChild(mechBtn); tabs.appendChild(cleanBtn);
   body.appendChild(tabs);
+
+  if (currentView === 'p1' || currentView === 'p2') {
+    renderDeckActionBar(body, currentView === 'p2' ? 2 : 1, repo);
+  } else {
+    renderStatus(body);
+  }
 
   const title = document.createElement('h2');
   title.className = 'revEditorSubhead';
@@ -8668,14 +10048,16 @@ function renderEditorView(view){
   const hint = document.createElement('div');
   hint.className = 'revEditorHint';
   hint.innerText = currentView === 'repo'
-    ? 'Tap a draft card to edit. Imported/default cards are read-only for now.'
+    ? 'Tap a card to expand it. Draft cards can be edited; official cards are read-only.'
     : currentView === 'mechanics'
       ? 'Reference list for wiring future card abilities.'
-      : 'Use + / - to build decks. Counts are saved immediately.';
+      : 'Use + / - to tune decks. The pinned bar shows count, clear, and random fill.';
   body.appendChild(hint);
 
+  if (currentView === 'repo') renderRepoFilters(body);
+
   const panel = document.createElement('div');
-  panel.className = 'revEditorPanel revTileGrid';
+  panel.className = currentView === 'repo' ? 'revEditorPanel revTileGrid revRepoGrid' : 'revEditorPanel revTileGrid';
   body.appendChild(panel);
 
   repoBtn.onclick = () => renderEditorView('repo');
@@ -8691,7 +10073,15 @@ function renderEditorView(view){
 
   const official = officialRepo().map(card => ({ card, isDraft:false }));
   const drafts = draftRepo().map(card => ({ card, isDraft:true }));
-  [...official, ...drafts].forEach(({card,isDraft}) => {
+  const cardsToRender = [...official, ...drafts].filter(({card,isDraft}) => currentView !== 'repo' || cardMatchesRepoFilters(card, isDraft));
+  if (!cardsToRender.length) {
+    const empty = document.createElement('div');
+    empty.className = 'revNoCardsNote';
+    empty.innerText = 'No cards match these filters.';
+    panel.appendChild(empty);
+    return;
+  }
+  cardsToRender.forEach(({card,isDraft}) => {
     panel.appendChild(makeTile(card, currentView === 'repo' ? 'repo' : 'deck', currentView === 'p2' ? 2 : 1, isDraft));
   });
 }
@@ -8704,7 +10094,9 @@ function createDraftCard(){
     name:'New Draft Card',
     internalName:'new_draft_card_' + timestamp,
     variant:'',
-    type:'Unit',
+    kind:'Unit',
+    unitType:'Common',
+    type:'Common',
     faction:'universal',
     cost:1,
     hp:1,
@@ -8800,14 +10192,62 @@ function install(){
   if (refresh) refresh.onclick = () => renderEditorView(currentView || 'repo');
   const close = document.getElementById('revSafeClose');
   if (close) close.onclick = () => { const editor = document.getElementById('revSafeEditor'); if (editor) editor.style.display = 'none'; };
+  installEditorUsabilityGuards();
+}
+
+function installEditorUsabilityGuards(){
+  if (window.__revEditorUsabilityGuards) return;
+  window.__revEditorUsabilityGuards = true;
+  document.addEventListener('focusin', function(e){
+    const el = e.target;
+    if (el && el.matches && el.matches('#revSafeEditor input[data-select-on-focus="1"]')) {
+      setTimeout(() => { try { el.select(); } catch(err){} }, 0);
+    }
+  });
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e){
+    const editor = document.getElementById('revSafeEditor');
+    if (!editor || editor.style.display === 'none' || !editor.contains(e.target)) return;
+    const now = Date.now();
+    if (now - lastTap < 320) e.preventDefault();
+    lastTap = now;
+  }, { passive:false });
 }
 
 window.revRenderEditorView = renderEditorView;
 window.revSyncRuntimeRepo = syncRuntimeRepo;
+window.revOpenEditor = openEditor;
+window.revInstallEditor = install;
+window.revCreateDraftCard = createDraftCard;
 
-window.addEventListener('load', function(){
-  setTimeout(install, 1500);
-});
+function forceInstallEditor(){
+  install();
+}
+
+function scheduleEditorInstall(){
+  forceInstallEditor();
+  setTimeout(forceInstallEditor, 300);
+  setTimeout(forceInstallEditor, 900);
+  setTimeout(forceInstallEditor, 1700);
+  setTimeout(forceInstallEditor, 2600);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', scheduleEditorInstall);
+} else {
+  scheduleEditorInstall();
+}
+window.addEventListener('load', scheduleEditorInstall);
+
+
+// Dynamic draft-card form: switching Unit/Power immediately hides irrelevant fields.
+document.addEventListener('change', function(e){
+  const kindSelect = e.target.closest('[data-field="kind"]');
+  if (!kindSelect) return;
+  const editor = kindSelect.closest('.revDraftEditor');
+  if (!editor) return;
+  editor.dataset.cardKind = kindSelect.value === 'Power' ? 'Power' : 'Unit';
+}, true);
 
 // Delegated handlers override older delete/save behaviour and refresh in-place.
 document.addEventListener('click', function(e){
@@ -8829,6 +10269,1358 @@ document.addEventListener('click', function(e){
 
 })();
 </script>
+
+<style>
+.revDraftEditor[data-card-kind="Unit"] .revPowerField { display:none !important; }
+.revDraftEditor[data-card-kind="Power"] .revUnitField { display:none !important; }
+.revDraftKindRow { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+.revFieldGrid select { width:100%; min-height:34px; background:#0a0806; border:1px solid #3a2a10; color:#d8bf7a; border-radius:4px; padding:5px 7px; font-family:'Spectral', Georgia, serif; }
+.revDraftHint { margin-top:8px; padding:8px 10px; border:1px solid #2a1e0a; background:rgba(0,0,0,0.22); color:#7a6848; font-size:11px; line-height:1.35; border-radius:5px; }
+.revTilePower .revTileMeta::after { content:' • POWER'; color:#d6a8ff; }
+
+/* Repo grid filters v95 */
+.revRepoFilterBar {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin:0 0 12px;
+  padding:8px;
+  border:1px solid rgba(216,196,154,0.16);
+  border-radius:10px;
+  background:rgba(0,0,0,0.18);
+}
+.revFilterBtn {
+  min-height:30px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid #3a2a10;
+  background:#100c08;
+  color:#806a48;
+  font-family:'Spectral', Georgia, serif;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:0.10em;
+  text-transform:uppercase;
+}
+.revFilterBtn.active {
+  border-color:#c8a060;
+  background:linear-gradient(160deg,#2a2010,#140e08);
+  color:#f0d080;
+  box-shadow:0 0 10px rgba(200,160,80,0.18);
+}
+.revEditorPanel.revRepoGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(82px,1fr));
+  gap:8px;
+  align-items:start;
+}
+.revEditorPanel.revRepoGrid .revTile {
+  min-height:0;
+  aspect-ratio:1/1;
+  padding:8px;
+  border-radius:9px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+}
+.revEditorPanel.revRepoGrid .revTileName {
+  font-size:11px;
+  line-height:1.05;
+  margin:0;
+  max-height:34px;
+  overflow:hidden;
+  text-align:center;
+}
+.revEditorPanel.revRepoGrid .revTileMeta {
+  font-size:9px;
+  line-height:1.05;
+  margin:2px 0 0;
+  text-align:center;
+  opacity:0.75;
+}
+.revEditorPanel.revRepoGrid .revTileSource {
+  align-self:center;
+  margin-top:3px;
+  padding:1px 4px;
+  font-size:8px;
+}
+.revEditorPanel.revRepoGrid .revTileActions,
+.revEditorPanel.revRepoGrid .revTileControls {
+  display:none;
+}
+.revEditorPanel.revRepoGrid .revTile.revExpanded {
+  grid-column:1 / -1;
+  aspect-ratio:auto;
+  min-height:0;
+  overflow:visible;
+  padding:12px;
+  display:block;
+}
+.revEditorPanel.revRepoGrid .revTile.revExpanded .revTileName {
+  font-size:16px;
+  line-height:1.15;
+  max-height:none;
+  text-align:left;
+  margin-bottom:4px;
+}
+.revEditorPanel.revRepoGrid .revTile.revExpanded .revTileMeta {
+  font-size:12px;
+  text-align:left;
+  margin-bottom:6px;
+}
+.revEditorPanel.revRepoGrid .revTile.revExpanded .revTileSource { align-self:flex-start; font-size:10px; }
+.revEditorPanel.revRepoGrid .revTile.revExpanded .revTileActions,
+.revEditorPanel.revRepoGrid .revTile.revExpanded .revTileControls {
+  display:flex;
+}
+.revNoCardsNote {
+  grid-column:1 / -1;
+  padding:18px;
+  border:1px dashed #3a2a10;
+  border-radius:10px;
+  color:#7a6848;
+  text-align:center;
+  font-size:13px;
+}
+</style>
+
+
+
+<script>
+(function(){
+  if (window.__revEditorFinalRebindV94) return;
+  window.__revEditorFinalRebindV94 = true;
+  function rebind(){
+    try { window.revInstallEditor?.(); } catch(err) { console.warn('[Revenant] editor final rebind failed', err); }
+  }
+  [500, 1300, 2100, 3200].forEach(ms => setTimeout(rebind, ms));
+  window.addEventListener('load', () => [500, 1300, 2100, 3200].forEach(ms => setTimeout(rebind, ms)));
+})();
+</script>
+
+
+<style id="rev-repo-grid-clean-tiles-v96">
+/* Repo grid clean tiles v96 */
+.revTileProto {
+  outline-color:#00b4d3 !important;
+}
+.revTileProto:not(.revTilePower) {
+  border-color:#00b4d3 !important;
+  box-shadow:0 0 10px rgba(0,180,211,0.18);
+}
+.revTilePower.revTileProto {
+  outline-color:#00b4d3 !important;
+  box-shadow:0 0 10px rgba(0,180,211,0.18), inset 0 0 0 1px rgba(139,92,246,0.18);
+}
+.revProtoBadge {
+  background:#00b4d3 !important;
+  color:#021116 !important;
+}
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) {
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+}
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) .revTileName {
+  margin:0;
+  max-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  font-size:12px;
+  line-height:1.08;
+}
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) .revTileMeta,
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) .revTileSource,
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) .revTileStats {
+  display:none !important;
+}
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) .revProtoBadge {
+  top:5px;
+  right:5px;
+  font-size:8px;
+  padding:1px 4px;
+  opacity:0.92;
+}
+</style>
+
+
+
+<style id="rev-repo-deck-card-tiles-v97">
+/* Repo/deck square card language v97 */
+.revEditorPanel.revTileGrid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(82px,1fr));
+  gap:8px;
+  align-items:start;
+}
+.revEditorPanel.revTileGrid .revTile {
+  min-height:0;
+  aspect-ratio:1/1;
+  padding:7px;
+  border-radius:10px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  cursor:pointer;
+}
+.revEditorPanel.revTileGrid .revTile.revDeckTile {
+  cursor:default;
+}
+.revEditorPanel.revTileGrid .revTileIcon {
+  position:absolute;
+  top:6px;
+  left:50%;
+  transform:translateX(-50%);
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  line-height:1;
+  color:#f0d080;
+  background:rgba(0,0,0,0.55);
+  border:1px solid rgba(200,160,96,0.42);
+  box-shadow:0 0 8px rgba(0,0,0,0.4);
+  z-index:2;
+}
+.revEditorPanel.revTileGrid .revTileName {
+  margin:0;
+  width:100%;
+  max-height:42px;
+  padding:22px 2px 25px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  font-size:11px;
+  line-height:1.08;
+  overflow:hidden;
+}
+.revEditorPanel.revTileGrid .revTileKind {
+  display:none;
+}
+.revEditorPanel.revTileGrid .revTileBottom {
+  position:absolute;
+  left:5px;
+  right:5px;
+  bottom:5px;
+  height:28px;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  justify-items:center;
+  gap:3px;
+  z-index:3;
+}
+.revTileCostRune {
+  width:24px;
+  height:24px;
+  border-radius:3px;
+  transform:rotate(45deg);
+  background:var(--resources);
+  border:2px solid var(--resources-hi);
+  box-shadow:0 0 8px rgba(217,121,24,0.42);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.revTileCostRune span {
+  transform:rotate(-45deg);
+  color:var(--resources-text);
+  font-size:17px;
+  font-weight:900;
+  line-height:1;
+}
+.revDeckAdjust {
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:1px solid rgba(200,160,96,0.52);
+  background:rgba(0,0,0,0.58);
+  color:#f0d080;
+  font-family:'Spectral', Georgia, serif;
+  font-size:20px;
+  font-weight:900;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  cursor:pointer;
+  box-shadow:0 0 8px rgba(0,0,0,0.5);
+}
+.revDeckAdjust:active {
+  background:#2a2010;
+  border-color:#f0d080;
+  color:#fff2c4;
+}
+.revDeckMinus {
+  justify-self:start;
+  color:#ffb2a8;
+  border-color:rgba(220,76,62,0.78);
+  background:rgba(90,16,12,0.82);
+  box-shadow:0 0 8px rgba(220,42,34,0.22);
+}
+.revDeckPlus {
+  justify-self:end;
+  color:#d9ffd0;
+  border-color:rgba(118,226,96,0.78);
+  background:rgba(18,88,34,0.82);
+  box-shadow:0 0 8px rgba(88,220,90,0.22);
+}
+.revDeckMinus:active {
+  background:#7a1810;
+  border-color:#ff8a7a;
+  color:#fff0ec;
+}
+.revDeckPlus:active {
+  background:#1e7a2e;
+  border-color:#9fff88;
+  color:#f1ffe8;
+}
+.revTileQtyBadge {
+  position:absolute;
+  top:5px;
+  right:5px;
+  min-width:20px;
+  height:20px;
+  padding:0 5px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:900;
+  line-height:1;
+  color:#d9ffd0;
+  background:rgba(22,88,38,0.88);
+  border:1px solid rgba(118,226,96,0.76);
+  box-shadow:0 0 8px rgba(88,220,90,0.26);
+  z-index:4;
+}
+.revEditorPanel.revTileGrid .revTile.revExpanded {
+  grid-column:1 / -1;
+  aspect-ratio:auto;
+  min-height:0;
+  overflow:visible;
+  padding:12px;
+  display:block;
+}
+.revEditorPanel.revTileGrid .revTile.revExpanded .revTileIcon,
+.revEditorPanel.revTileGrid .revTile.revExpanded .revTileBottom,
+.revEditorPanel.revTileGrid .revTile.revExpanded .revTileQtyBadge {
+  display:none;
+}
+.revEditorPanel.revTileGrid .revTile.revExpanded .revTileName {
+  display:block;
+  padding:0;
+  font-size:16px;
+  line-height:1.15;
+  max-height:none;
+  text-align:left;
+  margin-bottom:4px;
+}
+.revEditorPanel.revTileGrid .revTile.revExpanded .revTileKind {
+  display:block;
+  font-size:11px;
+  color:#7a6848;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  margin-bottom:8px;
+}
+.revEditorPanel.revTileGrid .revTileMeta,
+.revEditorPanel.revTileGrid .revTileSource,
+.revEditorPanel.revTileGrid .revTileStats {
+  display:none !important;
+}
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) {
+  justify-content:center;
+  align-items:center;
+}
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) .revProtoBadge {
+  top:5px;
+  right:5px;
+  font-size:8px;
+  padding:1px 4px;
+  opacity:0.92;
+}
+</style>
+
+
+<style id="rev-editor-usability-v98">
+#revSafeEditor, #revSafeEditor * { touch-action: manipulation; }
+#revSafeEditor input, #revSafeEditor textarea, #revSafeEditor select { font-size:16px; }
+.revEditorTabs { gap:7px; align-items:center; flex-wrap:wrap; }
+.revSafeBtn.revTabBtn.active,
+.revFilterBtn.active {
+  background:linear-gradient(160deg,#6a4516,#2a1a08) !important;
+  border-color:#f0d080 !important;
+  color:#fff1c8 !important;
+  box-shadow:0 0 14px rgba(240,208,128,0.34), inset 0 0 0 1px rgba(255,240,180,0.12) !important;
+}
+.revSafeBtn.revUtilityBtn { opacity:.86; }
+.revEditorPanel.revTileGrid,
+.revEditorPanel.revRepoGrid {
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+  gap:10px !important;
+  align-items:start;
+}
+.revEditorPanel.revTileGrid .revTile:not(.revExpanded),
+.revEditorPanel.revRepoGrid .revTile:not(.revExpanded) {
+  width:100% !important;
+  min-width:0 !important;
+  aspect-ratio:1 / 1 !important;
+  min-height:112px !important;
+  padding:8px 7px !important;
+  border-radius:10px !important;
+}
+.revEditorPanel.revTileGrid .revTile.revExpanded,
+.revEditorPanel.revRepoGrid .revTile.revExpanded {
+  grid-column:1 / -1 !important;
+  aspect-ratio:auto !important;
+}
+.revTileIcon { font-size:22px !important; min-height:24px; }
+.revTileName { font-size:12px !important; line-height:1.12 !important; max-height:42px; overflow:hidden; }
+.revTileKind { display:none !important; }
+.revTileCostRune { width:28px !important; height:28px !important; }
+.revTileCostRune span { font-size:18px !important; }
+.revDeckAdjust { width:30px !important; height:30px !important; font-size:22px !important; }
+.revTileQtyBadge { top:6px !important; right:6px !important; min-width:22px !important; height:22px !important; font-size:13px !important; }
+.revFieldGrid input[type="number"] { appearance:textfield; -moz-appearance:textfield; }
+.revFieldGrid input[type="number"]::-webkit-outer-spin-button,
+.revFieldGrid input[type="number"]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+@media (max-width:330px){
+  .revEditorPanel.revTileGrid,
+  .revEditorPanel.revRepoGrid { gap:7px !important; }
+  .revEditorPanel.revTileGrid .revTile:not(.revExpanded),
+  .revEditorPanel.revRepoGrid .revTile:not(.revExpanded) { min-height:100px !important; }
+  .revTileName { font-size:11px !important; }
+}
+</style>
+
+
+
+<style>
+/* Backup import/export controls */
+.revBackupBtn { border-color:#3c6a68 !important; color:#8fd8d0 !important; }
+.revBackupBtn:active { border-color:#a8fff4 !important; color:#e8fffb !important; }
+.revBackupImportInput { display:none !important; }
+</style>
+
+<script>
+(function(){
+  if (window.__revBackupImportExportV99) return;
+  window.__revBackupImportExportV99 = true;
+
+  const BACKUP_KEYS = [
+    'grim_repo_official',
+    'grim_repo_drafts',
+    'grim_card_repo',
+    'grim_deck_p1',
+    'grim_deck_p2',
+    'grim_lane_deck',
+    'grim_proto_cards'
+  ];
+
+  let nativeSetItem = null;
+  function getNativeSetItem(){
+    if (nativeSetItem) return nativeSetItem;
+    try {
+      const frame = document.createElement('iframe');
+      frame.style.display = 'none';
+      document.documentElement.appendChild(frame);
+      nativeSetItem = frame.contentWindow.Storage.prototype.setItem;
+      frame.remove();
+    } catch(err) {
+      nativeSetItem = null;
+    }
+    return nativeSetItem;
+  }
+
+  function writeRaw(key, value){
+    const native = getNativeSetItem();
+    if (native) native.call(localStorage, key, value);
+    else localStorage.setItem(key, value);
+  }
+
+  function readJSON(key, fallback){
+    try {
+      const raw = localStorage.getItem(key);
+      return raw == null ? fallback : JSON.parse(raw);
+    } catch(err) {
+      return fallback;
+    }
+  }
+
+  function writeJSON(key, value){
+    writeRaw(key, JSON.stringify(value));
+  }
+
+  function mergedRepoFromStorage(){
+    const official = readJSON('grim_repo_official', []);
+    const drafts = readJSON('grim_repo_drafts', []);
+    return [
+      ...(Array.isArray(official) ? official : []),
+      ...(Array.isArray(drafts) ? drafts : [])
+    ];
+  }
+
+  function syncRuntimeRepo(){
+    const official = readJSON('grim_repo_official', []);
+    const drafts = readJSON('grim_repo_drafts', []);
+    writeJSON('grim_repo_official', Array.isArray(official) ? official : []);
+    writeJSON('grim_repo_drafts', Array.isArray(drafts) ? drafts : []);
+    writeJSON('grim_card_repo', mergedRepoFromStorage());
+  }
+
+  function safeFilenameDate(){
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}`;
+  }
+
+  function exportRevenantBackup(){
+    syncRuntimeRepo();
+    const storage = {};
+    BACKUP_KEYS.forEach(key => {
+      storage[key] = localStorage.getItem(key);
+    });
+    const backup = {
+      app: 'Revenant Prototype',
+      type: 'revenant_editor_backup',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      data: {
+        officialRepo: readJSON('grim_repo_official', []),
+        draftRepo: readJSON('grim_repo_drafts', []),
+        runtimeRepo: readJSON('grim_card_repo', []),
+        deckP1: readJSON('grim_deck_p1', {}),
+        deckP2: readJSON('grim_deck_p2', {}),
+        laneDeck: readJSON('grim_lane_deck', []),
+        draftMode: localStorage.getItem('grim_proto_cards') !== 'false'
+      },
+      localStorage: storage
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `revenant-backup-${safeFilenameDate()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+  }
+
+  function normaliseBackupPayload(payload){
+    if (!payload || typeof payload !== 'object') throw new Error('Backup file is not valid JSON.');
+
+    if (payload.localStorage && typeof payload.localStorage === 'object') {
+      return {
+        officialRepo: JSON.parse(payload.localStorage.grim_repo_official || '[]'),
+        draftRepo: JSON.parse(payload.localStorage.grim_repo_drafts || '[]'),
+        deckP1: JSON.parse(payload.localStorage.grim_deck_p1 || '{}'),
+        deckP2: JSON.parse(payload.localStorage.grim_deck_p2 || '{}'),
+        laneDeck: JSON.parse(payload.localStorage.grim_lane_deck || '[]'),
+        draftMode: payload.localStorage.grim_proto_cards !== 'false'
+      };
+    }
+
+    const data = payload.data && typeof payload.data === 'object' ? payload.data : payload;
+    return {
+      officialRepo: data.officialRepo || data.grim_repo_official || data.cardRepo || data.cards || [],
+      draftRepo: data.draftRepo || data.grim_repo_drafts || data.drafts || [],
+      deckP1: data.deckP1 || data.grim_deck_p1 || data.p1Deck || {},
+      deckP2: data.deckP2 || data.grim_deck_p2 || data.p2Deck || {},
+      laneDeck: data.laneDeck || data.grim_lane_deck || data.laneEffects || [],
+      draftMode: data.draftMode !== false && data.grim_proto_cards !== 'false'
+    };
+  }
+
+  function importRevenantBackupFile(file){
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const payload = JSON.parse(reader.result);
+        const data = normaliseBackupPayload(payload);
+        if (!confirm('Import this Revenant backup? This will replace current official cards, draft cards, decks, and lane deck in this browser.')) return;
+
+        writeJSON('grim_repo_official', Array.isArray(data.officialRepo) ? data.officialRepo : []);
+        writeJSON('grim_repo_drafts', Array.isArray(data.draftRepo) ? data.draftRepo : []);
+        writeJSON('grim_deck_p1', data.deckP1 && typeof data.deckP1 === 'object' ? data.deckP1 : {});
+        writeJSON('grim_deck_p2', data.deckP2 && typeof data.deckP2 === 'object' ? data.deckP2 : {});
+        writeJSON('grim_lane_deck', Array.isArray(data.laneDeck) ? data.laneDeck : []);
+        writeRaw('grim_proto_cards', String(data.draftMode !== false));
+        syncRuntimeRepo();
+
+        if (window.revRenderEditorView) window.revRenderEditorView('repo');
+        alert('Backup imported. Use New Game to test the restored cards/decks.');
+      } catch(err) {
+        alert('Could not import backup: ' + (err && err.message ? err.message : err));
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function ensureBackupControls(){
+    const editor = document.getElementById('revSafeEditor');
+    const header = document.getElementById('revSafeEditorHeader');
+    if (!editor || !header) return;
+    const controls = header.querySelector('div:last-child');
+    if (!controls) return;
+
+    let input = document.getElementById('revImportBackupInput');
+    if (!input) {
+      input = document.createElement('input');
+      input.id = 'revImportBackupInput';
+      input.className = 'revBackupImportInput';
+      input.type = 'file';
+      input.accept = 'application/json,.json';
+      input.onchange = e => {
+        const file = e.target.files && e.target.files[0];
+        importRevenantBackupFile(file);
+        e.target.value = '';
+      };
+      editor.appendChild(input);
+    }
+
+    let importBtn = document.getElementById('revImportBackupBtn');
+    if (!importBtn) {
+      importBtn = document.createElement('button');
+      importBtn.id = 'revImportBackupBtn';
+      importBtn.className = 'revSafeBtn revBackupBtn';
+      importBtn.innerText = 'Import Backup';
+      importBtn.onclick = e => { e.preventDefault(); e.stopPropagation(); input.click(); };
+      controls.prepend(importBtn);
+    }
+
+    let exportBtn = document.getElementById('revExportBackupBtn');
+    if (!exportBtn) {
+      exportBtn = document.createElement('button');
+      exportBtn.id = 'revExportBackupBtn';
+      exportBtn.className = 'revSafeBtn revBackupBtn';
+      exportBtn.innerText = 'Export Backup';
+      exportBtn.onclick = e => { e.preventDefault(); e.stopPropagation(); exportRevenantBackup(); };
+      controls.prepend(exportBtn);
+    }
+  }
+
+  function wrapOpenEditor(){
+    if (window.__revBackupOpenWrapped) return;
+    window.__revBackupOpenWrapped = true;
+    const prev = window.revOpenEditor;
+    if (typeof prev === 'function') {
+      window.revOpenEditor = function(){
+        const result = prev.apply(this, arguments);
+        setTimeout(ensureBackupControls, 0);
+        return result;
+      };
+    }
+  }
+
+  window.revExportRevenantBackup = exportRevenantBackup;
+  window.revImportRevenantBackupFile = importRevenantBackupFile;
+  window.revEnsureBackupControls = ensureBackupControls;
+
+  const install = () => { ensureBackupControls(); wrapOpenEditor(); };
+  install();
+  document.addEventListener('DOMContentLoaded', install);
+  window.addEventListener('load', install);
+  setTimeout(install, 250);
+  setTimeout(install, 900);
+  setTimeout(install, 1800);
+})();
+</script>
+
+
+
+<style>
+/* v100 editor layout/data fixes */
+#revSafeEditor { overflow:hidden !important; }
+#revSafeEditorHeader {
+  position:sticky !important;
+  top:0 !important;
+  z-index:100002 !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  padding:calc(8px + env(safe-area-inset-top)) 8px 8px !important;
+  align-items:flex-start !important;
+}
+#revSafeEditorHeader > div:first-child {
+  flex:1 1 110px !important;
+  min-width:92px !important;
+  line-height:1.15 !important;
+}
+#revSafeEditorHeader > div:last-child {
+  flex:1 1 190px !important;
+  min-width:0 !important;
+  display:flex !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-end !important;
+  align-items:center !important;
+  gap:5px !important;
+  max-width:100% !important;
+}
+#revSafeEditorHeader .revSafeBtn {
+  padding:6px 8px !important;
+  min-height:32px !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+#revSafeClose {
+  border-color:#d8c49a !important;
+  color:#fff0c8 !important;
+  order:99 !important;
+}
+#revSafeEditorBody {
+  padding:10px !important;
+  overflow:auto !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+.revEditorTabs {
+  position:sticky !important;
+  top:0 !important;
+  z-index:100001 !important;
+  background:linear-gradient(180deg,rgba(11,9,7,0.98),rgba(11,9,7,0.94)) !important;
+  border:1px solid rgba(200,160,96,0.16) !important;
+  border-radius:10px !important;
+  padding:7px !important;
+  margin:0 0 10px !important;
+  box-shadow:0 8px 18px rgba(0,0,0,0.28) !important;
+}
+.revTabBtn.active,
+.revFilterBtn.active {
+  border-color:#f0d080 !important;
+  background:linear-gradient(160deg,#5a3c10,#1e1408) !important;
+  color:#fff1bd !important;
+  box-shadow:0 0 14px rgba(240,208,128,0.32), inset 0 0 0 1px rgba(255,240,180,0.14) !important;
+}
+.revEditorSubhead { margin-top:8px !important; }
+.revRepoFilterBar {
+  position:sticky !important;
+  top:48px !important;
+  z-index:100000 !important;
+  background:rgba(11,9,7,0.96) !important;
+  box-shadow:0 8px 16px rgba(0,0,0,0.22) !important;
+}
+.revDataNotice {
+  margin:8px 0 10px;
+  padding:8px 10px;
+  border:1px solid #3c6a68;
+  border-radius:8px;
+  background:rgba(10,36,34,0.28);
+  color:#8fd8d0;
+  font-size:11px;
+  line-height:1.35;
+}
+</style>
+
+<script>
+(function(){
+  if (window.__revV100EditorDataLayoutFix) return;
+  window.__revV100EditorDataLayoutFix = true;
+
+  let nativeSetItem = null;
+  function getNativeSetItem(){
+    if (nativeSetItem) return nativeSetItem;
+    try {
+      const frame = document.createElement('iframe');
+      frame.style.display = 'none';
+      document.documentElement.appendChild(frame);
+      nativeSetItem = frame.contentWindow.Storage.prototype.setItem;
+      frame.remove();
+    } catch(err) { nativeSetItem = null; }
+    return nativeSetItem;
+  }
+  function writeRaw(key, value){
+    const native = getNativeSetItem();
+    if (native) native.call(localStorage, key, value);
+    else localStorage.setItem(key, value);
+  }
+  function readJSON(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw == null ? fallback : JSON.parse(raw); }
+    catch(err){ return fallback; }
+  }
+  function writeJSON(key, value){ writeRaw(key, JSON.stringify(value)); }
+  function slug(value){
+    return String(value ?? '').trim().toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+  }
+  function generatedId(card){
+    if (!card || typeof card !== 'object') return '';
+    const base = slug(card.internalName || card.name || card.id || 'card');
+    const variant = slug(card.variant || '');
+    return variant ? `${base}_${variant}` : base;
+  }
+  function cardId(card){ return String(card?.id || generatedId(card) || card?.name || '').trim(); }
+  function isDraftLike(card){
+    if (!card || typeof card !== 'object') return false;
+    const source = String(card.source || '').toLowerCase();
+    const status = String(card.status || '').toLowerCase();
+    const id = cardId(card).toLowerCase();
+    const art = String(card.artId || '').toLowerCase();
+    return source === 'draft' || source === 'prototype' || status === 'draft' || id.startsWith('draft_') || id.startsWith('proto_power_') || art.includes('_prototype');
+  }
+  function normaliseFactionKey(value){
+    const raw = String(value || 'universal').trim().toLowerCase();
+    const compact = raw.replace(/[^a-z0-9]+/g,'');
+    const s = slug(raw);
+    const map = {
+      universal:'universal', none:'universal', neutral:'universal',
+      orderofiron:'order_of_iron', iron:'order_of_iron', order_iron:'order_of_iron', order_of_iron:'order_of_iron',
+      orderofflame:'order_of_flame', orderofflames:'order_of_flame', flame:'order_of_flame', flames:'order_of_flame', order_flame:'order_of_flame', order_flames:'order_of_flame', order_of_flame:'order_of_flame', order_of_flames:'order_of_flame',
+      orderoflight:'order_of_light', light:'order_of_light', order_light:'order_of_light', order_of_light:'order_of_light',
+      orderoftheveil:'order_of_the_veil', orderofveil:'order_of_the_veil', veil:'order_of_the_veil', order_veil:'order_of_the_veil', order_of_veil:'order_of_the_veil', order_of_the_veil:'order_of_the_veil',
+      orderofshadows:'order_of_shadows', shadow:'order_of_shadows', shadows:'order_of_shadows', order_shadows:'order_of_shadows', order_of_shadows:'order_of_shadows',
+      orderofartifice:'order_of_artifice', artifice:'order_of_artifice', order_artifice:'order_of_artifice', order_of_artifice:'order_of_artifice',
+      orderofthehunt:'order_of_beasts', orderofhunt:'order_of_beasts', orderofbeasts:'order_of_beasts', hunt:'order_of_beasts', beasts:'order_of_beasts', order_hunt:'order_of_beasts', order_beasts:'order_of_beasts', order_of_hunt:'order_of_beasts', order_of_beasts:'order_of_beasts'
+    };
+    return map[compact] || map[s] || s || 'universal';
+  }
+  function normaliseRepoCards(cards, sourceHint){
+    if (!Array.isArray(cards)) return [];
+    return cards.filter(Boolean).map(card => {
+      const next = { ...card };
+      next.faction = normaliseFactionKey(next.faction);
+      const identity = generatedId(next);
+      if (identity) {
+        next.id = identity;
+        next.artId = identity;
+      }
+      if (sourceHint === 'official') {
+        if (next.source === 'draft' || next.source === 'prototype') delete next.source;
+        if (next.status === 'draft') delete next.status;
+      }
+      if (sourceHint === 'draft') {
+        next.source = next.source || 'draft';
+        next.status = next.status || 'draft';
+      }
+      return next;
+    });
+  }
+  function dedupeById(cards){
+    const seen = new Set();
+    const out = [];
+    (cards || []).forEach(card => {
+      const id = cardId(card);
+      if (!id || seen.has(id)) return;
+      seen.add(id);
+      out.push(card);
+    });
+    return out;
+  }
+  function cleanRepos(){
+    const officialRaw = readJSON('grim_repo_official', []);
+    const draftsRaw = readJSON('grim_repo_drafts', []);
+    const draftBucket = [];
+    const officialBucket = [];
+
+    [...(Array.isArray(draftsRaw) ? draftsRaw : []), ...(Array.isArray(officialRaw) ? officialRaw : [])].forEach(card => {
+      if (!card) return;
+      if (isDraftLike(card)) draftBucket.push({ ...card, source: card.source || 'draft', status: card.status || 'draft' });
+      else officialBucket.push(card);
+    });
+
+    const drafts = dedupeById(normaliseRepoCards(draftBucket, 'draft'));
+    const draftIds = new Set(drafts.map(cardId));
+    const official = dedupeById(normaliseRepoCards(officialBucket, 'official')).filter(c => !draftIds.has(cardId(c)));
+    const merged = [...official, ...drafts];
+
+    writeJSON('grim_repo_official', official);
+    writeJSON('grim_repo_drafts', drafts);
+    writeJSON('grim_card_repo', merged);
+    window.repo = merged;
+    window.cardRepo = merged;
+    window.cards = merged;
+    return { official, drafts, merged };
+  }
+
+  // Replace the earlier grim_card_repo interception with one that cannot copy drafts into official.
+  const native = getNativeSetItem();
+  if (native) {
+    Storage.prototype.setItem = function(key, value){
+      if (key === 'grim_card_repo') {
+        try {
+          const incoming = JSON.parse(value || '[]');
+          const currentDrafts = readJSON('grim_repo_drafts', []);
+          const draftIds = new Set((Array.isArray(currentDrafts) ? currentDrafts : []).map(cardId));
+          const officialIncoming = (Array.isArray(incoming) ? incoming : []).filter(c => !isDraftLike(c) && !draftIds.has(cardId(c)));
+          const draftIncoming = (Array.isArray(incoming) ? incoming : []).filter(c => isDraftLike(c));
+          const drafts = dedupeById(normaliseRepoCards([...(Array.isArray(currentDrafts) ? currentDrafts : []), ...draftIncoming], 'draft'));
+          const official = dedupeById(normaliseRepoCards(officialIncoming, 'official')).filter(c => !new Set(drafts.map(cardId)).has(cardId(c)));
+          native.call(localStorage, 'grim_repo_official', JSON.stringify(official));
+          native.call(localStorage, 'grim_repo_drafts', JSON.stringify(drafts));
+          native.call(localStorage, 'grim_card_repo', JSON.stringify([...official, ...drafts]));
+          return;
+        } catch(err) {
+          console.warn('[Revenant] v100 repo split failed, falling back to native setItem', err);
+        }
+      }
+      native.call(this, key, value);
+    };
+  }
+
+  const iconMap = {
+    order_of_iron:'⚙', order_of_flame:'♨', order_of_flames:'♨', order_of_light:'☼',
+    order_of_the_veil:'☽', order_of_shadows:'†', order_of_artifice:'◆', order_of_beasts:'♈',
+    universal:'✦', none:'✦', neutral:'✦'
+  };
+  function factionIcon(card){ return iconMap[normaliseFactionKey(card?.faction)] || '✦'; }
+  try {
+    window.editorFactionIcon = factionIcon;
+    // In classic scripts the global function binding is writable; keep this guarded for safety.
+    editorFactionIcon = factionIcon;
+  } catch(err) {}
+
+  function addDataNotice(){
+    const body = document.getElementById('revSafeEditorBody');
+    if (!body || body.querySelector('.revDataNotice')) return;
+    const { official, drafts } = cleanRepos();
+    const notice = document.createElement('div');
+    notice.className = 'revDataNotice';
+    notice.textContent = `Repo cleaned: ${official.length} official / ${drafts.length} draft cards. Draft-like cards are kept out of the official repo.`;
+    const tabs = body.querySelector('.revEditorTabs');
+    if (tabs && tabs.nextSibling) body.insertBefore(notice, tabs.nextSibling);
+    else body.prepend(notice);
+    setTimeout(() => notice.remove(), 3500);
+  }
+
+  function patchHeaderClose(){
+    const close = document.getElementById('revSafeClose');
+    if (close) close.onclick = e => { e.preventDefault(); e.stopPropagation(); const editor = document.getElementById('revSafeEditor'); if (editor) editor.style.display = 'none'; };
+  }
+
+  function wrapRender(){
+    if (window.__revV100RenderWrapped) return;
+    window.__revV100RenderWrapped = true;
+    if (typeof window.renderEditorView === 'function') {
+      const prev = window.renderEditorView;
+      window.renderEditorView = function(){
+        cleanRepos();
+        const result = prev.apply(this, arguments);
+        patchHeaderClose();
+        return result;
+      };
+      try { renderEditorView = window.renderEditorView; } catch(err) {}
+    }
+    if (typeof window.revRenderEditorView === 'function') {
+      const prevRev = window.revRenderEditorView;
+      window.revRenderEditorView = function(){
+        cleanRepos();
+        const result = prevRev.apply(this, arguments);
+        patchHeaderClose();
+        return result;
+      };
+    }
+  }
+
+  function wrapOpen(){
+    if (window.__revV100OpenWrapped) return;
+    window.__revV100OpenWrapped = true;
+    if (typeof window.revOpenEditor === 'function') {
+      const prev = window.revOpenEditor;
+      window.revOpenEditor = function(){
+        cleanRepos();
+        const result = prev.apply(this, arguments);
+        setTimeout(() => { patchHeaderClose(); addDataNotice(); }, 0);
+        return result;
+      };
+      try { openEditor = window.revOpenEditor; } catch(err) {}
+    }
+  }
+
+  function install(){
+    cleanRepos();
+    wrapRender();
+    wrapOpen();
+    patchHeaderClose();
+    const openBtn = document.getElementById('open-editor-btn');
+    if (openBtn && typeof window.revOpenEditor === 'function') openBtn.onclick = window.revOpenEditor;
+  }
+
+  window.revCleanRepos = cleanRepos;
+  window.revNormaliseFactionKey = normaliseFactionKey;
+  install();
+  document.addEventListener('DOMContentLoaded', install);
+  window.addEventListener('load', install);
+  setTimeout(install, 250);
+  setTimeout(install, 900);
+  setTimeout(install, 1800);
+})();
+</script>
+
+
+
+<!-- Patch 105: editor close/topbar real file fix -->
+<style id="rev-editor-close-topbar-fix-v105">
+#revSafeEditor {
+  z-index: 2147483000 !important;
+}
+#revSafeEditorHeader {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2147483002 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  padding: calc(8px + env(safe-area-inset-top)) 10px 8px !important;
+  background: linear-gradient(180deg, rgba(12,9,6,0.99), rgba(12,9,6,0.96)) !important;
+  border-bottom: 1px solid rgba(200,160,96,0.26) !important;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.42) !important;
+}
+#revSafeEditorHeader > div:first-child {
+  flex: 1 1 auto !important;
+  min-width: 120px !important;
+}
+#revSafeEditorHeader .revSafeBtn {
+  flex: 0 0 auto !important;
+  max-width: calc(50vw - 12px) !important;
+}
+#revSafeClose {
+  position: fixed !important;
+  top: calc(8px + env(safe-area-inset-top)) !important;
+  right: 10px !important;
+  z-index: 2147483647 !important;
+  min-width: 64px !important;
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border: 2px solid #f0d080 !important;
+  border-radius: 10px !important;
+  background: linear-gradient(160deg,#3a2410,#100806) !important;
+  color: #fff3c8 !important;
+  box-shadow: 0 0 18px rgba(0,0,0,0.72), 0 0 12px rgba(240,208,128,0.32) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+}
+#revSafeEditorBody {
+  padding-top: 8px !important;
+}
+.revEditorTabs {
+  position: sticky !important;
+  top: calc(52px + env(safe-area-inset-top)) !important;
+  z-index: 2147483001 !important;
+}
+.revRepoFilterBar {
+  position: sticky !important;
+  top: calc(104px + env(safe-area-inset-top)) !important;
+  z-index: 2147483000 !important;
+}
+</style>
+<script id="rev-editor-close-topbar-fix-v105-script">
+(function(){
+  if (window.__revEditorCloseTopbarFixV105) return;
+  window.__revEditorCloseTopbarFixV105 = true;
+  function closeEditor(e){
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    const editor = document.getElementById('revSafeEditor');
+    if (editor) {
+      editor.style.display = 'none';
+      editor.classList.remove('show','open','active');
+    }
+    document.body.classList.remove('revEditorOpen','editor-open');
+    document.documentElement.classList.remove('revEditorOpen','editor-open');
+  }
+  function installClose(){
+    const close = document.getElementById('revSafeClose');
+    if (!close) return;
+    close.textContent = 'Close';
+    close.removeAttribute('onclick');
+    close.onclick = closeEditor;
+    close.addEventListener('click', closeEditor, { capture:true });
+    close.addEventListener('touchend', closeEditor, { capture:true, passive:false });
+  }
+  function wrapOpen(){
+    if (window.__revEditorCloseTopbarFixV105Wrapped) return;
+    window.__revEditorCloseTopbarFixV105Wrapped = true;
+    if (typeof window.revOpenEditor === 'function') {
+      const prev = window.revOpenEditor;
+      window.revOpenEditor = function(){
+        const result = prev.apply(this, arguments);
+        setTimeout(installClose, 0);
+        setTimeout(installClose, 100);
+        return result;
+      };
+      try { openEditor = window.revOpenEditor; } catch(err) {}
+    }
+  }
+  function install(){ installClose(); wrapOpen(); }
+  window.revCloseEditor = closeEditor;
+  install();
+  document.addEventListener('DOMContentLoaded', install);
+  window.addEventListener('load', install);
+  setTimeout(install, 250);
+  setTimeout(install, 900);
+  setTimeout(install, 1800);
+})();
+</script>
+
+
+<script id="rev-attack-roll-triggers-v106">
+(function(){
+  if (window.__revAttackRollTriggersV106) return;
+  window.__revAttackRollTriggersV106 = true;
+
+  function revToNum(value, fallback) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function revCurrentRepo() {
+    try {
+      const merged = localStorage.getItem('grim_card_repo');
+      if (merged) return JSON.parse(merged) || [];
+    } catch(e) {}
+    try {
+      const official = JSON.parse(localStorage.getItem('grim_repo_official') || '[]') || [];
+      const drafts = JSON.parse(localStorage.getItem('grim_repo_drafts') || '[]') || [];
+      return [...official, ...drafts];
+    } catch(e) { return []; }
+  }
+
+  function revFindSourceCard(unit) {
+    if (!unit) return null;
+    const repo = revCurrentRepo();
+    const keys = [unit.id, unit.artId, unit.internalName, unit.name].filter(Boolean).map(v => String(v).trim().toLowerCase());
+    const slug = v => String(v || '').trim().toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+    const slugs = keys.map(slug);
+    return repo.find(c => {
+      const vals = [c.id, c.artId, c.internalName, c.name].filter(Boolean).map(v => String(v).trim().toLowerCase());
+      return vals.some(v => keys.includes(v) || slugs.includes(slug(v)));
+    }) || null;
+  }
+
+  function revDiceTriggerFromUnit(unit) {
+    const source = revFindSourceCard(unit);
+    const candidates = [
+      unit?.diceTrigger,
+      unit?.mechanic?.diceTrigger,
+      source?.diceTrigger,
+      source?.mechanic?.diceTrigger
+    ].filter(Boolean);
+
+    // Compatibility fallback: if a draft unit saved the dice mechanic as its normal effect.
+    [unit, unit?.mechanic, source, source?.mechanic].filter(Boolean).forEach(obj => {
+      const effect = obj.effect || obj.unitEffect || obj.diceEffect;
+      if (effect === 'exploding_hits' || effect === 'chain_hits') {
+        candidates.push({
+          trigger: obj.trigger === 'on_attack_roll' ? 'on_attack_roll' : 'on_attack_roll',
+          threshold: obj.threshold || obj.diceThreshold || 6,
+          effect,
+          value: obj.value || obj.unitValue || obj.diceValue || 1
+        });
+      }
+    });
+
+    for (const dt of candidates) {
+      const trigger = dt.trigger || dt.rollTrigger || dt.type || dt.roll || 'on_attack_roll';
+      const effect = dt.effect || dt.diceEffect || dt.result || 'none';
+      if ((trigger === 'on_attack_roll' || trigger === 'onAttackRoll') && (effect === 'exploding_hits' || effect === 'chain_hits')) {
+        return {
+          trigger: 'on_attack_roll',
+          condition: 'natural_gte',
+          threshold: Math.max(1, Math.min(6, revToNum(dt.threshold ?? dt.diceThreshold, 6))),
+          effect,
+          value: Math.max(1, revToNum(dt.value ?? dt.diceValue, 1))
+        };
+      }
+    }
+    return null;
+  }
+
+  window.revDiceTriggerFromUnit = revDiceTriggerFromUnit;
+
+  if (typeof window.REV_MECHANIC_REGISTRY === 'object') {
+    window.REV_MECHANIC_REGISTRY.triggers = window.REV_MECHANIC_REGISTRY.triggers || [];
+    window.REV_MECHANIC_REGISTRY.effects = window.REV_MECHANIC_REGISTRY.effects || [];
+    if (!window.REV_MECHANIC_REGISTRY.triggers.some(t => t.id === 'on_attack_roll')) {
+      window.REV_MECHANIC_REGISTRY.triggers.push({ id:'on_attack_roll', description:'Triggers when this unit rolls attack dice.' });
+    }
+    [
+      { id:'exploding_hits', description:'On matching attack dice, create extra hits without rolling extra dice.' },
+      { id:'chain_hits', description:'On matching attack dice, roll extra attack dice. Extra dice can continue the chain.' }
+    ].forEach(effect => {
+      if (!window.REV_MECHANIC_REGISTRY.effects.some(e => e.id === effect.id)) window.REV_MECHANIC_REGISTRY.effects.push(effect);
+    });
+  }
+
+  // Override combat maths with modular attack-roll triggers.
+  window.resolveCombat = resolveCombat = function resolveCombat(atk, def, laneKey=null) {
+    const fx = getLaneEffect(laneKey);
+    const eff = fx ? EFFECT_REGISTRY[fx.effect] : null;
+    const hitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    const saveThresh = parseInt(def.save || '7', 10);
+    let modSave = saveThresh + (Number(atk.weapon?.ap) || 0);
+    if (eff?.modifySave) modSave = eff.modifySave(fx, modSave);
+    const autoFail = modSave > 6;
+    const attackCount = (Number(atk.weapon?.attacks) || 0) + (atk.bonusAttacks || 0);
+    const diceTrigger = revDiceTriggerFromUnit(atk);
+    const atkDice = [];
+    let hits = 0;
+    let bonusHits = 0;
+    let chainRolls = 0;
+    const queue = Array.from({ length: Math.max(0, attackCount) }, () => 'base');
+    const MAX_ATTACK_DICE = 60;
+
+    while (queue.length && atkDice.length < MAX_ATTACK_DICE) {
+      queue.shift();
+      const d = Math.ceil(Math.random() * 6);
+      atkDice.push(d);
+      const isHit = d >= hitThresh;
+      if (isHit) hits += 1;
+
+      if (diceTrigger && isHit && d >= diceTrigger.threshold) {
+        if (diceTrigger.effect === 'exploding_hits') {
+          bonusHits += diceTrigger.value;
+          hits += diceTrigger.value;
+        } else if (diceTrigger.effect === 'chain_hits') {
+          for (let i = 0; i < diceTrigger.value && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
+            queue.push('chain');
+            chainRolls += 1;
+          }
+        }
+      }
+    }
+
+    const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
+    const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
+    let totalDmg = (hits - saved) * (Number(atk.weapon?.damage) || 0);
+    if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
+    return { atkDice, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
+  };
+
+  // Draft editor ability fields are handled by the unified Ability Builder above.
+})();
+
+
+  document.addEventListener('change', function(e){
+    const t=e.target;
+    if(!(t instanceof HTMLElement)) return;
+    if(t.dataset.field !== 'trigger' && t.dataset.field !== 'unitEffect') return;
+    const editor=t.closest('.revDraftEditor');
+    if(!editor) return;
+    const label=t.closest('label');
+    if(t.dataset.field === 'trigger' && label && !label.classList.contains('revUnitField')) return;
+    updateDraftAbilityContext(editor);
+  });
+</script>
+
+
+
+<style id="rev-editor-tabs-deck-toolbar-v121">
+/* v121: top-pinned single-row tabs + deck-page action bar */
+#revSafeEditorBody {
+  padding: 0 10px 16px !important;
+}
+.revEditorTabs {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2147483300 !important;
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+  flex-wrap: nowrap !important;
+  margin: 0 -10px 8px !important;
+  padding: 6px 8px !important;
+  background: linear-gradient(180deg, rgba(12,9,6,0.99), rgba(12,9,6,0.96)) !important;
+  border-bottom: 1px solid rgba(200,160,96,0.24) !important;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.34) !important;
+}
+.revEditorTabs .revSafeBtn {
+  min-width: 0 !important;
+  width: 100% !important;
+  min-height: 32px !important;
+  padding: 6px 3px !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.03em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  border-radius: 7px !important;
+}
+.revEditorTabs .revUtilityBtn {
+  opacity: .78 !important;
+  font-size: 9px !important;
+}
+.revDeckActionBar {
+  position: sticky;
+  top: 45px;
+  z-index: 2147483290;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 -10px 10px;
+  padding: 7px 9px;
+  background: linear-gradient(180deg, rgba(16,12,8,0.98), rgba(8,6,4,0.96));
+  border-bottom: 1px solid rgba(200,160,96,0.22);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.30);
+}
+.revDeckActionInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+.revDeckActionTitle {
+  color: #f0d080;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.revDeckActionCount {
+  color: #9a8050;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.revDeckActionButtons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.revDeckActionButtons .revSafeBtn {
+  min-height: 30px;
+  padding: 6px 8px;
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.revDeckClearBtn {
+  border-color: #803030 !important;
+  color: #e0a090 !important;
+}
+.revDeckRandomBtn {
+  border-color: #5a4a16 !important;
+  color: #f0d080 !important;
+}
+.revRepoFilterBar {
+  top: 45px !important;
+}
+@media (max-width: 330px) {
+  .revEditorTabs { gap: 3px !important; padding-left: 6px !important; padding-right: 6px !important; }
+  .revEditorTabs .revSafeBtn { font-size: 9px !important; padding-left: 2px !important; padding-right: 2px !important; }
+  .revDeckActionButtons .revSafeBtn { padding-left: 6px; padding-right: 6px; }
+}
+</style>
 
 </body>
 </html>
