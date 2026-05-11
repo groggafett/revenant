@@ -127,7 +127,7 @@ background: #1a1610;
 }
 .board-inner {
 position: absolute; top: 0; left: 0;
-display: flex; gap: 5px;
+display: flex; gap: 14px;
 padding: 55px 20vw 175px;
 transform-origin: 0 0;
 width: 140vw; height: 100%;
@@ -142,17 +142,17 @@ align-items: stretch;
 }
 .lane {
 flex: 1; display: flex; flex-direction: column;
-gap: 12px; padding: 0 6px;
+gap: 10px; padding: 0 2px;
 background: transparent;
 justify-content: center;
 }
 .lane-label { display: none; }
 .turn-whose { display: none; }
-.row { display: flex; justify-content: center; gap: 10px; flex-shrink: 0; overflow: visible; }
+.row { display: flex; justify-content: center; gap: 7px; flex-shrink: 0; overflow: visible; }
 
 /* ── TILES ── */
 .tile {
-width: clamp(28px, 9vw, 44px);
+width: 50px;
 aspect-ratio: 5 / 7;
 flex-shrink: 0; border-radius: 4px;
 border: none; background: rgba(0,0,0,0.5);
@@ -164,24 +164,52 @@ transition: opacity 0.15s;
 .tile::before { display: none; }
 .tile::after {
 content: ''; position: absolute; z-index: -1;
-left: -4px; right: -4px; top: -10px; bottom: -10px;
-background: rgba(40,32,16,0.4);
-clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 87%, 50% 100%, 0% 87%);
+left: 0; right: 0; top: 0; bottom: 0;
+background: rgba(40,32,16,0.38);
+border-radius: 4px;
+clip-path: none;
 pointer-events: none;
+box-shadow: inset 0 0 0 1.5px rgba(190,176,145,0.32);
 }
 .deploy-p1::after {
-clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 100%, 0% 100%);
-top: -10px; bottom: -4px;
-background: rgba(30,60,160,0.5);
+clip-path: none;
+top: 0; bottom: 0;
+background: rgba(30,60,160,0.34);
+box-shadow: inset 0 0 0 1.5px rgba(74,120,216,0.72);
 }
 .deploy-p2::after {
-clip-path: polygon(0% 0%, 100% 0%, 100% 87%, 50% 100%, 0% 87%);
-top: -4px; bottom: -10px;
-background: rgba(160,30,30,0.5);
+clip-path: none;
+top: 0; bottom: 0;
+background: rgba(160,30,30,0.34);
+box-shadow: inset 0 0 0 1.5px rgba(204,48,48,0.72);
 }
-.move::after { background: rgba(30,30,30,0.45); }
-.control-zone::after { background: rgba(30,120,60,0.5); }
-.centre { background: linear-gradient(160deg,#0e0c08,#080604); cursor: pointer; }
+.move::after {
+background: rgba(30,30,30,0.38);
+box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.36);
+}
+.control-zone::after {
+background: rgba(30,120,60,0.44);
+left: -1px; right: -1px; top: -4px; bottom: -4px;
+border-radius: 0;
+clip-path: polygon(0% 10%, 50% 0%, 100% 10%, 100% 90%, 50% 100%, 0% 90%);
+box-shadow: inset 0 0 0 1.5px rgba(86,190,96,0.58);
+}
+/* Keep the neutral rows mostly uniform, with only a slim forward hex edge toward scoring. */
+.tile.move[data-row="1"]::after {
+left: 0; right: 0; top: 0; bottom: -4px;
+border-radius: 4px 4px 0 0;
+clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 50% 100%, 0% 90%);
+}
+.tile.move[data-row="5"]::after {
+left: 0; right: 0; top: -4px; bottom: 0;
+border-radius: 0 0 4px 4px;
+clip-path: polygon(0% 10%, 50% 0%, 100% 10%, 100% 100%, 0% 100%);
+}
+.centre {
+background: linear-gradient(160deg,#0e0c08,#080604);
+cursor: pointer;
+border: 1.5px solid rgba(160,160,160,0.36);
+}
 .centre::after { display: none; }
 .tile-label {
 position: relative; z-index: 1;
@@ -2356,6 +2384,33 @@ pointer-events: none;
   font-size: clamp(16px, 5vw, 24px);
 }
 
+/* ── PATCH 156: consistent board row spacing + larger backplates ── */
+.board-inner { gap: 14px; }
+.lane { gap: 8px; padding: 0 2px; }
+.row { gap: 7px; margin-top: 0; margin-bottom: 0; }
+.tile { width: 50px; }
+/* All rows now use one consistent vertical rhythm. No row-specific negative margins. */
+.lane .row:nth-child(2),
+.lane .row:nth-child(3),
+.lane .row:nth-child(7),
+.lane .row:nth-child(8),
+.row.deploy-row-tight-next,
+.row.nml-row-tight-prev { margin-top: 0; margin-bottom: 0; }
+/* Shaped scoring backplates are a touch wider for 50×70 cards, without eating row gaps. */
+.control-zone::after {
+  left: -3px; right: -3px; top: -1px; bottom: -1px;
+  clip-path: polygon(0% 9%, 50% 0%, 100% 9%, 100% 91%, 50% 100%, 0% 91%);
+}
+/* Neutral rows keep only a subtle directional point inside the row footprint. */
+.tile.move[data-row="1"]::after {
+  left: -2px; right: -2px; top: 0; bottom: 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 94%, 50% 100%, 0% 94%);
+}
+.tile.move[data-row="5"]::after {
+  left: -2px; right: -2px; top: 0; bottom: 0;
+  clip-path: polygon(0% 6%, 50% 0%, 100% 6%, 100% 100%, 0% 100%);
+}
+
 /* ── PATCH 143: board name wrap + deck count + pass HUD ── */
 .unit-on-tile {
   overflow: hidden;
@@ -2421,6 +2476,371 @@ pointer-events: none;
   .hub-deck-count { gap: 3px; margin-right: 4px; }
   .hub-deck-icon { width: 13px; height: 18px; }
   .hub-deck-num { font-size: 11px; min-width: 13px; }
+}
+
+
+/* ── PATCH 157: three-tile deploy + old-style board shape language ── */
+/* Deployment rows: 3 flat square/card tiles with player-colour borders, no arrow/hex teeth. */
+.tile.deploy-p1::after,
+.tile.deploy-p2::after {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  clip-path: none;
+  border-radius: 4px;
+}
+
+.tile.deploy-p1::after {
+  background: rgba(30,60,160,0.34);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(74,120,216,0.78),
+    inset 0 1px 0 rgba(160,190,255,0.12);
+}
+
+.tile.deploy-p2::after {
+  background: rgba(160,30,30,0.34);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(204,48,48,0.78),
+    inset 0 1px 0 rgba(255,160,160,0.10);
+}
+
+/* No Man's Land rows: 3 neutral tiles with a forward-facing point toward the scoring band. */
+.tile.move::after {
+  left: -2px;
+  right: -2px;
+  top: 0;
+  bottom: 0;
+  background: rgba(30,30,30,0.38);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(160,160,160,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.tile.move[data-row="1"]::after {
+  border-radius: 4px 4px 0 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 88%, 50% 100%, 0% 88%);
+}
+
+.tile.move[data-row="5"]::after {
+  border-radius: 0 0 4px 4px;
+  clip-path: polygon(0% 12%, 50% 0%, 100% 12%, 100% 100%, 0% 100%);
+}
+
+/* Scoring/control points: old green hex identity, mirrored around the centre lane-effect tile. */
+.tile.control-zone::after {
+  left: -3px;
+  right: -3px;
+  top: -1px;
+  bottom: -1px;
+  border-radius: 0;
+  background: rgba(30,120,60,0.44);
+  clip-path: polygon(0% 10%, 50% 0%, 100% 10%, 100% 90%, 50% 100%, 0% 90%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(86,190,96,0.64),
+    inset 0 1px 0 rgba(170,255,160,0.10);
+}
+
+/* Keep the centre lane-effect card visually distinct from scoring hexes. */
+.tile.centre {
+  border: 1.5px solid rgba(160,160,160,0.36);
+}
+
+
+/* ── PATCH 158: map 3-deploy layout back to old hex-board styling ── */
+/* Keep the bigger 50x70 card zones, but restore the older chunky hex backplate language. */
+.tile {
+  width: 50px;
+  aspect-ratio: 5 / 7;
+}
+
+/* Default board backplate: old-style hex plate sized to support the larger card zone. */
+.tile::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -5px;
+  right: -5px;
+  top: -10px;
+  bottom: -10px;
+  border-radius: 0;
+  background: rgba(40,32,16,0.40);
+  clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 87%, 50% 100%, 0% 87%);
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1.5px rgba(190,176,145,0.32),
+    inset 0 1px 0 rgba(255,235,190,0.06);
+}
+
+/* Deployment rows: still 3 tiles, but square/card-like and non-hex so they interlock cleanly. */
+.tile.deploy-p1::after,
+.tile.deploy-p2::after {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+  clip-path: none;
+}
+
+.tile.deploy-p1::after {
+  background: rgba(30,60,160,0.42);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(74,120,216,0.80),
+    inset 0 1px 0 rgba(160,190,255,0.12);
+}
+
+.tile.deploy-p2::after {
+  background: rgba(160,30,30,0.42);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(204,48,48,0.80),
+    inset 0 1px 0 rgba(255,160,160,0.10);
+}
+
+/* No Man's Land: old-style neutral directional plates pointing toward the central scoring band. */
+.tile.move::after {
+  left: -5px;
+  right: -5px;
+  background: rgba(30,30,30,0.45);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(160,160,160,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.tile.move[data-row="1"]::after {
+  top: -4px;
+  bottom: -10px;
+  border-radius: 4px 4px 0 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 87%, 50% 100%, 0% 87%);
+}
+
+.tile.move[data-row="5"]::after {
+  top: -10px;
+  bottom: -4px;
+  border-radius: 0 0 4px 4px;
+  clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 100%, 0% 100%);
+}
+
+/* Scoring/control: old green hex plates, mirrored around the centre. */
+.tile.control-zone::after {
+  left: -5px;
+  right: -5px;
+  top: -10px;
+  bottom: -10px;
+  border-radius: 0;
+  background: rgba(30,120,60,0.50);
+  clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 87%, 50% 100%, 0% 87%);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(86,190,96,0.68),
+    inset 0 1px 0 rgba(170,255,160,0.10);
+}
+
+/* Centre lane-effect card stays a separate card slot rather than a scoring hex. */
+.tile.centre::after { display: none; }
+.tile.centre {
+  border: 1.5px solid rgba(160,160,160,0.36);
+}
+
+
+/* ── PATCH 159: old board shape language mapped onto 3-deploy / 50x70 layout ── */
+/* Keep the agreed card footprint. */
+.tile {
+  width: 50px;
+  aspect-ratio: 5 / 7;
+}
+
+/* Restore the cleaner old plate proportions rather than the overly chunky/cropped version. */
+.tile::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -4px;
+  right: -4px;
+  top: -10px;
+  bottom: -10px;
+  border-radius: 0;
+  background: rgba(40,32,16,0.40);
+  clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 87%, 50% 100%, 0% 87%);
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1.5px rgba(190,176,145,0.32);
+}
+
+/* Deployment rows: three flat card slots only, no old arrow/hex tooth. */
+.tile.deploy-p1::after,
+.tile.deploy-p2::after {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+  clip-path: none;
+}
+
+.tile.deploy-p1::after {
+  background: rgba(30,60,160,0.42);
+  box-shadow: inset 0 0 0 1.5px rgba(74,120,216,0.80);
+}
+
+.tile.deploy-p2::after {
+  background: rgba(160,30,30,0.42);
+  box-shadow: inset 0 0 0 1.5px rgba(204,48,48,0.80);
+}
+
+/* No Man's Land: old directional plate style, pointed toward the scoring/control band. */
+.tile.move::after {
+  left: -4px;
+  right: -4px;
+  background: rgba(30,30,30,0.45);
+  box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.42);
+}
+
+.tile.move[data-row="1"]::after {
+  top: -4px;
+  bottom: -10px;
+  border-radius: 4px 4px 0 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 87%, 50% 100%, 0% 87%);
+}
+
+.tile.move[data-row="5"]::after {
+  top: -10px;
+  bottom: -4px;
+  border-radius: 0 0 4px 4px;
+  clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 100%, 0% 100%);
+}
+
+/* Scoring/control: old green full-hex plates, mirrored around the lane effect tile. */
+.tile.control-zone::after {
+  left: -4px;
+  right: -4px;
+  top: -10px;
+  bottom: -10px;
+  border-radius: 0;
+  background: rgba(30,120,60,0.50);
+  clip-path: polygon(0% 13%, 50% 0%, 100% 13%, 100% 87%, 50% 100%, 0% 87%);
+  box-shadow: inset 0 0 0 1.5px rgba(86,190,96,0.68);
+}
+
+/* Centre lane-effect card remains a distinct black/special card slot. */
+.tile.centre::after { display: none; }
+.tile.centre { border: 1.5px solid rgba(160,160,160,0.36); }
+
+
+/* ── PATCH 160: consistent bespoke row padding + flatter board plates ── */
+/* Row spacing is now controlled per row type rather than by protruding shapes colliding. */
+.lane {
+  gap: 0;
+}
+
+.lane .row {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+/* Slightly tighter at the UI-facing ends, but no touching/overlap. */
+.lane .row-0 { margin-bottom: 5px; }
+.lane .row-1 { margin-top: 5px; margin-bottom: 6px; }
+.lane .row-2 { margin-top: 6px; margin-bottom: 6px; }
+.lane .row-3 { margin-top: 6px; margin-bottom: 6px; }
+.lane .row-4 { margin-top: 6px; margin-bottom: 6px; }
+.lane .row-5 { margin-top: 6px; margin-bottom: 5px; }
+.lane .row-6 { margin-top: 5px; }
+
+/* Keep a visible dark card-zone in the middle, separate from the shaped backplate. */
+.tile {
+  background: transparent;
+}
+
+.tile::before {
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 0;
+  inset: 3px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.42);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.06),
+    inset 0 8px 18px rgba(0,0,0,0.18);
+  pointer-events: none;
+}
+
+/* Flatter semi-transparent backplates. Shape gives row identity, fill stays calm. */
+.tile::after {
+  background: rgba(34,30,24,0.34);
+  box-shadow: inset 0 0 0 1.5px rgba(190,176,145,0.28);
+}
+
+/* Deployment: flat card slots, no hex/arrow attachment. */
+.tile.deploy-p1::after,
+.tile.deploy-p2::after {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 4px;
+  clip-path: none;
+}
+
+.tile.deploy-p1::after {
+  background: rgba(30,60,160,0.30);
+  box-shadow: inset 0 0 0 1.5px rgba(74,120,216,0.72);
+}
+
+.tile.deploy-p2::after {
+  background: rgba(160,30,30,0.30);
+  box-shadow: inset 0 0 0 1.5px rgba(204,48,48,0.72);
+}
+
+/* Neutral: pointed forward, but contained enough to preserve row padding. */
+.tile.move::after {
+  left: -3px;
+  right: -3px;
+  background: rgba(34,34,32,0.34);
+  box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.34);
+}
+
+.tile.move[data-row="1"]::after {
+  top: -2px;
+  bottom: -5px;
+  border-radius: 4px 4px 0 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 50% 100%, 0% 90%);
+}
+
+.tile.move[data-row="5"]::after {
+  top: -5px;
+  bottom: -2px;
+  border-radius: 0 0 4px 4px;
+  clip-path: polygon(0% 10%, 50% 0%, 100% 10%, 100% 100%, 0% 100%);
+}
+
+/* Scoring: old green hex language, with smaller overhang to avoid row collision. */
+.tile.control-zone::after {
+  left: -4px;
+  right: -4px;
+  top: -5px;
+  bottom: -5px;
+  border-radius: 0;
+  background: rgba(30,120,60,0.38);
+  clip-path: polygon(0% 12%, 50% 0%, 100% 12%, 100% 88%, 50% 100%, 0% 88%);
+  box-shadow: inset 0 0 0 1.5px rgba(86,190,96,0.58);
+}
+
+/* Centre stays dark and readable. */
+.tile.centre::before {
+  inset: 2px;
+  background: rgba(0,0,0,0.54);
+}
+.tile.centre::after {
+  display: none;
+}
+
+/* Lift bottom controls clear of the iPhone home indicator / browser chrome. */
+.player-bar {
+  bottom: 6px;
+}
+.hub-row {
+  height: calc(52px + env(safe-area-inset-bottom));
+  padding-bottom: calc(env(safe-area-inset-bottom) + 2px);
 }
 
 </style>
@@ -3315,13 +3735,13 @@ const state = {
   // Each row: { zone, count, label }
   // player: 1=p1 deploy, 2=p2 deploy, 0=neutral
   const LANE_ROWS = [
-    { zone:'deploy-p2', count:4, player:2 },
+    { zone:'deploy-p2', count:3, player:2 },
     { zone:'move',      count:3, player:0, label:"No Man's Land" },
     { zone:'control-zone', count:2, player:0 },
     { zone:'control-centre', count:3, player:0 }, // special: control, centre, control
     { zone:'control-zone', count:2, player:0 },
     { zone:'move',      count:3, player:0, label:"No Man's Land" },
-    { zone:'deploy-p1', count:4, player:1 },
+    { zone:'deploy-p1', count:3, player:1 },
   ];
 
   function initGame() {
@@ -3791,6 +4211,8 @@ const state = {
         }
         const rowEl=document.createElement('div');
         rowEl.className='row';
+        rowEl.classList.add(`row-${ri}`);
+        rowEl.dataset.row = ri;
 
         const zones = rowDef.zone==='control-centre'
           ? ['control-zone','centre','control-zone']
@@ -3812,7 +4234,7 @@ const state = {
             if(state.selectedHandCard?.type==='Power') executePowerCard(lane);
             else showLaneEffectOverlay(lane, tile);
           });
-          const symMap={'deploy-p1':'↓','deploy-p2':'↓','control-zone':'♛','centre':'⚜'};
+          const symMap={'control-zone':'♛','centre':'⚜'};
           if(symMap[zone]){const s=document.createElement('span');s.className='tile-symbol';s.textContent=symMap[zone];tile.appendChild(s);}
           if(zone==='centre'){
             const badge=document.createElement('span');
