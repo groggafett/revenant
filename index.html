@@ -2769,6 +2769,7 @@ window.addEventListener('unhandledrejection', e => {
   function normaliseImportedCard(card) {
     if (!card || typeof card !== 'object') return card;
     const identity = generatedCardIdentity(card);
+    const displayName = card.displayName || card.display_name || card.display || card.title || card.name || identity;
     const weapon = card.weapon && typeof card.weapon === 'object' ? { ...card.weapon } : card.weapon;
     const type = normaliseCardTypeValue(card.type || '');
     const triggerKey = normaliseAbilityTriggerValue(card.trigger || card.mechanic?.trigger || card.abilityTrigger || '');
@@ -2792,6 +2793,8 @@ window.addEventListener('unhandledrejection', e => {
     return {
       ...card,
       id: identity,
+      name: card.name || displayName,
+      displayName,
       artId: card.artId || identity,
       internalName: card.internalName || card.internal_name || card.name || identity,
       type,
@@ -2825,9 +2828,11 @@ window.addEventListener('unhandledrejection', e => {
     return repo.find(r =>
       String(r.id ?? '').trim().toLowerCase() === key ||
       String(r.name ?? '').trim().toLowerCase() === key ||
+      String(r.displayName ?? r.display_name ?? '').trim().toLowerCase() === key ||
       String(r.internalName ?? '').trim().toLowerCase() === key ||
       cardSlug(r.id) === slug ||
       cardSlug(r.name) === slug ||
+      cardSlug(r.displayName ?? r.display_name) === slug ||
       cardSlug(r.internalName) === slug
     );
   }
@@ -3083,6 +3088,11 @@ const state = {
 
   function formatCardName(name) {
     return String(name ?? '').trim().toUpperCase();
+  }
+
+  function cardDisplayName(card, fallback='') {
+    const raw = card?.displayName ?? card?.display_name ?? card?.display ?? card?.title ?? card?.name ?? fallback ?? card?.internalName ?? card?.id ?? '';
+    return formatCardName(raw);
   }
 
   function expectedArtLabel(card) {
@@ -3617,7 +3627,7 @@ const state = {
           <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
           <div class="card-zoom-title">
             <div class="card-zoom-order">${escapeHtml(header)}</div>
-            <div class="card-zoom-name">${formatCardName(card.name)}</div>
+            <div class="card-zoom-name">${cardDisplayName(card)}</div>
             ${subtitle ? `<div class="card-zoom-weapon">${escapeHtml(subtitle)}</div>` : ''}
           </div>
           <div class="card-zoom-side-icon">${isPower ? '✦' : factionIcon}</div>
@@ -4087,7 +4097,7 @@ const state = {
     tile.querySelector('.power-ready-overlay')?.remove();
     const overlay = document.createElement('div');
     overlay.className = 'power-ready-overlay';
-    overlay.innerHTML = `<div class="power-ready-chip"><div class="power-ready-icon">✦</div><div class="power-ready-text">Cast Ready</div></div><div class="power-ready-label">${escapeHtml(formatCardName(card?.name || 'Power'))}</div>`;
+    overlay.innerHTML = `<div class="power-ready-chip"><div class="power-ready-icon">✦</div><div class="power-ready-text">Cast Ready</div></div><div class="power-ready-label">${escapeHtml(cardDisplayName(card, 'Power'))}</div>`;
     tile.appendChild(overlay);
   }
 
@@ -4250,7 +4260,7 @@ const state = {
       targetFilter: (tid) => state.board[tid]?.owner && state.board[tid].owner !== state.activePlayer,
       execute(card, tileId) {
         const dmg = card.value ?? card.weapon?.damage ?? 2;
-        damageUnitByPower(tileId, dmg, `${formatCardName(card.name)}: ${dmg} damage`);
+        damageUnitByPower(tileId, dmg, `${cardDisplayName(card)}: ${dmg} damage`);
         powerCardDone();
       }
     },
@@ -4260,7 +4270,7 @@ const state = {
       targetFilter: (tid) => state.board[tid]?.owner === state.activePlayer,
       execute(card, tileId) {
         const amt = card.value ?? 3;
-        healUnitByPower(tileId, amt, formatCardName(card.name));
+        healUnitByPower(tileId, amt, cardDisplayName(card));
         powerCardDone();
       }
     },
@@ -4278,7 +4288,7 @@ const state = {
         tile.classList.add('confirm-tile');
         setTimeout(() => tile.classList.remove('confirm-tile'), 700);
         renderUnit(tile, unit);
-        showToastMsg(`${formatCardName(card.name)}: +${gain} action`);
+        showToastMsg(`${cardDisplayName(card)}: +${gain} action`);
         powerCardDone();
       }
     },
@@ -4296,7 +4306,7 @@ const state = {
         renderUnit(tile, unit);
         tile.classList.add('confirm-tile');
         setTimeout(() => tile.classList.remove('confirm-tile'), 700);
-        showToastMsg(`${formatCardName(card.name)}: +${amt} HP`);
+        showToastMsg(`${cardDisplayName(card)}: +${amt} HP`);
         powerCardDone();
       }
     },
@@ -4321,7 +4331,7 @@ const state = {
           showDiceFloat(tileId, result.roll, result.saved);
           setTimeout(()=>{
             tile.classList.remove('highlight-target');
-            if(!result.saved && state.board[tileId]) damageUnitByPower(tileId, dmg, `${formatCardName(card.name)}: ${dmg} damage`);
+            if(!result.saved && state.board[tileId]) damageUnitByPower(tileId, dmg, `${cardDisplayName(card)}: ${dmg} damage`);
             setTimeout(resolveNext, 650);
           }, 800);
         }
@@ -4747,7 +4757,7 @@ const state = {
               <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
               <div class="card-zoom-title">
                 <div class="card-zoom-order">${escapeHtml(header)}</div>
-                <div class="card-zoom-name">${formatCardName(card.name)}</div>
+                <div class="card-zoom-name">${cardDisplayName(card)}</div>
                 ${subtitle ? `<div class="card-zoom-weapon">${escapeHtml(subtitle)}</div>` : ''}
               </div>
               <div class="card-zoom-side-icon ${isPower ? 'power' : ''}">${isPower ? '✦' : factionIcon}</div>
@@ -4969,7 +4979,7 @@ const state = {
       const preview = document.createElement('div');
       preview.className = `unit-on-tile ${col}-unit pending-deploy-preview`;
       preview.style.cssText = 'opacity:0.7;';
-      preview.innerHTML = `<div class="unit-name-on-tile" style="font-size:var(--fs-xs);line-height:1.2;text-align:center;padding:2px;">${formatCardName(card.name)}</div>`;
+      preview.innerHTML = `<div class="unit-name-on-tile" style="font-size:var(--fs-xs);line-height:1.2;text-align:center;padding:2px;">${cardDisplayName(card)}</div>`;
       tile.appendChild(preview);
     }
     const cost = card?.cost ?? 0;
@@ -5149,14 +5159,14 @@ const state = {
       badges.style.display = cardTypeEarly === 'Power' ? 'none' : '';
     }
     if (unitInfo) unitInfo.style.display = 'none';
-    document.getElementById('prof-name').textContent=formatCardName(card.name);
+    document.getElementById('prof-name').textContent=cardDisplayName(card);
     document.getElementById('prof-weapon-name').textContent = card.weapon?.name ?? '';
     document.getElementById('prof-faction-icon').textContent=FACTION_ICONS[card.faction]||'';
     // Show unit info in bottom bar — hidden, badges used instead
     const uInfo = document.getElementById('hub-unit-info');
     if (uInfo) {
       document.getElementById('hub-unit-icon').textContent = FACTION_ICONS[card.faction] ?? '';
-      document.getElementById('hub-unit-name').textContent = formatCardName(card.name);
+      document.getElementById('hub-unit-name').textContent = cardDisplayName(card);
       document.getElementById('hub-unit-weapon').textContent = card.weapon?.name ? '⚔ ' + card.weapon.name : '';
     }
     document.getElementById('prof-move').textContent = card.move == null ? '' : card.move===-1 ? '—' : card.move;
@@ -5353,7 +5363,7 @@ const state = {
 
     el.innerHTML = `
       <div class="unit-hp ${unit.owner===1?'p1-hp':unit.owner===2?'p2-hp':''}"><span>${unit.hp}</span></div>
-      <div class="unit-name">${formatCardName(unit.name)}</div>
+      <div class="unit-name">${cardDisplayName(unit)}</div>
       ${bottomHtml}`;
     if (unit.artId) {
       el.setAttribute('style', artStyle(unit));
@@ -6102,7 +6112,7 @@ const state = {
           ${defenceHtml}
           <div class="battle-card-fallback" id="${fallbackId}">${expectedArtLabel(card)}</div>
         </div>
-        <div class="battle-card-name">${formatCardName(card.name)}</div>
+        <div class="battle-card-name">${cardDisplayName(card)}</div>
         ${card.weapon?.name ? `<div class="battle-card-weapon">${escapeHtml(card.weapon.name)}</div>` : ''}
       </div>`;
     }
@@ -7238,6 +7248,55 @@ const state = {
       .finally(()=>{ initGame(); });
   }));
 
+  function boardFrameFromTap(clientX, clientY) {
+    const tiles = [...document.querySelectorAll('.tile[data-lane][data-row]')];
+    if (!tiles.length) return null;
+    const outerRect = outer.getBoundingClientRect();
+    let best = null;
+    let bestScore = Infinity;
+    tiles.forEach(tile => {
+      const r = tile.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = clientX - cx;
+      const dy = clientY - cy;
+      const score = dx * dx + dy * dy;
+      if (score < bestScore) { bestScore = score; best = tile; }
+    });
+    if (!best) return null;
+    const lane = best.dataset.lane;
+    const row = best.dataset.row;
+    const rowTiles = tiles.filter(t => t.dataset.lane === lane && t.dataset.row === row);
+    const rects = rowTiles.map(t => t.getBoundingClientRect());
+    const left = Math.min(...rects.map(r => r.left));
+    const right = Math.max(...rects.map(r => r.right));
+    const top = Math.min(...rects.map(r => r.top));
+    const bottom = Math.max(...rects.map(r => r.bottom));
+    return {
+      lane,
+      row,
+      cx: (left + right) / 2 - outerRect.left,
+      cy: (top + bottom) / 2 - outerRect.top,
+      width: right - left,
+      height: bottom - top
+    };
+  }
+
+  function zoomToBoardFrame(frame) {
+    if (!frame) return false;
+    const target = clamp(2.5, minScale, 3);
+    const ow = outer.clientWidth;
+    const oh = outer.clientHeight;
+    const worldCx = (frame.cx - tx) / scale;
+    const worldCy = (frame.cy - ty) / scale;
+    scale = target;
+    tx = clamp(ow / 2 - worldCx * scale, ow - inner.offsetWidth * scale, 0);
+    ty = clamp(oh / 2 - worldCy * scale, oh - inner.offsetHeight * scale, 0);
+    setBoardTransition(320);
+    applyTransform();
+    return true;
+  }
+
   // ── DOUBLE TAP TO ZOOM ──
   let _lastTap=0, _lastTapX=0, _lastTapY=0;
   outer.addEventListener('touchend', e=>{
@@ -7254,13 +7313,15 @@ const state = {
         // Zoom out to fit
         fitBoard();
       } else {
-        // Zoom in to 2.5x centred on tap point
-        const target=clamp(2.5, minScale, 3);
-        tx=tapX-tapX*(target/scale);
-        ty=tapY-tapY*(target/scale);
-        scale=target;
-        setBoardTransition(300);
-        applyTransform();
+        // Zoom in to the tapped lane/row frame rather than the raw tap point.
+        if (!zoomToBoardFrame(boardFrameFromTap(t.clientX, t.clientY))) {
+          const target=clamp(2.5, minScale, 3);
+          tx=tapX-tapX*(target/scale);
+          ty=tapY-tapY*(target/scale);
+          scale=target;
+          setBoardTransition(300);
+          applyTransform();
+        }
       }
       _lastTap=0;
     } else {
@@ -7835,7 +7896,8 @@ return '';
 
 const card = { ...raw };
 
-const name = get('name','cardName','card');
+const displayName = get('displayName','display_name','display','title','card_display_name','player_name');
+const name = get('name','cardName','card') || displayName;
 const internalName = get('internalName','internal_name','internal','slug');
 const variant = get('variant');
 const artId = get('artId','art_id','art');
@@ -7849,6 +7911,7 @@ const move = get('move','Move','movement','mov','speed');
 const save = get('save','Save','armour','armor','defence','defense');
 const special = get('special','abilityText','ability_text','rules','text');
 
+if(displayName) card.displayName = displayName;
 if(name) card.name = name;
 if(internalName) card.internalName = internalName;
 else if(name && !card.internalName) card.internalName = name;
@@ -9795,7 +9858,8 @@ function draftEditorHtml(card, id){
         ${selectField('Unit Type','unitType',unitType,['Common','Uncommon','Hero'],false,'revUnitField')}
       </div>
       <div class="revFieldGrid">
-        ${field('Name','name',card.name)}
+        ${field('Display Name','displayName',card.displayName || card.display_name || card.name)}
+        ${field('Name / ID Base','name',card.name)}
         ${field('Internal Name','internalName',card.internalName || card.name)}
         ${field('Variant','variant',card.variant || '')}
         ${selectField('Faction','faction',card.faction || 'universal',factionOptions())}
@@ -9882,7 +9946,8 @@ function collectDraftFields(tile, original){
   };
   const card = {
     ...original,
-    name: get('name') || original.name,
+    displayName: get('displayName') || original.displayName || original.display_name || get('name') || original.name,
+    name: get('name') || original.name || get('displayName'),
     internalName: get('internalName') || get('name') || original.internalName,
     variant: get('variant') || '',
     kind,
@@ -9943,7 +10008,7 @@ function makeTile(card, mode, player, isDraft){
   tile.dataset.draft = isDraft ? '1' : '0';
   tile.dataset.mode = mode;
   if (mode === 'deck') tile.classList.add('revDeckTile');
-  const name = escapeHtml(card.name || id);
+  const name = escapeHtml(cardDisplayName(card, id));
   const icon = escapeHtml(editorFactionIcon(card));
   const kindLabel = escapeHtml(editorTileKindLabel(card));
   const deck = mode === 'deck' ? getDeck(player) : null;
