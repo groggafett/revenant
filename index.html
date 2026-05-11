@@ -2103,6 +2103,45 @@ pointer-events: none;
 }
 #act-btn-skip .act-label { font-size: 9px; }
 
+
+
+/* Patch 132 — floating hand + hub-only panel */
+.player-bar {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.player-bar .hub-row {
+  background: linear-gradient(0deg, rgba(13,11,8,0.96) 0%, rgba(20,16,8,0.96) 100%);
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.4);
+}
+.player-bar.p1-active .hub-row {
+  background: linear-gradient(0deg,rgba(8,12,20,0.96) 0%,rgba(14,16,32,0.96) 100%);
+}
+.player-bar.p2-active .hub-row {
+  background: linear-gradient(0deg,rgba(20,8,8,0.96) 0%,rgba(32,8,8,0.96) 100%);
+}
+.inspector {
+  border-top: 0 !important;
+  background: transparent !important;
+}
+.inspector-deck {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+#hand-scroll {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+#open-editor-btn.rev-menu-editor-btn {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  z-index: auto !important;
+  padding: 14px 22px !important;
+}
+
 </style>
 
 </head>
@@ -6001,39 +6040,47 @@ const state = {
 
     const diceTrigger = readDiceTrigger(atk);
     const atkDice = [];
+    const rollEvents = [];
     let hits = 0;
     let bonusHits = 0;
     let chainRolls = 0;
-    const queue = Array.from({ length: Math.max(0, attackCount) }, () => 'base');
+    const baseAttackCount = Math.max(0, attackCount);
+    const queue = Array.from({ length: baseAttackCount }, () => 'base');
     const MAX_ATTACK_DICE = 60;
 
     while (queue.length && atkDice.length < MAX_ATTACK_DICE) {
-      queue.shift();
+      const source = queue.shift() || 'base';
       const d = Math.ceil(Math.random() * 6);
       atkDice.push(d);
       const isHit = d >= hitThresh;
+      let bonusAdded = 0;
+      let chainAdded = 0;
       if (isHit) hits += 1;
 
       // Dice triggers use natural dice values, before any later modifiers.
       // Exploding hits only apply from successful attack rolls.
       if (diceTrigger && isHit && d >= diceTrigger.threshold) {
         if (diceTrigger.effect === 'exploding_hits') {
-          hits += diceTrigger.value;
-          bonusHits += diceTrigger.value;
+          bonusAdded = Math.max(1, Number(diceTrigger.value) || 1);
+          hits += bonusAdded;
+          bonusHits += bonusAdded;
         } else if (diceTrigger.effect === 'chain_hits') {
-          for (let i = 0; i < diceTrigger.value && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
+          const toAdd = Math.max(1, Number(diceTrigger.value) || 1);
+          for (let i = 0; i < toAdd && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
             queue.push('chain');
             chainRolls += 1;
+            chainAdded += 1;
           }
         }
       }
+      rollEvents.push({ value:d, source, isHit, bonusAdded, chainAdded });
     }
 
     const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
     const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
     let totalDmg = (hits - saved) * (Number(atk.weapon?.damage) || 0);
     if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
-    return { atkDice, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
+    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
   }
 
   function openBattleOverlay(targetTileId) {
@@ -6173,6 +6220,17 @@ const state = {
       row.innerHTML = '';
       for (let i = 0; i < count; i++) row.appendChild(makeDie('', 'die-ghost die-reveal'));
     };
+    const appendGhostDice = (row, count) => {
+      if (!row) return;
+      for (let i = 0; i < count; i++) row.appendChild(makeDie('', 'die-ghost die-reveal'));
+    };
+    const appendResolvedDie = async (row, value, cls='') => {
+      if (!row) return null;
+      const die = makeDie(value, `${cls} die-reveal`.trim());
+      row.appendChild(die);
+      await wait(Math.max(120, Math.round(DIE_MS * 0.55)));
+      return die;
+    };
     const fillPlaceholder = async (row, index, value, cls='') => {
       const die = row?.children?.[index];
       if (!die) return null;
@@ -6252,29 +6310,45 @@ const state = {
       const hpBefore = def.hp;
       const hpAfter = Math.max(0, hpBefore - result.totalDmg);
       const slain = hpAfter <= 0;
-      const { atkDice, hits, saveDice, saved, autoFail, modSave, hitThresh } = result;
+      const { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, hitThresh } = result;
       const failed = Math.max(0, hits - saved);
       const ap = atk.weapon?.ap ?? 0;
       if (attackProfile) attackProfile.classList.add('sequence-live');
       setRowButton('', null);
-      setupGhostRow(attackRow, atkDice.length + (result.bonusHits || 0));
+      setupGhostRow(attackRow, baseAttackCount ?? atkDice.length);
       setAttackSummary('');
       setPreAttackDefenceRow();
 
       (async () => {
         await wait(PRE_ATTACK_PAUSE);
-        let slotIndex = 0;
-        for (const d of atkDice) {
-          const isHit = d >= hitThresh;
-          await fillPlaceholder(attackRow, slotIndex++, d, isHit ? 'die-hit die-hit-active' : 'die-miss');
-        }
-        for (let i = 0; i < (result.bonusHits || 0); i++) {
-          await fillPlaceholder(attackRow, slotIndex++, '+', 'die-hit die-hit-active');
+        let attackSlotIndex = 0;
+        const events = Array.isArray(rollEvents) && rollEvents.length
+          ? rollEvents
+          : atkDice.map((d, i) => ({ value:d, source:i < (baseAttackCount ?? atkDice.length) ? 'base' : 'chain', isHit:d >= hitThresh, bonusAdded:0, chainAdded:0 }));
+
+        for (const ev of events) {
+          const isHit = !!ev.isHit;
+          const triggeredSpecial = (Number(ev.bonusAdded) || 0) > 0 || (Number(ev.chainAdded) || 0) > 0;
+          while (attackRow && attackRow.children.length <= attackSlotIndex) appendGhostDice(attackRow, 1);
+          const dieClass = isHit
+            ? `die-hit die-hit-active${triggeredSpecial ? ' die-special-trigger' : ''}`
+            : 'die-miss';
+          await fillPlaceholder(attackRow, attackSlotIndex++, ev.value, dieClass);
+
+          if (ev.bonusAdded > 0) {
+            for (let i = 0; i < ev.bonusAdded; i++) {
+              await appendResolvedDie(attackRow, '+', 'die-hit die-hit-active die-bonus-hit die-special-trigger');
+            }
+          }
+          if (ev.chainAdded > 0) {
+            appendGhostDice(attackRow, ev.chainAdded);
+            await wait(120);
+          }
         }
         const triggerNote = result.bonusHits > 0
           ? ` · Exploding Hits +${result.bonusHits}`
           : result.chainRolls > 0
-            ? ` · Chain Rolls +${result.chainRolls}`
+            ? ` · Chain Dice +${result.chainRolls}`
             : '';
         setAttackSummary(`${hits} hit${hits !== 1 ? 's' : ''}${triggerNote}`, hits > 0 ? 'good' : 'bad');
         await wait(POST_ATTACK_PAUSE);
@@ -7007,8 +7081,21 @@ const state = {
   const inner=document.getElementById('board-inner');
   let scale=1,tx=0,ty=0,minScale=1;
   let lastDist=null,isPinching=false,startX,startY;
+  let panLastX=0, panLastY=0, panLastT=0, panVX=0, panVY=0;
+  let boardTransitionTimer=null;
 
   function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
+
+  function setBoardTransition(ms=280, curve='cubic-bezier(0.22,0.61,0.36,1)'){
+    clearTimeout(boardTransitionTimer);
+    inner.style.transition = `transform ${ms}ms ${curve}`;
+    boardTransitionTimer = setTimeout(()=>{ inner.style.transition=''; boardTransitionTimer=null; }, ms + 40);
+  }
+
+  function clearBoardTransition(){
+    if(boardTransitionTimer){ clearTimeout(boardTransitionTimer); boardTransitionTimer=null; }
+    inner.style.transition='';
+  }
 
   const ELASTIC = 40;
   function applyTransform(elastic=false){
@@ -7074,15 +7161,19 @@ const state = {
     setTimeout(() => { inner.style.transition = ''; }, 320);
   }
 
-  function snapBack(){
-    const ow=outer.clientWidth;
-    const sw=inner.offsetWidth*scale;
-    const bounded = clamp(tx, ow-sw, 0);
-    if(bounded !== tx){
-      inner.style.transition='transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94)';
-      tx=bounded; ty=0;
+  function snapBack(useInertia=false){
+    const ow=outer.clientWidth, oh=outer.clientHeight;
+    const sw=inner.offsetWidth*scale, sh=inner.offsetHeight*scale;
+    if(useInertia && scale > minScale){
+      tx += panVX * 170;
+      ty += panVY * 170;
+    }
+    const boundedX = clamp(tx, ow-sw, 0);
+    const boundedY = scale > minScale ? clamp(ty, oh-sh, 0) : 0;
+    if(Math.abs(boundedX - tx) > 0.5 || Math.abs(boundedY - ty) > 0.5 || useInertia){
+      setBoardTransition(useInertia ? 360 : 280);
+      tx=boundedX; ty=boundedY;
       inner.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
-      setTimeout(()=>{ inner.style.transition=''; },300);
     }
   }
 
@@ -7168,6 +7259,7 @@ const state = {
         tx=tapX-tapX*(target/scale);
         ty=tapY-tapY*(target/scale);
         scale=target;
+        setBoardTransition(300);
         applyTransform();
       }
       _lastTap=0;
@@ -7187,8 +7279,16 @@ const state = {
         return;
       }
     }
+    clearBoardTransition();
+    panVX=0; panVY=0;
     if(e.touches.length===2){isPinching=true;lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
-    else if(!isPinching){startX=e.touches[0].clientX-tx;startY=e.touches[0].clientY-ty;}
+    else if(!isPinching){
+      const d=boardFlipped?-1:1;
+      const px=e.touches[0].clientX*d;
+      const py=e.touches[0].clientY*d;
+      startX=px-tx; startY=py-ty;
+      panLastX=px; panLastY=py; panLastT=performance.now();
+    }
   },{passive:true});
 
   outer.addEventListener('touchmove',e=>{
@@ -7201,12 +7301,23 @@ const state = {
       const mid={x:(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left,y:(e.touches[0].clientY+e.touches[1].clientY)/2-rect.top};
       if(lastDist){const ns=clamp(scale*dist/lastDist,minScale,3);tx=mid.x-(mid.x-tx)*ns/scale;ty=mid.y-(mid.y-ty)*ns/scale;scale=ns;}
       lastDist=dist;applyTransform();
-    } else if(!isPinching){const d=boardFlipped?-1:1;tx=e.touches[0].clientX*d-startX;ty=e.touches[0].clientY*d-startY;applyTransform(true);}
+    } else if(!isPinching){
+      const d=boardFlipped?-1:1;
+      const px=e.touches[0].clientX*d;
+      const py=e.touches[0].clientY*d;
+      const now=performance.now();
+      const dt=Math.max(16, now-panLastT);
+      panVX=(px-panLastX)/dt;
+      panVY=(py-panLastY)/dt;
+      panLastX=px; panLastY=py; panLastT=now;
+      tx=px-startX; ty=py-startY;
+      applyTransform(true);
+    }
   },{passive:false});
 
   outer.addEventListener('touchend',e=>{
     if(e.touches.length<2)lastDist=null;
-    if(e.touches.length===0){ isPinching=false; snapBack(); }
+    if(e.touches.length===0){ isPinching=false; snapBack(true); }
   },{passive:true});
 </script>
 
@@ -7320,23 +7431,16 @@ return original.call(this,key,value);
 
 function injectEditorButton(){
 
-const menu = document.body;
+const menu = document.querySelector('#start-overlay .splash-actions');
 
-if(document.getElementById('open-editor-btn')) return;
+if(!menu || document.getElementById('open-editor-btn')) return;
 
 const btn = document.createElement('button');
 
 btn.id = 'open-editor-btn';
-btn.innerText = 'EDITOR';
-
-btn.style.position = 'fixed';
-btn.style.top = '12px';
-btn.style.right = '12px';
-btn.style.zIndex = '9999';
-btn.style.padding = '10px 14px';
-btn.style.background = '#1a1408';
-btn.style.border = '1px solid #c08020';
-btn.style.color = '#d8c49a';
+btn.type = 'button';
+btn.className = 'splash-btn ghost rev-menu-editor-btn';
+btn.innerText = 'Editor';
 
 btn.onclick = function(){
 
@@ -11470,37 +11574,45 @@ document.addEventListener('click', function(e){
     const attackCount = (Number(atk.weapon?.attacks) || 0) + (atk.bonusAttacks || 0);
     const diceTrigger = revDiceTriggerFromUnit(atk);
     const atkDice = [];
+    const rollEvents = [];
     let hits = 0;
     let bonusHits = 0;
     let chainRolls = 0;
-    const queue = Array.from({ length: Math.max(0, attackCount) }, () => 'base');
+    const baseAttackCount = Math.max(0, attackCount);
+    const queue = Array.from({ length: baseAttackCount }, () => 'base');
     const MAX_ATTACK_DICE = 60;
 
     while (queue.length && atkDice.length < MAX_ATTACK_DICE) {
-      queue.shift();
+      const source = queue.shift() || 'base';
       const d = Math.ceil(Math.random() * 6);
       atkDice.push(d);
       const isHit = d >= hitThresh;
+      let bonusAdded = 0;
+      let chainAdded = 0;
       if (isHit) hits += 1;
 
       if (diceTrigger && isHit && d >= diceTrigger.threshold) {
         if (diceTrigger.effect === 'exploding_hits') {
-          bonusHits += diceTrigger.value;
-          hits += diceTrigger.value;
+          bonusAdded = Math.max(1, Number(diceTrigger.value) || 1);
+          bonusHits += bonusAdded;
+          hits += bonusAdded;
         } else if (diceTrigger.effect === 'chain_hits') {
-          for (let i = 0; i < diceTrigger.value && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
+          const toAdd = Math.max(1, Number(diceTrigger.value) || 1);
+          for (let i = 0; i < toAdd && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
             queue.push('chain');
             chainRolls += 1;
+            chainAdded += 1;
           }
         }
       }
+      rollEvents.push({ value:d, source, isHit, bonusAdded, chainAdded });
     }
 
     const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
     const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
     let totalDmg = (hits - saved) * (Number(atk.weapon?.damage) || 0);
     if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
-    return { atkDice, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
+    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
   };
 
   // Draft editor ability fields are handled by the unified Ability Builder above.
@@ -11622,5 +11734,19 @@ document.addEventListener('click', function(e){
 }
 </style>
 
+
+<style id="rev-combat-inline-chain-v134">
+/* v134: chain dice grow the main attack dice row; purple marks ability-triggering dice. */
+.battle-sequence .die.die-special-trigger {
+  color: #e8d0ff !important;
+  border-color: #a864ff !important;
+  background: radial-gradient(circle at 50% 42%, rgba(168,100,255,0.26), rgba(24,10,42,0.86)) !important;
+  box-shadow: 0 0 12px rgba(168,100,255,0.68), inset 0 0 8px rgba(232,208,255,0.18) !important;
+  text-shadow: 0 0 8px rgba(232,208,255,0.72);
+}
+.battle-sequence .die.die-bonus-hit {
+  box-shadow: 0 0 12px rgba(168,100,255,0.62), inset 0 0 8px rgba(232,208,255,0.16) !important;
+}
+</style>
 </body>
 </html>
