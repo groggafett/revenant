@@ -2922,6 +2922,491 @@ pointer-events: none;
   inset: 0;
 }
 
+
+/* ── PATCH 164: consistent plate body + directional extensions ── */
+/*
+  Layout model:
+  - playable card zone is fixed by .tile: 47px x 65.8px
+  - each tile gets the same base plate body: card zone + 3px padding each side
+  - row types differ only by the extra directional/hex extensions from that same body
+*/
+.tile {
+  width: 47px;
+  aspect-ratio: 5 / 7;
+  background: transparent;
+}
+
+.unit-on-tile {
+  inset: 0;
+}
+
+/* The actual usable card zone: same everywhere. */
+.tile::before {
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 0;
+  inset: 3px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.24);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.045),
+    inset 0 8px 16px rgba(0,0,0,0.10);
+  pointer-events: none;
+}
+
+/* The shared body every tile type starts from. */
+.tile::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+  background: rgba(34,30,24,0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(190,176,145,0.22);
+  pointer-events: none;
+}
+
+/* Row spacing uses the known point depth so rows interlock neatly without touching. */
+.lane {
+  gap: 0;
+  padding: 0 2px;
+}
+
+.lane .row {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+/* Deploy/body to neutral/body+point */
+.lane .row-0 { margin-bottom: 6px; }
+.lane .row-1 { margin-top: 6px; margin-bottom: 5px; }
+
+/* Neutral point into scoring hex */
+.lane .row-2 { margin-top: 5px; margin-bottom: 7px; }
+
+/* Centre/scoring band: slightly more room around the lane effect row */
+.lane .row-3 { margin-top: 7px; margin-bottom: 7px; }
+.lane .row-4 { margin-top: 7px; margin-bottom: 5px; }
+
+/* Scoring hex into neutral point, then neutral into deploy */
+.lane .row-5 { margin-top: 5px; margin-bottom: 6px; }
+.lane .row-6 { margin-top: 6px; }
+
+/* Keep the freed width as centre separation rather than outside padding. */
+.board-inner {
+  gap: 24px;
+}
+
+/* Deployment: same body width as every other tile, no direction point. */
+.tile.deploy-p1::after,
+.tile.deploy-p2::after {
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+}
+
+.tile.deploy-p1::after {
+  background: rgba(30,60,160,0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(74,120,216,0.64);
+}
+
+.tile.deploy-p2::after {
+  background: rgba(160,30,30,0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(204,48,48,0.64);
+}
+
+/* No Man's Land: same body width, plus one forward point. */
+.tile.move::after {
+  left: -3px;
+  right: -3px;
+  background: rgba(34,34,32,0.24);
+  box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.26);
+}
+
+/* Upper neutral row points down toward scoring. */
+.tile.move[data-row="1"]::after {
+  top: -3px;
+  bottom: -10px;
+  border-radius: 4px 4px 0 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 86%, 50% 100%, 0% 86%);
+}
+
+/* Lower neutral row points up toward scoring. */
+.tile.move[data-row="5"]::after {
+  top: -10px;
+  bottom: -3px;
+  border-radius: 0 0 4px 4px;
+  clip-path: polygon(0% 14%, 50% 0%, 100% 14%, 100% 100%, 0% 100%);
+}
+
+/* Control/scoring: same body width, with a full hex extension. */
+.tile.control-zone::after {
+  left: -3px;
+  right: -3px;
+  top: -10px;
+  bottom: -10px;
+  border-radius: 0;
+  background: rgba(30,120,60,0.28);
+  clip-path: polygon(0% 14%, 50% 0%, 100% 14%, 100% 86%, 50% 100%, 0% 86%);
+  box-shadow: inset 0 0 0 1.5px rgba(86,190,96,0.48);
+}
+
+/* Centre lane-effect tile: same body width, distinct dark centre slot, no green hex. */
+.tile.centre::before {
+  inset: 3px;
+  background: rgba(0,0,0,0.38);
+}
+
+.tile.centre::after {
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+  display: block;
+  background: rgba(8,8,6,0.34);
+  box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.30);
+}
+
+
+/* ── PATCH 166: compact interlocking board geometry ── */
+/*
+  Fix from 165/163 playtest:
+  - board starts higher under HUD
+  - rows are compact and measured from shared rectangular bodies
+  - arrows/hex points are short wedges that sit in the body gap, not long stems
+  - neutral bodies are visually the same width as deployment/control bodies
+*/
+.board-inner {
+  padding: calc(74px + env(safe-area-inset-top)) 20vw 175px;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.lane {
+  justify-content: flex-start;
+  gap: 0;
+  padding: 0 2px;
+}
+
+/* Compact body-to-body rhythm. Points occupy this gap visually. */
+.lane .row {
+  margin-top: 0;
+  margin-bottom: 3px;
+  gap: 7px;
+}
+.lane .row-6 { margin-bottom: 0; }
+
+.tile {
+  width: 47px;
+  aspect-ratio: 5 / 7;
+  background: transparent;
+}
+
+.unit-on-tile { inset: 0; }
+
+/* Fixed playable card zone. */
+.tile::before {
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 0;
+  inset: 3px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.24);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.045),
+    inset 0 8px 16px rgba(0,0,0,0.10);
+  pointer-events: none;
+}
+
+/* Shared padded rectangular body for every tile type. */
+.tile::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+  background: rgba(34,30,24,0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(190,176,145,0.22);
+  pointer-events: none;
+}
+
+/* Deployment = same body only. */
+.tile.deploy-p1::after,
+.tile.deploy-p2::after {
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+}
+.tile.deploy-p1::after {
+  background: rgba(30,60,160,0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(74,120,216,0.64);
+}
+.tile.deploy-p2::after {
+  background: rgba(160,30,30,0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(204,48,48,0.64);
+}
+
+/* No Man's Land = same body width plus a short point toward scoring. */
+.tile.move::after {
+  left: -3px;
+  right: -3px;
+  background: rgba(34,34,32,0.28);
+  box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.34);
+}
+.tile.move[data-row="1"]::after {
+  top: -3px;
+  bottom: -7px; /* 4px beyond the shared body: short wedge, not a stem */
+  border-radius: 4px 4px 0 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 89%, 50% 100%, 0% 89%);
+}
+.tile.move[data-row="5"]::after {
+  top: -7px; /* 4px beyond the shared body */
+  bottom: -3px;
+  border-radius: 0 0 4px 4px;
+  clip-path: polygon(0% 11%, 50% 0%, 100% 11%, 100% 100%, 0% 100%);
+}
+
+/* Control/scoring = same body width plus shorter full-hex points. */
+.tile.control-zone::after {
+  left: -3px;
+  right: -3px;
+  top: -8px;    /* 5px beyond the shared body */
+  bottom: -8px; /* 5px beyond the shared body */
+  border-radius: 0;
+  background: rgba(30,120,60,0.30);
+  clip-path: polygon(0% 12%, 50% 0%, 100% 12%, 100% 88%, 50% 100%, 0% 88%);
+  box-shadow: inset 0 0 0 1.5px rgba(86,190,96,0.52);
+}
+
+/* Centre lane-effect tile = same body width, distinct dark special slot. */
+.tile.centre::before {
+  inset: 3px;
+  background: rgba(0,0,0,0.38);
+}
+.tile.centre::after {
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+  display: block;
+  background: rgba(8,8,6,0.34);
+  box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.30);
+}
+
+
+/* ── PATCH 167: increase vertical row padding by 4px ── */
+.lane .row {
+  margin-bottom: 7px;
+}
+.lane .row-6 {
+  margin-bottom: 0;
+}
+
+
+/* ── PATCH 168: clean row-margin stack ── */
+/*
+  Remove leftover row-specific top margins from earlier board experiments.
+  Row spacing is now one predictable body-to-body gap.
+*/
+.lane .row,
+.lane .row-0,
+.lane .row-1,
+.lane .row-2,
+.lane .row-3,
+.lane .row-4,
+.lane .row-5,
+.lane .row-6 {
+  margin-top: 0;
+}
+
+.lane .row,
+.lane .row-0,
+.lane .row-1,
+.lane .row-2,
+.lane .row-3,
+.lane .row-4,
+.lane .row-5 {
+  margin-bottom: 7px;
+}
+
+.lane .row-6 {
+  margin-bottom: 0;
+}
+
+
+/* ── PATCH 169: fixed row-box board layout ── */
+/*
+  Root fix:
+  - each lane row has a fixed row box tall enough to contain tile plates and extensions
+  - tiles are centred inside that row box
+  - row-to-row spacing is a small real gap between row boxes
+  - pseudo-element arrows/hexes no longer visually depend on overflowing into margin space
+*/
+.board-inner {
+  padding: calc(74px + env(safe-area-inset-top)) 20vw 175px;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.lane {
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 0 2px;
+}
+
+.lane .row,
+.lane .row-0,
+.lane .row-1,
+.lane .row-2,
+.lane .row-3,
+.lane .row-4,
+.lane .row-5,
+.lane .row-6 {
+  height: 78px;
+  min-height: 78px;
+  max-height: 78px;
+  margin-top: 0;
+  margin-bottom: 0;
+  align-items: center;
+  overflow: visible;
+}
+
+/* Same card/play area everywhere. */
+.tile {
+  width: 47px;
+  aspect-ratio: 5 / 7;
+  background: transparent;
+  align-self: center;
+}
+
+.unit-on-tile {
+  inset: 0;
+}
+
+/* Consistent dark card-zone in the middle of every tile. */
+.tile::before {
+  content: '';
+  display: block;
+  position: absolute;
+  z-index: 0;
+  inset: 3px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    inset 0 8px 16px rgba(0,0,0,0.10);
+  pointer-events: none;
+}
+
+/* Shared rectangular body: card area + 3px colour/frame padding. */
+.tile::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+  background: rgba(34,30,24,0.22);
+  box-shadow: inset 0 0 0 1.5px rgba(190,176,145,0.22);
+  pointer-events: none;
+}
+
+/* Deployment: body only, no directional extension. */
+.tile.deploy-p1::after,
+.tile.deploy-p2::after {
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+}
+
+.tile.deploy-p1::after {
+  background: rgba(30,60,160,0.24);
+  box-shadow: inset 0 0 0 1.5px rgba(74,120,216,0.66);
+}
+
+.tile.deploy-p2::after {
+  background: rgba(160,30,30,0.24);
+  box-shadow: inset 0 0 0 1.5px rgba(204,48,48,0.66);
+}
+
+/* No Man's Land: same body width, short visible point contained inside row box. */
+.tile.move::after {
+  left: -3px;
+  right: -3px;
+  background: rgba(42,42,38,0.28);
+  box-shadow: inset 0 0 0 1.5px rgba(170,170,160,0.34);
+}
+
+.tile.move[data-row="1"]::after {
+  top: -3px;
+  bottom: -7px;
+  border-radius: 4px 4px 0 0;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 89%, 50% 100%, 0% 89%);
+}
+
+.tile.move[data-row="5"]::after {
+  top: -7px;
+  bottom: -3px;
+  border-radius: 0 0 4px 4px;
+  clip-path: polygon(0% 11%, 50% 0%, 100% 11%, 100% 100%, 0% 100%);
+}
+
+/* Control/scoring: same body width, fuller hex contained inside row box. */
+.tile.control-zone::after {
+  left: -3px;
+  right: -3px;
+  top: -8px;
+  bottom: -8px;
+  border-radius: 0;
+  background: rgba(30,120,60,0.30);
+  clip-path: polygon(0% 12%, 50% 0%, 100% 12%, 100% 88%, 50% 100%, 0% 88%);
+  box-shadow: inset 0 0 0 1.5px rgba(86,190,96,0.52);
+}
+
+/* Centre lane-effect: same body, distinct dark special slot. */
+.tile.centre::before {
+  inset: 3px;
+  background: rgba(0,0,0,0.38);
+}
+
+.tile.centre::after {
+  left: -3px;
+  right: -3px;
+  top: -3px;
+  bottom: -3px;
+  border-radius: 4px;
+  clip-path: none;
+  display: block;
+  background: rgba(8,8,6,0.34);
+  box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.30);
+}
+
 </style>
 
 
