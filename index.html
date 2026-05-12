@@ -3407,6 +3407,47 @@ pointer-events: none;
   box-shadow: inset 0 0 0 1.5px rgba(160,160,160,0.30);
 }
 
+
+/* ── PATCH 170: tighter board spacing + player territory glow ── */
+/* Move board higher under the HUD. */
+.board-inner {
+  padding-top: calc(60px + env(safe-area-inset-top));
+  gap: 27px;
+}
+
+/* Slightly reduce vertical space between fixed row boxes. */
+.lane {
+  gap: 2px;
+}
+
+/* Player territory glow between board and hand/action UI. */
+.player-area-glow {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(190px + env(safe-area-inset-bottom));
+  z-index: 9;
+  pointer-events: none;
+  opacity: 0.82;
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      rgba(74,120,216,0.34) 0%,
+      rgba(74,120,216,0.22) 28%,
+      rgba(74,120,216,0.09) 58%,
+      rgba(74,120,216,0.00) 86%);
+  mix-blend-mode: screen;
+}
+
+body.p2-turn .player-area-glow {
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      rgba(204,48,48,0.34) 0%,
+      rgba(204,48,48,0.22) 28%,
+      rgba(204,48,48,0.09) 58%,
+      rgba(204,48,48,0.00) 86%);
+}
+
 </style>
 
 
@@ -3609,6 +3650,7 @@ pointer-events: none;
   </div><!-- /board-inner -->
   </div><!-- /board-flip -->
 </div><!-- /board-outer -->
+<div class="player-area-glow" id="player-area-glow"></div>
 <div class="player-bar" id="player-bar">
   <!-- Inspector -->
   <div class="inspector open" id="inspector">
