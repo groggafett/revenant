@@ -4634,6 +4634,200 @@ body.p2-turn .player-area-glow {
 }
 </style>
 
+
+<style id="rev-lane-editor-v196">
+.revLaneActionBar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; padding:10px; border:1px solid rgba(216,196,154,0.14); border-radius:10px; background:rgba(0,0,0,0.18); }
+.revLaneGrid { display:grid; grid-template-columns:1fr; gap:10px; }
+.revLaneCard { border:2px solid #31543b; border-radius:12px; background:linear-gradient(160deg,#101a12,#080b08); color:#d8c49a; padding:12px; box-shadow:0 0 12px rgba(40,120,70,0.12); }
+.revLaneCard.revLaneDraft { border-color:#00b4d3; box-shadow:0 0 12px rgba(0,180,211,0.16); }
+.revLaneCardTop { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; }
+.revLaneName { font-size:16px; font-weight:900; color:#dff5d2; line-height:1.1; }
+.revLaneMeta { margin-top:3px; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#6e9b72; }
+.revLaneDesc { font-size:12px; line-height:1.35; color:#9bb087; margin:8px 0 12px; }
+.revLaneIncluded { display:inline-flex; align-items:center; gap:5px; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#d8c49a; white-space:nowrap; }
+.revLaneFields input, .revLaneFields textarea { width:100%; box-sizing:border-box; margin-top:4px; margin-bottom:8px; background:#0d0906; border:1px solid #4a3720; color:#d8c49a; padding:6px; border-radius:6px; }
+.revLaneMechanicCard { border-color:#31543b; box-shadow:0 0 10px rgba(40,120,70,0.10); }
+@media (max-width:420px){ .revLaneActionBar { flex-direction:column; align-items:stretch; } }
+</style>
+
+
+<style id="rev-patch-198-lane-editor-dropdowns-no-starters">
+.revLaneFields select {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  background: #0d0906;
+  border: 1px solid #4a3720;
+  color: #d8c49a;
+  padding: 6px;
+  border-radius: 6px;
+  font-family: Spectral, Georgia, serif;
+}
+.revLaneIdentity { display:flex; align-items:center; gap:10px; min-width:0; }
+.revLaneEmoji {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 21px;
+  background: radial-gradient(circle at 50% 38%, rgba(200,160,96,.16), rgba(0,0,0,.28));
+  border: 1px solid rgba(200,160,96,.24);
+  box-shadow: inset 0 0 12px rgba(200,160,96,.08), 0 0 10px rgba(0,0,0,.28);
+}
+.revLaneFields input[data-lane-field="emoji"] { text-align:center; font-size:20px; }
+</style>
+
+
+<style id="rev-patch-199-lane-reveal-sequence">
+/* Patch 199 — staged lane reveal before scoring */
+.round-end-overlay.lane-reveal-sequence {
+  background: rgba(0,0,0,0.36);
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.lane-reveal-mode #board-inner {
+  filter: brightness(1.05) saturate(1.08);
+}
+.tile.lane-reveal-focus::after {
+  background: rgba(60,150,80,0.42) !important;
+  box-shadow: inset 0 0 0 2px rgba(116,230,128,0.78), 0 0 18px rgba(64,220,120,0.34) !important;
+  filter: brightness(1.28);
+}
+.tile.lane-reveal-target .unit-on-tile {
+  box-shadow: 0 0 18px rgba(240,208,128,0.85), 0 0 34px rgba(217,121,24,0.36) !important;
+  transform: scale(1.08);
+  z-index: 12;
+}
+.lane-reveal-stage-label {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #f0d080;
+  text-shadow: 0 0 14px rgba(240,208,128,0.4);
+  margin-bottom: 4px;
+}
+.lane-reveal-card {
+  width: min(232px, 64vw);
+  aspect-ratio: 5/7;
+  perspective: 900px;
+  opacity: 0;
+  transform: translateY(28px) scale(.82) rotate(2deg);
+  transition: opacity .28s ease, transform .34s cubic-bezier(.18,.86,.26,1.05);
+}
+.lane-reveal-card.deal-in {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(0deg);
+}
+.lane-reveal-flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .52s cubic-bezier(.2,.7,.22,1);
+}
+.lane-reveal-card.flipped .lane-reveal-flipper { transform: rotateY(180deg); }
+.lane-reveal-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  backface-visibility: hidden;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 2px solid rgba(64,168,112,0.74);
+  box-shadow: 0 0 24px rgba(64,168,112,0.28), 0 16px 42px rgba(0,0,0,0.86);
+  font-family: 'Spectral', Georgia, serif;
+}
+.lane-reveal-back {
+  background: radial-gradient(circle at 50% 36%, rgba(64,168,112,0.22), transparent 36%), linear-gradient(160deg,#07100a,#050706 74%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#40a878;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+}
+.lane-reveal-back-title { font-size: 24px; font-weight: 900; color:#c8a060; text-shadow:0 0 16px rgba(200,160,96,.35); }
+.lane-reveal-back-sub { font-size: 10px; color:#5a8868; }
+.lane-reveal-front {
+  transform: rotateY(180deg);
+  background: radial-gradient(circle at 50% 22%, rgba(64,168,112,0.18), transparent 34%), linear-gradient(160deg,#0e1a12,#060806 72%);
+  padding: 14px 12px 16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  text-align:center;
+}
+.lane-reveal-lane {
+  font-size: 10px;
+  color:#5a8868;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.lane-reveal-emoji {
+  font-size: 52px;
+  line-height:1;
+  filter: drop-shadow(0 0 14px rgba(240,208,128,0.26));
+  margin-bottom:10px;
+}
+.lane-reveal-name {
+  color:#f4dfb8;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:.06em;
+  line-height:1.05;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+.lane-reveal-trigger {
+  color:#40a878;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+.lane-reveal-desc {
+  color:#b8c8a8;
+  font-size:12px;
+  line-height:1.35;
+  max-height:96px;
+  overflow:hidden;
+}
+.lane-reveal-effect-text {
+  width:min(320px, calc(100vw - 48px));
+  min-height:36px;
+  margin-top:8px;
+  padding:9px 12px;
+  border-radius:8px;
+  border:1px solid rgba(64,168,112,0.36);
+  background:rgba(4,10,6,0.78);
+  color:#c8f0b8;
+  font-family:'Spectral',Georgia,serif;
+  font-size:var(--fs-xs);
+  line-height:1.35;
+  text-align:center;
+  box-shadow:0 0 14px rgba(0,0,0,0.45);
+}
+.lane-reveal-effect-text.passive { color:#d8bf7a; border-color:rgba(200,160,96,0.32); }
+@media (max-height: 720px) {
+  .lane-reveal-card { width: min(198px, 58vw); }
+  .lane-reveal-emoji { font-size: 42px; }
+  .lane-reveal-name { font-size: 17px; }
+  .lane-reveal-desc { font-size: 11px; max-height:72px; }
+}
+</style>
+
 </head>
 <body>
 
@@ -5005,93 +5199,240 @@ window.addEventListener('unhandledrejection', e => {
   }
 
   // ── CARD LOADING ──
-  const DEFAULT_LANE_EFFECTS = [
-    { id:'l1', name:'Acid Rain',      key:'acid_rain',      effect:'damage_all_round_start', trigger:'round_start', value:1,    description:'At the start of each round, deal 1 damage to every unit in this lane.' },
-    { id:'l2', name:'Hallowed Ground',key:'hallowed_ground', effect:'save_modifier',          trigger:'passive',     value:1,    description:'All saves in this lane are improved by 1 (e.g. 4+ becomes 3+).' },
-    { id:'l3', name:'Comet Strike',   key:'comet_strike',   effect:'bonus_dmg_on_six',        trigger:'on_roll_6',   value:2,    description:'Whenever any attack roll produces a natural 6, deal 2 bonus damage.' },
-    { id:'l4', name:'Choking Fog',    key:'choking_fog',    effect:'range_cap',               trigger:'passive',     value:2,    description:'Ranged weapons in this lane have their range reduced to 2.' },
-    { id:'l5', name:'Blood Frenzy',   key:'blood_frenzy',   effect:'attack_bonus_on_slain',   trigger:'on_slain',    value:1,    description:'When any unit is slain here, all other units in this lane gain +1 attack until end of round.' },
-    { id:'l6', name:'Booby Trapped',  key:'booby_trapped',  effect:'booby_trapped',            trigger:'on_reveal',   value:null, description:'On reveal, roll a d6. All units in the control zone of this lane suffer that damage, ignoring armour.' },
-  ];
+  // Lane pool is intentionally empty by default. Draft/import lanes in the editor instead of seeding starter test lanes.
+  const DEFAULT_LANE_EFFECTS = [];
 
-  // ── EFFECT REGISTRY ──
-  // Each entry maps an effect type to its hook functions.
-  // Hooks receive (fx, ...context) where fx is the full lane effect object.
-  // To add a new mechanic: add one entry here. No other code changes needed.
-  const EFFECT_REGISTRY = {
-    damage_all_round_start: {
-      onRoundStart(fx, lane) {
-        const tids = Object.keys(state.board).filter(tid => unitLane(tid) === lane);
-        tids.forEach(tid => {
-          const unit = state.board[tid];
-          unit.hp = Math.max(0, unit.hp - fx.value);
-          showDamageFloat(tid, fx.value);
-          if (unit.hp <= 0) {
-            setTimeout(()=>removeSlain(tid), 600);
-          } else {
-            const hpEl = document.querySelector(`[data-id="${tid}"] .unit-hp span`);
-            setTimeout(()=>{ if(hpEl) hpEl.textContent=unit.hp; }, 600);
-          }
-        });
+  function laneRandomInt(min, max) {
+    min = Math.ceil(Number(min) || 0);
+    max = Math.floor(Number(max) || min);
+    if (max < min) [min, max] = [max, min];
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function resolveLaneValue(raw, ctx={}) {
+    if (raw == null || raw === '') return 0;
+    if (Array.isArray(raw) && raw.length >= 2) return laneRandomInt(raw[0], raw[1]);
+    if (typeof raw === 'number') return raw;
+    const value = String(raw).trim().toUpperCase();
+    const rangeMatch = value.match(/^\[\s*(-?\d+)\s*,\s*(-?\d+)\s*\]$/);
+    if (rangeMatch) return laneRandomInt(rangeMatch[1], rangeMatch[2]);
+    const diceMatch = value.match(/^D(3|6)(?:\s*([+-])\s*(\d+))?$/);
+    if (diceMatch) {
+      const die = Number(diceMatch[1]);
+      const base = die === 3 ? Math.ceil(laneRandomInt(1,6) / 2) : laneRandomInt(1,6);
+      const mod = diceMatch[2] ? Number(diceMatch[3] || 0) * (diceMatch[2] === '-' ? -1 : 1) : 0;
+      return Math.max(0, base + mod);
+    }
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function laneScopeTileIds(lane, scope='this_lane') {
+    const s = cardSlug(scope || 'this_lane');
+    return Object.keys(tileMap || {}).filter(tid => {
+      const td = tileMap[tid];
+      if (!td) return false;
+      if (s === 'battlefield' || s === 'all' || s === 'all_lanes') return td.zone !== 'centre';
+      if (unitLane(tid) !== lane) return false;
+      if (s === 'control_zone' || s === 'control' || s === 'controlzone') return td.zone === 'control-zone';
+      return td.zone !== 'centre';
+    });
+  }
+
+  function getLaneController(lane) {
+    const totals = {1:0, 2:0};
+    laneScopeTileIds(lane, 'control_zone').forEach(tid => {
+      const unit = state.board[tid];
+      if (!unit?.owner) return;
+      totals[unit.owner] += Math.max(0, Number(unit.hp || 0));
+    });
+    if (totals[1] === totals[2]) return null;
+    return totals[1] > totals[2] ? 1 : 2;
+  }
+
+  function selectLaneUnitTargets(lane, fx, ctx={}) {
+    const scope = fx.scope || 'this_lane';
+    const target = cardSlug(fx.target || fx.laneTarget || 'all_units');
+    const controller = getLaneController(lane);
+    let ids = laneScopeTileIds(lane, scope).filter(tid => !!state.board[tid]);
+    if (target === 'friendly_units' || target === 'controller_units') ids = controller ? ids.filter(tid => state.board[tid].owner === controller) : [];
+    if (target === 'enemy_units' || target === 'non_controller_units') ids = controller ? ids.filter(tid => state.board[tid].owner !== controller) : [];
+    if (target === 'highest_power_unit' || target === 'highest_hp_unit') {
+      const max = Math.max(...ids.map(tid => Number(state.board[tid].hp || 0)), -Infinity);
+      ids = ids.filter(tid => Number(state.board[tid].hp || 0) === max);
+      ids = ids.length ? [ids[Math.floor(Math.random() * ids.length)]] : [];
+    }
+    if (target === 'lowest_power_unit' || target === 'lowest_hp_unit') {
+      const min = Math.min(...ids.map(tid => Number(state.board[tid].hp || 0)), Infinity);
+      ids = ids.filter(tid => Number(state.board[tid].hp || 0) === min);
+      ids = ids.length ? [ids[Math.floor(Math.random() * ids.length)]] : [];
+    }
+    if (target === 'random_unit') ids = ids.length ? [ids[Math.floor(Math.random() * ids.length)]] : [];
+    return ids;
+  }
+
+  function laneEffectPlayerTargets(lane, fx) {
+    const target = cardSlug(fx.target || 'controller');
+    const controller = getLaneController(lane);
+    if (target === 'both_players' || target === 'all_players') return [1,2];
+    if (target === 'non_controller') return controller ? [controller === 1 ? 2 : 1] : [];
+    if (target === 'player_1' || target === 'p1') return [1];
+    if (target === 'player_2' || target === 'p2') return [2];
+    return controller ? [controller] : [];
+  }
+
+  function pulseLaneTarget(tid, cls='highlight-target') {
+    const tile = document.querySelector(`[data-id="${tid}"]`);
+    const unitEl = tile?.querySelector('.unit-on-tile');
+    if (!unitEl) return;
+    unitEl.classList.add(cls);
+    setTimeout(() => unitEl.classList.remove(cls), 850);
+  }
+
+  function applyLaneGenericEffect(fx, lane, ctx={}) {
+    const amount = resolveLaneValue(fx.value, { ...ctx, fx, lane });
+    const effect = normaliseLaneEffectKey(fx.effect);
+    if (effect === 'draw' || effect === 'add_resource') {
+      laneEffectPlayerTargets(lane, fx).forEach(player => {
+        const p = state.players[player];
+        if (!p) return;
+        if (effect === 'draw') {
+          for (let i = 0; i < Math.max(1, Number(amount) || 1); i++) drawCard(player);
+          if (typeof showToastMsg === 'function') showToastMsg(`${fx.name}: ${p.name} draws ${amount || 1}`);
+        } else {
+          p.resources += Math.max(0, Number(amount) || 0);
+          if (typeof showToastMsg === 'function') showToastMsg(`${fx.name}: ${p.name} +${amount} requisition`);
+        }
+      });
+      renderHub();
+      return;
+    }
+
+    const tids = selectLaneUnitTargets(lane, fx, ctx);
+    tids.forEach(tid => {
+      const unit = state.board[tid];
+      if (!unit) return;
+      if (effect === 'damage') {
+        unit.hp = Math.max(0, Number(unit.hp || 0) - amount);
+        showDamageFloat(tid, amount);
+        pulseLaneTarget(tid);
+        if (unit.hp <= 0) setTimeout(()=>removeSlain(tid), 600);
+        else setTimeout(()=>{ const tile=document.querySelector(`[data-id="${tid}"]`); if(tile) renderUnit(tile, unit); }, 300);
+      } else if (effect === 'heal') {
+        const maxHp = Number(unit.maxHp ?? unit.hp ?? 0);
+        unit.hp = Math.min(maxHp, Number(unit.hp || 0) + amount);
+        pulseLaneTarget(tid, 'highlight-ability');
+        const tile=document.querySelector(`[data-id="${tid}"]`);
+        if(tile) renderUnit(tile, unit);
       }
+    });
+  }
+
+  function laneAttackFilterMatches(fx, atk, attackerTileId=null, targetTileId=null) {
+    const target = cardSlug(fx.target || fx.attackFilter || 'all_attacks');
+    const range = Number(atk?.weapon?.range ?? 1);
+    const measuredRange = attackerTileId && targetTileId ? tileDistance(attackerTileId, targetTileId) : range;
+    if (target === 'melee_attacks' || target === 'melee') return measuredRange <= 1;
+    if (target === 'ranged_attacks' || target === 'ranged') return measuredRange > 1 || range > 1 || atk?.weapon?.range === 0;
+    return true;
+  }
+
+  function laneModifyHit(fx, hitThresh, atk=null, attackerTileId=null, targetTileId=null) {
+    if (!laneAttackFilterMatches(fx, atk, attackerTileId, targetTileId)) return hitThresh;
+    return Math.max(2, Math.min(7, Number(hitThresh || 7) - resolveLaneValue(fx.value || 0)));
+  }
+
+  function laneModifySave(fx, modSave) {
+    return Math.max(2, Math.min(7, Number(modSave || 7) - resolveLaneValue(fx.value || 0)));
+  }
+
+  function getEffectiveMove(unit, tileId) {
+    let move = Number(unit?.move ?? 0);
+    const fx = tileId ? getLaneEffect(unitLane(tileId)) : null;
+    const eff = fx ? LANE_EFFECT_REGISTRY[fx.effect] : null;
+    if (eff?.getMove) move = eff.getMove(fx, move, unit, tileId);
+    return move;
+  }
+
+  // ── LANE EFFECT REGISTRY ──
+  const LANE_EFFECT_REGISTRY = {
+    damage: {
+      onReveal: applyLaneGenericEffect,
+      onRoundStart: applyLaneGenericEffect,
+      getRevealPreview(fx, lane) { return `${fx.name}: ${fx.value ?? 0} damage to ${String(fx.target || 'targets').replace(/_/g,' ')}`; }
     },
-    save_modifier: {
-      modifySave(fx, modSave) { return Math.max(2, modSave - fx.value); }
+    heal: {
+      onReveal: applyLaneGenericEffect,
+      onRoundStart: applyLaneGenericEffect,
+      getRevealPreview(fx, lane) { return `${fx.name}: heal ${fx.value ?? 0}`; }
     },
-    bonus_dmg_on_six: {
-      onRollSix(fx, atkDice) { return atkDice.filter(d => d === 6).length * fx.value; }
+    draw: {
+      onReveal: applyLaneGenericEffect,
+      onRoundStart: applyLaneGenericEffect,
+      getRevealPreview(fx, lane) { return `${fx.name}: controller draws ${fx.value ?? 1}`; }
     },
-    range_cap: {
+    add_resource: {
+      onReveal: applyLaneGenericEffect,
+      onRoundStart: applyLaneGenericEffect,
+      getRevealPreview(fx, lane) { return `${fx.name}: controller gains +${fx.value ?? 1} requisition`; }
+    },
+    cap_range: {
       getRange(fx, base) {
+        const cap = resolveLaneValue(fx.value || 0);
         if (typeof base === 'string' && base.includes('-')) {
           const [a,b] = base.split('-').map(Number);
-          return `${a}-${Math.min(b, fx.value)}`;
+          return `${a}-${Math.min(b, cap)}`;
         }
-        return base === 0 ? fx.value : Math.min(base, fx.value);
+        return base === 0 ? cap : Math.min(Number(base) || cap, cap);
       }
+    },
+    cap_move: {
+      getMove(fx, base) { return Math.min(Number(base) || 0, resolveLaneValue(fx.value || 0)); }
+    },
+    modify_hit: {
+      modifyHit: laneModifyHit
+    },
+    modify_save: {
+      modifySave: laneModifySave
+    },
+
+    // Backwards-compatible older lane keys.
+    damage_all_round_start: {
+      onRoundStart(fx, lane) { applyLaneGenericEffect({ ...fx, effect:'damage', scope:fx.scope || 'this_lane', target:fx.target || 'all_units' }, lane); }
+    },
+    save_modifier: {
+      modifySave(fx, modSave) { return laneModifySave({ ...fx, effect:'modify_save' }, modSave); }
+    },
+    bonus_dmg_on_six: {
+      onRollSix(fx, atkDice) { return atkDice.filter(d => d === 6).length * resolveLaneValue(fx.value || 0); }
+    },
+    range_cap: {
+      getRange(fx, base) { return LANE_EFFECT_REGISTRY.cap_range.getRange(fx, base); }
     },
     attack_bonus_on_slain: {
       onSlain(fx, slainTileId) {
         const lane = unitLane(slainTileId);
         Object.keys(state.board).filter(tid => unitLane(tid) === lane).forEach(tid => {
-          state.board[tid].bonusAttacks = (state.board[tid].bonusAttacks || 0) + fx.value;
+          state.board[tid].bonusAttacks = (state.board[tid].bonusAttacks || 0) + resolveLaneValue(fx.value || 0);
         });
       }
     },
     booby_trapped: {
       getRevealPreview(fx, lane) {
-        const roll = Math.floor(Math.random() * 6) + 1;
-        fx._roll = roll;
-        const count = Object.keys(state.board).filter(tid =>
-          unitLane(tid) === lane && tileMap[tid]?.zone === 'control-zone'
-        ).length;
-        const hits = count === 1 ? '1 unit' : count > 1 ? `${count} units` : 'no units';
-        return `🎲 Rolled <strong style="color:#cc3030">${roll}</strong> — ${roll} damage to ${hits} in control zone`;
+        const preview = String(fx.value || 'D6');
+        const count = selectLaneUnitTargets(lane, { ...fx, scope:'control_zone', target:'all_units' }).length;
+        return `${fx.name}: ${preview} damage to ${count || 'no'} control-zone unit${count === 1 ? '' : 's'}`;
       },
-      onReveal(fx, lane) {
-        const roll = fx._roll ?? Math.floor(Math.random() * 6) + 1;
-        const tids = Object.keys(state.board).filter(tid =>
-          unitLane(tid) === lane && tileMap[tid]?.zone === 'control-zone'
-        );
-        tids.forEach(tid => {
-          const unit = state.board[tid];
-          unit.hp = Math.max(0, unit.hp - roll);
-          showDamageFloat(tid, roll);
-          if (unit.hp <= 0) {
-            setTimeout(()=>removeSlain(tid), 600);
-          } else {
-            const hpEl = document.querySelector(`[data-id="${tid}"] .unit-hp span`);
-            setTimeout(()=>{ if(hpEl) hpEl.textContent = unit.hp; }, 600);
-          }
-        });
-      }
+      onReveal(fx, lane) { applyLaneGenericEffect({ ...fx, effect:'damage', value:fx.value || 'D6', scope:'control_zone', target:'all_units' }, lane); }
     },
   };
+
+  const EFFECT_REGISTRY = LANE_EFFECT_REGISTRY;
 
   function unitLane(tileId) { return tileId.split('-')[0]; }
   function getLaneEffect(lane) {
     const fx = state.laneEffects?.[lane];
-    return (fx && fx.revealed && EFFECT_REGISTRY[fx.effect]) ? fx : null;
+    return (fx && fx.revealed && LANE_EFFECT_REGISTRY[fx.effect]) ? fx : null;
   }
 
 
@@ -5103,6 +5444,91 @@ window.addEventListener('unhandledrejection', e => {
       .replace(/&/g, 'and')
       .replace(/[^a-z0-9]+/g, '_')
       .replace(/^_+|_+$/g, '');
+  }
+
+
+  function normaliseLaneTrigger(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return 'passive';
+    const key = cardSlug(raw).replace(/_/g, '');
+    const map = {
+      roundstart:'round_start', onroundstart:'round_start', requisition:'round_start', startofround:'round_start',
+      onreveal:'on_reveal', reveal:'on_reveal', whenrevealed:'on_reveal', instant:'on_reveal',
+      turnstart:'turn_start', onturnstart:'turn_start', startofturn:'turn_start',
+      controllerroundstart:'controller_round_start', controllerturnstart:'controller_turn_start',
+      onroll6:'on_roll_6', roll6:'on_roll_6', nat6:'on_roll_6', natural6:'on_roll_6',
+      onslain:'on_slain', slain:'on_slain', ondeath:'on_slain', death:'on_slain',
+      passive:'passive', aura:'passive', ongoing:'passive'
+    };
+    return map[key] || cardSlug(raw);
+  }
+
+  function normaliseLaneEffectKey(value) {
+    const raw = String(value ?? '').trim();
+    if (!raw) return '';
+    const key = cardSlug(raw).replace(/_/g, '');
+    const map = {
+      damage:'damage', dealdamage:'damage', directdamage:'damage', heal:'heal', healing:'heal', draw:'draw', drawcard:'draw', drawcards:'draw',
+      addresource:'add_resource', addresources:'add_resource', gainresource:'add_resource', gainresources:'add_resource', resource:'add_resource', resources:'add_resource',
+      caprange:'cap_range', rangecap:'cap_range', chokingfog:'cap_range', fog:'cap_range',
+      capmove:'cap_move', movecap:'cap_move', muddyground:'cap_move', mud:'cap_move',
+      modifyhit:'modify_hit', hitmodifier:'modify_hit', bloodlust:'modify_hit',
+      modifysave:'modify_save', savemodifier:'modify_save', savesmodifier:'modify_save', hallowedground:'modify_save',
+      acidrain:'damage', damageallroundstart:'damage_all_round_start', roundstartdamage:'damage_all_round_start',
+      cometstrike:'bonus_dmg_on_six', bonusdmgonsix:'bonus_dmg_on_six', bonusdamageonsix:'bonus_dmg_on_six',
+      bloodfrenzy:'attack_bonus_on_slain', attackbonusonslain:'attack_bonus_on_slain', frenzy:'attack_bonus_on_slain',
+      boobytrapped:'damage', boobytrap:'damage'
+    };
+    return map[key] || cardSlug(raw);
+  }
+
+  function laneValue(value) {
+    if (value == null || value === '') return null;
+    const raw = String(value).trim();
+    const num = Number(raw);
+    return Number.isFinite(num) && /^-?\d+(\.\d+)?$/.test(raw) ? num : value;
+  }
+
+  function normaliseLaneEffect(raw, index=0) {
+    if (!raw || typeof raw !== 'object') return null;
+    const name = String(raw.name || raw.displayName || raw.title || raw.key || raw.effect || `Lane ${index + 1}`).trim();
+    const key = cardSlug(raw.key || raw.internalName || name || `lane_${index + 1}`);
+    const effect = normaliseLaneEffectKey(raw.effect || raw.laneEffect || raw.unitEffect || raw.mechanicEffect || key);
+    return {
+      ...raw,
+      id: String(raw.id || `lane_${key || index + 1}`).trim(),
+      name,
+      displayName: raw.displayName || raw.display_name || name,
+      type: 'Lane',
+      key,
+      effect,
+      trigger: normaliseLaneTrigger(raw.trigger || raw.laneTrigger || raw.mechanicTrigger || raw.timing || raw.revealTiming || 'passive'),
+      value: laneValue(raw.value ?? raw.laneValue ?? raw.mechanicValue ?? null),
+      description: raw.description || raw.rules || raw.text || raw.special || '',
+      revealTiming: raw.revealTiming || raw.reveal_timing || 'before_scoring',
+      duration: raw.duration || raw.laneDuration || (normaliseLaneTrigger(raw.trigger || raw.laneTrigger || raw.mechanicTrigger || raw.timing || raw.revealTiming || 'passive') === 'passive' ? 'while_revealed' : 'instant'),
+      scope: raw.scope || raw.laneScope || raw.lane_scope || raw.laneTarget || 'this_lane',
+      target: raw.target || raw.laneTargetSelector || raw.lane_target || raw.selector || 'all_units',
+      condition: raw.condition || '',
+      attackFilter: raw.attackFilter || raw.attack_filter || '',
+      visualTag: raw.visualTag || raw.visual_tag || '',
+      included: raw.included === false || raw.enabled === false ? false : true,
+      source: raw.source || 'built_in'
+    };
+  }
+
+  function normaliseLaneDeck(deck) {
+    const source = Array.isArray(deck) && deck.length ? deck : DEFAULT_LANE_EFFECTS;
+    const normalised = source.map(normaliseLaneEffect).filter(Boolean);
+    return normalised.length ? normalised : DEFAULT_LANE_EFFECTS.map(normaliseLaneEffect).filter(Boolean);
+  }
+
+  function activeLaneDeck() {
+    try {
+      const stored = localStorage.getItem('grim_lane_deck');
+      if (stored) return normaliseLaneDeck(JSON.parse(stored));
+    } catch(err) { console.warn('Lane deck load failed', err); }
+    return normaliseLaneDeck(DEFAULT_LANE_EFFECTS);
   }
 
   function generatedCardIdentity(card) {
@@ -5364,8 +5790,9 @@ window.addEventListener('unhandledrejection', e => {
       const d2 = localStorage.getItem('grim_deck_p2');
       if (d2) lists[2] = JSON.parse(d2);
       const ld = localStorage.getItem('grim_lane_deck');
-      if (ld) laneDeck = JSON.parse(ld);
+      if (ld) laneDeck = normaliseLaneDeck(JSON.parse(ld));
     } catch(e) { console.warn('Card data load failed', e); }
+    laneDeck = normaliseLaneDeck(laneDeck);
     repo = mergeDraftPowerCards(repo);
     return { repo, lists, laneDeck };
   }
@@ -5524,8 +5951,9 @@ const state = {
   }
 
   function drawLaneEffects(deck) {
-    if (!deck || !deck.length) return;
-    const shuffled = [...deck].sort(() => Math.random() - 0.5);
+    const pool = normaliseLaneDeck(deck).filter(fx => fx && fx.included !== false && fx.enabled !== false);
+    if (!pool.length) return;
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
     state.laneEffects.A = { ...shuffled[0], revealed: false };
     state.laneEffects.B = { ...shuffled[Math.min(1, shuffled.length - 1)], revealed: false };
   }
@@ -5538,7 +5966,7 @@ const state = {
       if (!fx) { badge.style.display = 'none'; return; }
       badge.style.display = '';
       if (fx.revealed) {
-        badge.textContent = formatCardName(fx.name);
+        badge.textContent = `${fx.emoji || fx.icon ? `${fx.emoji || fx.icon} ` : ''}${formatCardName(fx.name)}`;
         badge.classList.remove('hidden');
       } else {
         badge.textContent = '?';
@@ -5696,6 +6124,7 @@ const state = {
       const label = lane === 'A' ? 'I' : 'II';
       return `<div onclick="devCycleLane('${lane}')" style="position:relative;width:75px;aspect-ratio:5/7;flex-shrink:0;background:linear-gradient(160deg,#0e1a12,#07100a);border:1px solid #1a5030;border-radius:5px;padding:7px 5px;cursor:pointer;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:inset 0 1px 0 rgba(80,180,120,0.08),0 4px 12px rgba(0,0,0,0.45);">
         <div style="position:absolute;top:4px;left:5px;right:5px;font-size:9px;color:#3a6848;text-transform:uppercase;letter-spacing:0.12em;line-height:1;">Lane ${label}</div>
+        <div style="font-size:20px;line-height:1;margin-bottom:4px;filter:drop-shadow(0 0 6px rgba(200,160,96,.25));">${fx?.emoji || fx?.icon || '◇'}</div>
         <div style="font-size:var(--fs-xs);color:#40a878;font-weight:900;line-height:1.15;text-transform:uppercase;width:100%;">${fx ? formatCardName(fx.name) : '—'}</div>
         <div class="setup-refresh-badge lane-refresh">↻</div>
       </div>`;
@@ -5736,9 +6165,11 @@ const state = {
     }
 
     window.devCycleLane = function(lane) {
+      const pool = activeLaneDeck().filter(fx => fx && fx.included !== false && fx.enabled !== false);
+      if (!pool.length) return;
       const fx = state.laneEffects[lane];
-      const idx = DEFAULT_LANE_EFFECTS.findIndex(e => e.effect === fx?.effect);
-      const next = DEFAULT_LANE_EFFECTS[(idx + 1) % DEFAULT_LANE_EFFECTS.length];
+      const idx = pool.findIndex(e => e.id === fx?.id || e.key === fx?.key || e.effect === fx?.effect);
+      const next = pool[(idx + 1 + pool.length) % pool.length];
       state.laneEffects[lane] = { ...next, revealed: false };
       renderLaneEffects();
       renderOverlay();
@@ -6103,10 +6534,14 @@ const state = {
     showTurnToast(state.activePlayer);
   }
 
+  function laneTriggerIs(fx, trigger) {
+    return normaliseLaneTrigger(fx?.trigger || '') === trigger;
+  }
+
   function applyRoundStartEffects() {
     ['A','B'].forEach(lane => {
       const fx = getLaneEffect(lane);
-      if (!fx) return;
+      if (!fx || !laneTriggerIs(fx, 'round_start')) return;
       EFFECT_REGISTRY[fx.effect]?.onRoundStart?.(fx, lane);
     });
   }
@@ -7399,8 +7834,8 @@ const state = {
       artId: fx.artId || fx.id || `lane_${lane}_${cardSlug(fx.name || 'effect')}`,
       type:'Power',
       faction:'universal',
-      displayName: fx.name || `Lane ${lane} Effect`,
-      name: fx.name || `Lane ${lane} Effect`,
+      displayName: `${fx.emoji || fx.icon ? `${fx.emoji || fx.icon} ` : ''}${fx.name || `Lane ${lane} Effect`}`,
+      name: `${fx.emoji || fx.icon ? `${fx.emoji || fx.icon} ` : ''}${fx.name || `Lane ${lane} Effect`}`,
       cost:'',
       effect:'lane_effect',
       value: fx.value ?? '',
@@ -8696,7 +9131,7 @@ const state = {
     if (contester?.tileId) {
       document.querySelector(`[data-id="${contester.tileId}"]`)?.classList.add('highlight-breakaway-source');
     }
-    getReachableTiles(tid, unit.move).forEach(id => {
+    getReachableTiles(tid, getEffectiveMove(unit, tid)).forEach(id => {
       const mt = document.querySelector(`[data-id="${id}"]`);
       if (!mt) return;
       mt.classList.add('highlight-move');
@@ -9578,7 +10013,8 @@ const state = {
     function resolveCombat(atk, def, laneKey=null) {
     const fx = getLaneEffect(laneKey);
     const eff = fx ? EFFECT_REGISTRY[fx.effect] : null;
-    const hitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    let hitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    if (eff?.modifyHit) hitThresh = eff.modifyHit(fx, hitThresh, atk, state.activeUnit?.tileId || null, state.pendingCombatContext?.targetTileId || null);
     const saveThresh = parseInt(def.save || '7', 10);
     let modSave = saveThresh + (Number(atk.weapon?.ap) || 0);
     if (eff?.modifySave) modSave = eff.modifySave(fx, modSave);
@@ -10628,19 +11064,19 @@ const state = {
     document.getElementById('player-bar').className = 'player-bar';
     const topBar = document.querySelector('.top-bar');
     topBar.style.zIndex = '60';
+    const lanesToReveal = ['A','B'].filter(lane => state.laneEffects?.[lane] && !state.laneEffects[lane].revealed);
     const ov = document.createElement('div');
     ov.className = 'round-end-overlay';
     ov.innerHTML = `
       <div class="round-end-title">End of Round ${state.round}</div>
-      <div class="round-end-sub">Scoring</div>
-      <button class="round-end-btn" id="score-begin-btn">Score ▶</button>`;
+      <div class="round-end-sub">${lanesToReveal.length ? 'Lane Effects' : 'Scoring'}</div>
+      <button class="round-end-btn" id="score-begin-btn">${lanesToReveal.length ? 'Reveal ▶' : 'Score ▶'}</button>`;
     document.body.appendChild(ov);
     requestAnimationFrame(()=>ov.classList.add('show'));
     document.getElementById('score-begin-btn').addEventListener('click', ()=>{
       ov.classList.add('dim');
       ov.innerHTML = '';
-      // Round 1: reveal lane effects before scoring
-      if (state.round === 1 && (state.laneEffects.A || state.laneEffects.B)) {
+      if (lanesToReveal.length) {
         revealLaneEffects(ov, () => {
           scoreRound(()=>{ finishRoundOverlay(ov, topBar); });
         });
@@ -10665,76 +11101,152 @@ const state = {
     });
   }
 
+  function laneRevealLabel(lane) {
+    return lane === 'A' ? 'Lane I' : 'Lane II';
+  }
+
+  function laneRevealEffectText(fx, lane) {
+    if (!fx) return '';
+    const trigger = normaliseLaneTrigger(fx.trigger || 'passive');
+    const reg = LANE_EFFECT_REGISTRY[fx.effect];
+    if (trigger === 'on_reveal') {
+      return reg?.getRevealPreview?.(fx, lane)
+        || `${formatCardName(fx.name)}: ${String(fx.effect || '').replace(/_/g,' ')} ${fx.value ?? ''}`.trim();
+    }
+    if (trigger === 'passive') return 'Passive effect now active.';
+    if (trigger === 'round_start') return 'This effect will trigger at the start of each round.';
+    return `${String(trigger).replace(/_/g,' ')} effect now active.`;
+  }
+
+  function laneRevealCardMarkup(fx, lane) {
+    const icon = fx?.emoji || fx?.icon || '◇';
+    const trigger = String(fx?.trigger || 'passive').replace(/_/g, ' ');
+    return `
+      <div class="lane-reveal-card" id="lane-reveal-card">
+        <div class="lane-reveal-flipper">
+          <div class="lane-reveal-face lane-reveal-back">
+            <div class="lane-reveal-back-title">Revenant</div>
+            <div class="lane-reveal-back-sub">Lane Effect</div>
+          </div>
+          <div class="lane-reveal-face lane-reveal-front">
+            <div class="lane-reveal-lane">${laneRevealLabel(lane)}</div>
+            <div class="lane-reveal-emoji">${icon}</div>
+            <div class="lane-reveal-name">${formatCardName(fx?.name || 'Unknown Lane')}</div>
+            <div class="lane-reveal-trigger">${trigger}</div>
+            <div class="lane-reveal-desc">${fx?.description || laneRevealEffectText(fx, lane)}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function setLaneRevealTargetFocus(lane, on=true) {
+    document.querySelectorAll('.tile.lane-reveal-focus, .tile.lane-reveal-target').forEach(t => {
+      t.classList.remove('lane-reveal-focus', 'lane-reveal-target');
+    });
+    if (!on) return;
+    document.querySelectorAll(`.tile.control-zone[data-lane="${lane}"]`).forEach(t => t.classList.add('lane-reveal-focus'));
+    const fx = state.laneEffects?.[lane];
+    if (!fx) return;
+    selectLaneUnitTargets(lane, fx).forEach(tid => {
+      const tile = document.querySelector(`[data-id="${tid}"]`);
+      if (tile) tile.classList.add('lane-reveal-target');
+    });
+  }
+
+  function focusBoardForLaneReveal(lane) {
+    document.body.classList.add('lane-reveal-mode');
+    scale = Math.max(minScale || 1, 1.18);
+    const ow = outer.clientWidth;
+    const oh = outer.clientHeight;
+    const laneFrac = lane === 'A' ? 0.33 : 0.67;
+    const laneX = inner.offsetWidth * laneFrac * scale;
+    tx = clamp(ow / 2 - laneX, ow - inner.offsetWidth * scale, 0);
+    ty = clamp(oh * 0.08, oh - inner.offsetHeight * scale, 0);
+    setBoardTransition(420);
+    applyTransform(false);
+    setLaneRevealTargetFocus(lane, true);
+  }
+
+  function restoreBoardAfterLaneReveal(view) {
+    setLaneRevealTargetFocus(null, false);
+    document.body.classList.remove('lane-reveal-mode');
+    if (view) {
+      scale = view.scale;
+      tx = view.tx;
+      ty = view.ty;
+      setBoardTransition(420);
+      applyTransform(false);
+    }
+  }
+
+  function applyLaneRevealEffect(fx, lane) {
+    if (!fx) return false;
+    const trigger = normaliseLaneTrigger(fx.trigger || 'passive');
+    if (trigger !== 'on_reveal') return false;
+    const reg = LANE_EFFECT_REGISTRY[fx.effect];
+    if (!reg?.onReveal) return false;
+    reg.onReveal(fx, lane);
+    renderHub();
+    refreshAllUnitIndicators();
+    return true;
+  }
+
   function revealLaneEffects(ov, callback) {
-    // Mark both revealed
-    ['A','B'].forEach(l => { if(state.laneEffects[l]) state.laneEffects[l].revealed = true; });
-    renderLaneEffects();
+    const lanes = ['A','B'].filter(lane => state.laneEffects?.[lane] && !state.laneEffects[lane].revealed);
+    if (!lanes.length) { callback?.(); return; }
+    const savedView = { scale, tx, ty };
+    ov.classList.remove('dim');
+    ov.classList.add('lane-reveal-sequence');
+    ov.style.pointerEvents = 'none';
 
-    const fxA = state.laneEffects.A;
-    const fxB = state.laneEffects.B;
-    const makeCard = (fx, preview) => fx ? `
-      <div style="background:#0e1a12;border:1px solid #1a5030;border-radius:6px;padding:10px 12px;text-align:left;flex:1">
-        <div style="font-size:var(--fs-xs);color:#40a878;text-transform:uppercase;letter-spacing:0.15em;margin-bottom:2px">${formatCardName(fx.name)}</div>
-        <div style="font-size:var(--fs-xs);color:#3a6848;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">${fx.trigger.replace(/_/g,' ')}</div>
-        <div style="font-size:var(--fs-xs);color:#5a8868;line-height:1.5">${fx.description}</div>
-        ${preview ? `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #1a3020;font-size:var(--fs-xs);color:#7a8868;line-height:1.5;">${preview}</div>` : ''}
-      </div>` : '';
+    let idx = 0;
+    function nextLane() {
+      if (idx >= lanes.length) {
+        restoreBoardAfterLaneReveal(savedView);
+        ov.innerHTML = `
+          <div class="round-end-title">Lane Effects Revealed</div>
+          <div class="round-end-sub">Scoring</div>`;
+        setTimeout(() => {
+          ov.classList.remove('lane-reveal-sequence');
+          callback?.();
+        }, 700);
+        return;
+      }
 
-    ov.innerHTML = `
-      <div class="round-end-title" style="font-size:var(--fs-md)">Lane Effects Revealed</div>
-      <div class="round-end-sub" style="margin-bottom:14px">The battlefield stirs…</div>
-      <div style="display:flex;gap:8px;width:100%;max-width:340px;margin-bottom:16px">
-        <div style="flex:1">
-          <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane I</div>
-          ${makeCard(fxA)}
-        </div>
-        <div style="flex:1">
-          <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane II</div>
-          ${makeCard(fxB)}
-        </div>
-      </div>
-      <button class="round-end-btn" id="reveal-score-btn">Score ▶</button>`;
+      const lane = lanes[idx++];
+      const fx = state.laneEffects[lane];
+      focusBoardForLaneReveal(lane);
+      ov.innerHTML = `
+        <div class="lane-reveal-stage-label">${laneRevealLabel(lane)}</div>
+        ${laneRevealCardMarkup(fx, lane)}
+        <div class="lane-reveal-effect-text" id="lane-reveal-effect-text">Revealing lane effect…</div>`;
 
-    ov.style.pointerEvents = 'all';
-
-    function applyAndContinue() {
-      ov.style.pointerEvents = 'none';
-      ov.innerHTML = '';
-      ['A','B'].forEach(lane => {
-        const fx = state.laneEffects[lane];
-        if(fx?.revealed) EFFECT_REGISTRY[fx.effect]?.onReveal?.(fx, lane);
+      requestAnimationFrame(() => {
+        const card = document.getElementById('lane-reveal-card');
+        card?.classList.add('deal-in');
       });
-      setTimeout(callback, 1200);
+
+      setTimeout(() => {
+        const card = document.getElementById('lane-reveal-card');
+        card?.classList.add('flipped');
+        fx.revealed = true;
+        renderLaneEffects();
+      }, 520);
+
+      setTimeout(() => {
+        const text = document.getElementById('lane-reveal-effect-text');
+        const message = laneRevealEffectText(fx, lane);
+        if (text) text.textContent = message;
+        const applied = applyLaneRevealEffect(fx, lane);
+        if (!applied && text) text.classList.add('passive');
+      }, 1150);
+
+      setTimeout(() => {
+        nextLane();
+      }, 2650);
     }
 
-    document.getElementById('reveal-score-btn').addEventListener('click', ()=>{
-      const previews = {};
-      ['A','B'].forEach(lane => {
-        const fx = state.laneEffects[lane];
-        if(!fx?.revealed) return;
-        const reg = EFFECT_REGISTRY[fx.effect];
-        if(reg?.getRevealPreview) previews[lane] = reg.getRevealPreview(fx, lane);
-      });
-
-      if(!Object.keys(previews).length) { applyAndContinue(); return; }
-
-      ov.innerHTML = `
-        <div class="round-end-title" style="font-size:var(--fs-md)">Lane Effects Revealed</div>
-        <div class="round-end-sub" style="margin-bottom:14px">The battlefield stirs\u2026</div>
-        <div style="display:flex;gap:8px;width:100%;max-width:340px;margin-bottom:16px">
-          <div style="flex:1">
-            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane I</div>
-            ${makeCard(fxA, previews['A'])}
-          </div>
-          <div style="flex:1">
-            <div style="font-size:var(--fs-xs);color:#5a4828;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px">Lane II</div>
-            ${makeCard(fxB, previews['B'])}
-          </div>
-        </div>
-        <button class="round-end-btn" id="reveal-apply-btn">Apply \u25b6</button>`;
-      ov.style.pointerEvents = 'all';
-      document.getElementById('reveal-apply-btn').addEventListener('click', applyAndContinue);
-    });
+    nextLane();
   }
 
   function scoreRound(callback) {
@@ -11613,7 +12125,7 @@ return map[key] || raw;
 function normaliseCSVCardType(value){
 const raw = String(value || '').trim();
 const key = csvMechanicKey(raw);
-const map = {power:'Power',spell:'Power',tactic:'Power',hero:'Hero',leader:'Hero',uncommon:'Uncommon',elite:'Uncommon',common:'Common',unit:'Common'};
+const map = {lane:'Lane',landscape:'Lane',battlefield:'Lane',terrain:'Lane',battlefront:'Lane',power:'Power',spell:'Power',tactic:'Power',hero:'Hero',leader:'Hero',uncommon:'Uncommon',elite:'Uncommon',common:'Common',unit:'Common'};
 return map[key] || raw;
 }
 
@@ -11652,6 +12164,40 @@ damage:'damage',dealdamage:'damage',heal:'heal',healing:'heal',draw:'draw',drawc
 addresource:'add_resource',addresources:'add_resource',resource:'add_resource',resources:'add_resource'
 };
 return map[key] || raw;
+}
+
+
+function normaliseCSVLaneTrigger(value){
+const raw = String(value || '').trim();
+if(!raw) return 'passive';
+const key = csvMechanicKey(raw);
+const map = {
+roundstart:'round_start',onroundstart:'round_start',startofround:'round_start',requisition:'round_start',
+onreveal:'on_reveal',reveal:'on_reveal',whenrevealed:'on_reveal',
+onroll6:'on_roll_6',roll6:'on_roll_6',nat6:'on_roll_6',natural6:'on_roll_6',
+onslain:'on_slain',slain:'on_slain',ondeath:'on_slain',death:'on_slain',
+passive:'passive',aura:'passive',ongoing:'passive'
+};
+return map[key] || raw.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+}
+
+function normaliseCSVLaneEffect(value){
+const raw = String(value || '').trim();
+if(!raw) return '';
+const key = csvMechanicKey(raw);
+const map = {
+damage:'damage',dealdamage:'damage',directdamage:'damage',heal:'heal',healing:'heal',draw:'draw',drawcard:'draw',drawcards:'draw',
+addresource:'add_resource',addresources:'add_resource',gainresource:'add_resource',gainresources:'add_resource',resource:'add_resource',resources:'add_resource',
+caprange:'cap_range',rangecap:'cap_range',chokingfog:'cap_range',fog:'cap_range',
+capmove:'cap_move',movecap:'cap_move',muddyground:'cap_move',mud:'cap_move',
+modifyhit:'modify_hit',hitmodifier:'modify_hit',bloodlust:'modify_hit',
+modifysave:'modify_save',savemodifier:'modify_save',savesmodifier:'modify_save',hallowedground:'modify_save',
+acidrain:'damage',damageallroundstart:'damage_all_round_start',roundstartdamage:'damage_all_round_start',
+cometstrike:'bonus_dmg_on_six',bonusdmgonsix:'bonus_dmg_on_six',bonusdamageonsix:'bonus_dmg_on_six',
+bloodfrenzy:'attack_bonus_on_slain',attackbonusonslain:'attack_bonus_on_slain',frenzy:'attack_bonus_on_slain',
+boobytrapped:'damage',boobytrap:'damage'
+};
+return map[key] || raw.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 }
 
 function normaliseCSVTargetValue(value, fallback=''){
@@ -11696,6 +12242,34 @@ const maxHp = get('maxHp','max_hp','maxHP','HP','hp','health','maxHealth');
 const move = get('move','Move','movement','mov','speed');
 const save = get('save','Save','armour','armor','defence','defense');
 const special = get('special','abilityText','ability_text','rules','text');
+
+if(type === 'Lane'){
+const laneName = name || displayName || get('laneName','lane_name') || 'New Lane';
+const laneKey = get('key','laneKey','lane_key','internalName','internal_name') || laneName;
+const laneEffectRaw = get('effect','laneEffect','lane_effect','mechanicEffect','mechanic_effect') || laneKey;
+const laneTriggerRaw = get('trigger','laneTrigger','lane_trigger','timing','revealTiming','reveal_timing');
+const laneValueRaw = get('value','laneValue','lane_value','mechanicValue','mechanic_value');
+return {
+id: get('id','laneId','lane_id') || 'lane_' + csvMechanicKey(laneKey || laneName),
+name: laneName,
+displayName: displayName || laneName,
+type: 'Lane',
+key: csvMechanicKey(laneKey || laneName).replace(/[^a-z0-9]+/g,'_'),
+effect: normaliseCSVLaneEffect(laneEffectRaw),
+trigger: normaliseCSVLaneTrigger(laneTriggerRaw || 'passive'),
+value: laneValueRaw ? csvNumberOrString(laneValueRaw) : null,
+description: get('description','rules','text','special','abilityText','ability_text') || '',
+revealTiming: get('revealTiming','reveal_timing') || 'before_scoring',
+duration: get('duration') || (normaliseCSVLaneTrigger(laneTriggerRaw || 'passive') === 'passive' ? 'while_revealed' : 'instant'),
+scope: get('scope','laneScope','lane_scope','laneTarget','lane_target') || 'this_lane',
+target: get('target','laneTargetSelector','lane_target_selector','selector') || 'all_units',
+condition: get('condition') || '',
+attackFilter: get('attackFilter','attack_filter') || '',
+visualTag: get('visualTag','visual_tag','tag') || '',
+included: !['false','0','no','off'].includes(String(get('included','enabled') || 'true').trim().toLowerCase()),
+source: get('source') || 'official'
+};
+}
 
 if(displayName) card.displayName = displayName;
 if(name) card.name = name;
@@ -11955,21 +12529,36 @@ try{
 const text =
 event.target.result || '';
 
-const cards =
+const importedRows =
 parseCSV(text);
+
+const lanes = importedRows.filter(row => String(row?.type || '').trim() === 'Lane');
+const cards = importedRows.filter(row => String(row?.type || '').trim() !== 'Lane');
 
 writeJSON(
 'grim_repo_official',
 cards
 );
 
+if(lanes.length){
+const existingLanes = readJSON('grim_lane_deck', []);
+const draftLanes = existingLanes.filter(lane => lane && (lane.source === 'draft' || lane.status === 'draft'));
+writeJSON('grim_lane_deck', [
+...lanes.map(lane => ({...lane, source: lane.source || 'official'})),
+...draftLanes
+]);
+}
+
 syncMergedRepo();
 
 rebuildEditorLists();
+if(window.revRenderEditorView) window.revRenderEditorView(window.revCurrentEditorView || 'repo');
 
 console.log(
 '[Revenant] official cards imported',
-cards.length
+cards.length,
+'lanes',
+lanes.length
 );
 
 }catch(err){
@@ -12921,6 +13510,15 @@ window.REV_MECHANIC_REGISTRY = {
     { id:'move_then_fight', label:'Charge / Move + Fight', description:'Action ability. Choose a reachable enemy, choose a valid charge position, move there, then Fight with a temporary damage bonus. Recommended defaults: trigger action, cost 2, target enemy unit, target location reachable_attack, value 1.' },
     { id:'exploding_hits', label:'Exploding Hits', description:'On matching attack dice, create extra hits without rolling extra dice.' },
     { id:'chain_hits', label:'Chain Hits', description:'On matching attack dice, roll extra attack dice. Extra dice can continue the chain.' }
+  ],
+
+  laneEffects: [
+    { id:'damage_all_round_start', label:'Acid Rain / Round Start Damage', trigger:'round_start', description:'At round start, damage every unit in this lane.' },
+    { id:'save_modifier', label:'Save Modifier', trigger:'passive', description:'Modify saves for units fighting in this lane.' },
+    { id:'bonus_dmg_on_six', label:'Bonus Damage on 6', trigger:'on_roll_6', description:'Natural 6s on attack dice add bonus damage.' },
+    { id:'range_cap', label:'Range Cap / Fog', trigger:'passive', description:'Limit ranged weapon reach inside this lane.' },
+    { id:'attack_bonus_on_slain', label:'Blood Frenzy', trigger:'on_slain', description:'When a unit is slain in this lane, other units here gain bonus attacks for the round.' },
+    { id:'booby_trapped', label:'Booby Trapped', trigger:'on_reveal', description:'On reveal, roll damage into this lane control zone.' }
   ]
 };
 
@@ -13392,6 +13990,7 @@ function renderStatus(parent){
     ['Official', official.length],
     ['Drafts', drafts.length],
     ['Runtime Repo', repo.length],
+    ['Lane Pool', laneDeck().length],
     ['P1 Deck', deckCountLabel(p1, repo)],
     ['P2 Deck', deckCountLabel(p2, repo)],
     ['Draft Mode', localStorage.getItem('grim_proto_cards') === 'false' ? 'Off' : 'On']
@@ -14034,6 +14633,230 @@ function makeTile(card, mode, player, isDraft){
   return tile;
 }
 
+
+function laneSlug(value){
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function normaliseEditorLane(raw, index=0){
+  const lane = raw && typeof raw === 'object' ? raw : {};
+  const name = String(lane.name || lane.displayName || lane.key || lane.effect || `New Lane ${index + 1}`).trim();
+  const key = laneSlug(lane.key || lane.internalName || name || `lane_${index + 1}`);
+  const effect = laneSlug(lane.effect || lane.laneEffect || key);
+  const trigger = laneSlug(lane.trigger || lane.laneTrigger || 'passive');
+  const rawValue = lane.value ?? lane.laneValue ?? '';
+  const numeric = Number(rawValue);
+  return {
+    ...lane,
+    id: String(lane.id || `lane_${key || Date.now()}`).trim(),
+    name,
+    displayName: lane.displayName || name,
+    type: 'Lane',
+    key,
+    effect,
+    trigger: trigger || 'passive',
+    value: rawValue === '' || rawValue == null ? null : (Number.isFinite(numeric) && /^-?\d+(\.\d+)?$/.test(String(rawValue).trim()) ? numeric : rawValue),
+    description: lane.description || lane.rules || lane.text || '',
+    emoji: lane.emoji || lane.icon || lane.artEmoji || lane.visualIcon || '',
+    icon: lane.icon || lane.emoji || lane.artEmoji || lane.visualIcon || '',
+    revealTiming: lane.revealTiming || 'before_scoring',
+    duration: lane.duration || (trigger === 'passive' ? 'while_revealed' : 'instant'),
+    scope: lane.scope || lane.laneScope || 'this_lane',
+    target: lane.target || lane.laneTarget || lane.selector || 'all_units',
+    condition: lane.condition || '',
+    attackFilter: lane.attackFilter || lane.attack_filter || '',
+    visualTag: lane.visualTag || '',
+    included: lane.included === false || lane.enabled === false ? false : true,
+    source: lane.source || 'draft',
+    status: lane.status || (lane.source === 'draft' ? 'draft' : '')
+  };
+}
+
+function laneDeck(){
+  const stored = readJSON('grim_lane_deck', []);
+  return (stored && stored.length ? stored : []).map(normaliseEditorLane).filter(Boolean);
+}
+
+function saveLaneDeck(lanes){
+  writeJSON('grim_lane_deck', (lanes || []).map(normaliseEditorLane).filter(Boolean));
+}
+
+function createDraftLane(){
+  const lanes = laneDeck();
+  const timestamp = Date.now();
+  lanes.push(normaliseEditorLane({
+    id:'draft_lane_' + timestamp,
+    name:'New Draft Lane',
+    key:'new_draft_lane_' + timestamp,
+    type:'Lane',
+    effect:'damage',
+    trigger:'on_reveal',
+    value:'D3',
+    description:'Draft lane effect. Edit this text and mechanics.',
+    emoji:'❔',
+    icon:'❔',
+    revealTiming:'before_scoring',
+    duration:'instant',
+    scope:'control_zone',
+    target:'all_units',
+    visualTag:'hazard',
+    source:'draft',
+    status:'draft',
+    included:true
+  }));
+  saveLaneDeck(lanes);
+  renderEditorView('lanes');
+}
+
+const REV_LANE_TRIGGER_OPTIONS = [
+  ['on_reveal','On Reveal'], ['round_start','Round Start'], ['passive','Passive'],
+  ['turn_start','Turn Start'], ['on_unit_slain','On Unit Slain'], ['on_enter_control','On Enter Control']
+];
+const REV_LANE_EFFECT_OPTIONS = [
+  ['damage','Damage'], ['heal','Heal'], ['draw','Draw Card'], ['add_resource','Gain Requisition'],
+  ['cap_range','Cap Range'], ['cap_move','Cap Move'], ['modify_hit','Modify Hit'], ['modify_save','Modify Save']
+];
+const REV_LANE_VALUE_OPTIONS = [
+  ['','Custom / none'], ['1','1'], ['2','2'], ['3','3'], ['D3','D3'], ['D6','D6'], ['D3+1','D3+1'], ['[1,3]','Random 1–3']
+];
+const REV_LANE_SCOPE_OPTIONS = [
+  ['this_lane','This Lane'], ['control_zone','Control Zone'], ['battlefield','Battlefield']
+];
+const REV_LANE_TARGET_OPTIONS = [
+  ['all_units','All Units'], ['controller','Controller'], ['non_controller','Non-controller'],
+  ['friendly_units','Controller Units'], ['enemy_units','Non-controller Units'],
+  ['highest_power_unit','Highest Power Unit'], ['lowest_power_unit','Lowest Power Unit'], ['random_unit','Random Unit'],
+  ['melee_attacks','Melee Attacks'], ['ranged_attacks','Ranged Attacks'], ['both_players','Both Players']
+];
+const REV_LANE_DURATION_OPTIONS = [
+  ['instant','Instant'], ['while_revealed','While Revealed'], ['round','This Round'], ['battle','Battle']
+];
+function revLaneOptionHtml(options, selected){
+  const current = String(selected ?? '');
+  return options.map(([value,label]) => `<option value="${escapeHtml(value)}" ${current === value ? 'selected' : ''}>${escapeHtml(label)}</option>`).join('');
+}
+function revLaneSelect(field, label, options, value){
+  return `<label>${escapeHtml(label)}<select data-lane-field="${escapeHtml(field)}">${revLaneOptionHtml(options, value)}</select></label>`;
+}
+function revLaneValueSelect(value){
+  const known = REV_LANE_VALUE_OPTIONS.some(([v]) => String(v) === String(value ?? ''));
+  return `<label>Value<select data-lane-field="valuePreset">${revLaneOptionHtml(REV_LANE_VALUE_OPTIONS, known ? value : '')}</select></label>
+    <label>Custom Value<input data-lane-field="valueCustom" value="${known ? '' : escapeHtml(value ?? '')}" placeholder="e.g. D6-1"></label>`;
+}
+
+function renderLaneEditor(panel){
+  panel.className = 'revEditorPanel revLaneEditorPanel';
+  panel.innerHTML = '';
+  const lanes = laneDeck();
+  const actions = document.createElement('div');
+  actions.className = 'revLaneActionBar';
+  actions.innerHTML = `
+    <div class="revEditorHint" style="margin:0;">Lane rows are stored separately from decks. Use trigger + effect + value + scope + target to build sheet-compatible lane hooks.</div>
+    <button class="revSafeBtn revLaneAddBtn" type="button">New Draft Lane</button>`;
+  panel.appendChild(actions);
+  actions.querySelector('.revLaneAddBtn')?.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); createDraftLane(); });
+
+  const grid = document.createElement('div');
+  grid.className = 'revLaneGrid';
+  panel.appendChild(grid);
+
+  if (!lanes.length) {
+    const empty = document.createElement('div');
+    empty.className = 'revNoCardsNote';
+    empty.innerText = 'No lane effects found. Create a draft lane or import CSV rows with type: Lane.';
+    grid.appendChild(empty);
+    return;
+  }
+
+  lanes.forEach((lane, index) => {
+    const isDraft = lane.source === 'draft' || lane.status === 'draft';
+    const card = document.createElement('div');
+    card.className = 'revLaneCard' + (isDraft ? ' revLaneDraft' : '');
+    card.dataset.laneIndex = String(index);
+    card.innerHTML = `
+      <div class="revLaneCardTop">
+        <div class="revLaneIdentity">
+          <div class="revLaneEmoji">${escapeHtml(lane.emoji || lane.icon || '◇')}</div>
+          <div>
+            <div class="revLaneName">${escapeHtml(lane.name || lane.id)}</div>
+            <div class="revLaneMeta">${escapeHtml(lane.trigger || 'passive')} · ${escapeHtml(lane.effect || 'none')}</div>
+          </div>
+        </div>
+        <label class="revLaneIncluded"><input type="checkbox" data-lane-field="included" ${lane.included !== false ? 'checked' : ''}> Pool</label>
+      </div>
+      <div class="revLaneDesc">${escapeHtml(lane.description || 'No description yet.')}</div>
+      <div class="revFieldGrid revLaneFields">
+        <label>Emoji/Icon<input data-lane-field="emoji" value="${escapeHtml(lane.emoji || lane.icon || '')}" maxlength="4" placeholder="☣️"></label>
+        <label>Name<input data-lane-field="name" value="${escapeHtml(lane.name || '')}"></label>
+        <label>Key<input data-lane-field="key" value="${escapeHtml(lane.key || '')}"></label>
+        ${revLaneSelect('trigger', 'Trigger', REV_LANE_TRIGGER_OPTIONS, lane.trigger || 'passive')}
+        ${revLaneSelect('effect', 'Effect', REV_LANE_EFFECT_OPTIONS, lane.effect || 'damage')}
+        ${revLaneValueSelect(lane.value ?? '')}
+        ${revLaneSelect('scope', 'Scope', REV_LANE_SCOPE_OPTIONS, lane.scope || 'this_lane')}
+        ${revLaneSelect('target', 'Target', REV_LANE_TARGET_OPTIONS, lane.target || 'all_units')}
+        ${revLaneSelect('duration', 'Duration', REV_LANE_DURATION_OPTIONS, lane.duration || 'instant')}
+        <label>Visual Tag<input data-lane-field="visualTag" value="${escapeHtml(lane.visualTag || '')}" placeholder="hazard / fog / reward"></label>
+        <label class="full">Description<textarea data-lane-field="description">${escapeHtml(lane.description || '')}</textarea></label>
+      </div>
+      <div class="revTileActions">
+        <button class="revSafeBtn revSaveLaneBtn" type="button">Save Lane</button>
+        ${isDraft ? '<button class="revSafeBtn revDeleteLaneBtn" type="button" style="background:#3a1010;border-color:#a33;">Delete Draft Lane</button>' : '<span class="revReadOnlyNote">Imported lane. You can edit it here, but delete is draft-only.</span>'}
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll('.revSaveLaneBtn').forEach(btn => {
+    btn.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const card = btn.closest('.revLaneCard');
+      const index = Number(card?.dataset.laneIndex);
+      const lanes = laneDeck();
+      const original = lanes[index] || {};
+      const get = field => card.querySelector(`[data-lane-field="${field}"]`);
+      lanes[index] = normaliseEditorLane({
+        ...original,
+        name: get('name')?.value || original.name,
+        key: get('key')?.value || original.key,
+        emoji: get('emoji')?.value || '',
+        icon: get('emoji')?.value || '',
+        effect: get('effect')?.value || original.effect,
+        trigger: get('trigger')?.value || original.trigger,
+        value: (get('valueCustom')?.value || get('valuePreset')?.value || original.value),
+        scope: get('scope')?.value || original.scope || 'this_lane',
+        target: get('target')?.value || original.target || 'all_units',
+        duration: get('duration')?.value || original.duration || 'instant',
+        visualTag: get('visualTag')?.value || '',
+        description: get('description')?.value || '',
+        included: !!get('included')?.checked
+      }, index);
+      saveLaneDeck(lanes);
+      renderEditorView('lanes');
+    };
+  });
+
+  grid.querySelectorAll('.revDeleteLaneBtn').forEach(btn => {
+    btn.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const card = btn.closest('.revLaneCard');
+      const index = Number(card?.dataset.laneIndex);
+      const lanes = laneDeck();
+      const lane = lanes[index];
+      if (!lane) return;
+      if (!confirm(`Delete draft lane "${lane.name || lane.id}"?`)) return;
+      lanes.splice(index, 1);
+      saveLaneDeck(lanes);
+      renderEditorView('lanes');
+    };
+  });
+}
+
 function renderMechanics(panel){
   panel.className = 'revEditorPanel';
   panel.innerHTML = '';
@@ -14069,13 +14892,29 @@ function renderMechanics(panel){
   });
   effectSection.appendChild(effectGrid);
   panel.appendChild(effectSection);
+
+  const laneSection = document.createElement('div');
+  laneSection.className = 'revMechanicSection';
+  laneSection.innerHTML = '<h2>Lane Effects</h2>';
+  const laneGrid = document.createElement('div');
+  laneGrid.className = 'revMechanicGrid';
+  (registry.laneEffects || []).forEach(effect => {
+    const card = document.createElement('div');
+    card.className = 'revMechanicCard revLaneMechanicCard';
+    const title = effect.label ? `${effect.label} (${effect.id})` : effect.id;
+    const syntax = `type: Lane\ntrigger: ${effect.trigger || '?'}\neffect: ${effect.id}\nvalue: ?`;
+    card.innerHTML = `<div class="revMechanicTitle">${escapeHtml(title)}</div><div>${escapeHtml(effect.description)}</div><div class="revMechanicSyntax">${escapeHtml(syntax)}</div>`;
+    laneGrid.appendChild(card);
+  });
+  laneSection.appendChild(laneGrid);
+  panel.appendChild(laneSection);
 }
 
 
 const REV_RANDOM_DECK_SIZE = 30;
 
 function makeRandomDeck(repo=mergedRepo(), targetCount=REV_RANDOM_DECK_SIZE){
-  const candidates = (repo || []).filter(card => card && card.id);
+  const candidates = (repo || []).filter(card => card && card.id && String(card.type || '').trim() !== 'Lane');
   const deck = {};
   if (!candidates.length) return deck;
   const target = Math.max(1, Number(targetCount) || REV_RANDOM_DECK_SIZE);
@@ -14135,6 +14974,9 @@ function renderDeckActionBar(parent, player, repo){
 
 function renderEditorView(view){
   currentView = view || currentView || 'repo';
+  window.revCurrentEditorView = currentView;
+  const headerDraftBtn = document.getElementById('revCreateDraftBtn');
+  if (headerDraftBtn) headerDraftBtn.innerText = currentView === 'lanes' ? 'New Lane' : 'New Draft';
   const repo = syncRuntimeRepo();
   cleanAllDecks(repo);
   const body = document.getElementById('revSafeEditorBody');
@@ -14147,9 +14989,10 @@ function renderEditorView(view){
   const repoBtn = document.createElement('button'); repoBtn.className = tabClass('repo'); repoBtn.innerText = 'Repo';
   const p1Btn = document.createElement('button'); p1Btn.className = tabClass('p1'); p1Btn.innerText = 'P1 Deck';
   const p2Btn = document.createElement('button'); p2Btn.className = tabClass('p2'); p2Btn.innerText = 'P2 Deck';
+  const lanesBtn = document.createElement('button'); lanesBtn.className = tabClass('lanes'); lanesBtn.innerText = 'Lanes';
   const mechBtn = document.createElement('button'); mechBtn.className = tabClass('mechanics'); mechBtn.innerText = 'Rules';
   const cleanBtn = document.createElement('button'); cleanBtn.className = 'revSafeBtn revUtilityBtn'; cleanBtn.innerText = 'Clean';
-  tabs.appendChild(repoBtn); tabs.appendChild(p1Btn); tabs.appendChild(p2Btn); tabs.appendChild(mechBtn); tabs.appendChild(cleanBtn);
+  tabs.appendChild(repoBtn); tabs.appendChild(p1Btn); tabs.appendChild(p2Btn); tabs.appendChild(lanesBtn); tabs.appendChild(mechBtn); tabs.appendChild(cleanBtn);
   body.appendChild(tabs);
 
   if (currentView === 'p1' || currentView === 'p2') {
@@ -14160,16 +15003,18 @@ function renderEditorView(view){
 
   const title = document.createElement('h2');
   title.className = 'revEditorSubhead';
-  title.innerText = currentView === 'p1' ? 'P1 Deck' : currentView === 'p2' ? 'P2 Deck' : currentView === 'mechanics' ? 'Mechanics Registry' : 'Card Repo';
+  title.innerText = currentView === 'p1' ? 'P1 Deck' : currentView === 'p2' ? 'P2 Deck' : currentView === 'lanes' ? 'Draft Lanes / Lane Pool' : currentView === 'mechanics' ? 'Mechanics Registry' : 'Card Repo';
   body.appendChild(title);
 
   const hint = document.createElement('div');
   hint.className = 'revEditorHint';
   hint.innerText = currentView === 'repo'
     ? 'Tap a card to expand it. Draft cards can be edited; official cards are read-only.'
-    : currentView === 'mechanics'
-      ? 'Reference list for wiring future card abilities.'
-      : 'Use the list controls to tune quantities. Filter by cards in deck, powers, or units.';
+    : currentView === 'lanes'
+      ? 'Create, edit, include, or exclude lane effects used by Battle Setup. Lanes are type: Lane rows and never enter decks.'
+      : currentView === 'mechanics'
+        ? 'Reference list for wiring future card and lane abilities.'
+        : 'Use the list controls to tune quantities. Filter by cards in deck, powers, or units.';
   body.appendChild(hint);
 
   if (currentView === 'repo') renderRepoFilters(body);
@@ -14186,8 +15031,14 @@ function renderEditorView(view){
   repoBtn.onclick = () => renderEditorView('repo');
   p1Btn.onclick = () => renderEditorView('p1');
   p2Btn.onclick = () => renderEditorView('p2');
+  lanesBtn.onclick = () => renderEditorView('lanes');
   mechBtn.onclick = () => renderEditorView('mechanics');
   cleanBtn.onclick = () => { cleanAllDecks(mergedRepo()); renderEditorView(currentView); };
+
+  if (currentView === 'lanes') {
+    renderLaneEditor(panel);
+    return;
+  }
 
   if (currentView === 'mechanics') {
     renderMechanics(panel);
@@ -14299,7 +15150,8 @@ function installHeaderButton(){
   btn.onclick = function(e){
     e.preventDefault();
     e.stopPropagation();
-    createDraftCard();
+    if (currentView === 'lanes') createDraftLane();
+    else createDraftCard();
   };
 }
 
@@ -15602,7 +16454,9 @@ document.addEventListener('click', function(e){
     const attackerTileId = combatOptions?.attackerTileId || state.activeUnit?.tileId || null;
     const targetTileId = combatOptions?.targetTileId || state.pendingCombatContext?.targetTileId || null;
     const shootingPenaltyContext = getShootingPenaltyContext(atk, def, attackerTileId, targetTileId);
-    const hitThresh = Math.min(7, baseHitThresh + Math.max(0, Number(shootingPenaltyContext.penalty) || 0));
+    let laneHitThresh = baseHitThresh;
+    if (eff?.modifyHit) laneHitThresh = eff.modifyHit(fx, laneHitThresh, atk, attackerTileId, targetTileId);
+    const hitThresh = Math.min(7, laneHitThresh + Math.max(0, Number(shootingPenaltyContext.penalty) || 0));
     const saveThresh = parseInt(def.save || '7', 10);
     let modSave = saveThresh + (Number(atk.weapon?.ap) || 0);
     if (eff?.modifySave) modSave = eff.modifySave(fx, modSave);
@@ -15668,6 +16522,49 @@ document.addEventListener('click', function(e){
     if(t.dataset.field === 'trigger' && label && !label.classList.contains('revUnitField')) return;
     updateDraftAbilityContext(editor);
   });
+</script>
+
+<script id="rev-patch-198-lane-starter-cleanup">
+(function(){
+  if (window.__revPatch198LaneStarterCleanup) return;
+  window.__revPatch198LaneStarterCleanup = true;
+  const STARTER_IDS = new Set([
+    'lane_booby_trapped','lane_acid_rain','lane_healing_shrine','lane_choking_fog',
+    'lane_muddy_ground','lane_bloodlust','lane_supply_cache','lane_hidden_archive',
+    'l1','l2','l3','l4','l5','l6'
+  ]);
+  function cleanStarterLanes(){
+    try {
+      const raw = localStorage.getItem('grim_lane_deck');
+      if (!raw) return;
+      const lanes = JSON.parse(raw || '[]');
+      if (!Array.isArray(lanes)) return;
+      const cleaned = lanes.filter(lane => {
+        if (!lane) return false;
+        const id = String(lane.id || '');
+        const isDraft = lane.source === 'draft' || lane.status === 'draft';
+        if (isDraft) return true;
+        return !STARTER_IDS.has(id);
+      });
+      if (cleaned.length !== lanes.length) localStorage.setItem('grim_lane_deck', JSON.stringify(cleaned));
+    } catch(err) { console.warn('[Revenant] lane starter cleanup failed', err); }
+  }
+  cleanStarterLanes();
+  document.addEventListener('DOMContentLoaded', cleanStarterLanes);
+  window.addEventListener('load', cleanStarterLanes);
+  if (window.REV_MECHANIC_REGISTRY) {
+    window.REV_MECHANIC_REGISTRY.laneEffects = [
+      { id:'damage', label:'Damage', trigger:'on_reveal / round_start', description:'Deal fixed or rolled damage to selected lane targets.' },
+      { id:'heal', label:'Heal', trigger:'on_reveal / round_start', description:'Restore HP to selected lane targets.' },
+      { id:'draw', label:'Draw', trigger:'on_reveal / round_start', description:'Controller or chosen player draws cards.' },
+      { id:'add_resource', label:'Add Resource', trigger:'on_reveal / round_start', description:'Controller or chosen player gains requisition.' },
+      { id:'cap_range', label:'Cap Range', trigger:'passive', description:'Caps ranged attacks in this lane.' },
+      { id:'cap_move', label:'Cap Move', trigger:'passive', description:'Caps movement in this lane.' },
+      { id:'modify_hit', label:'Modify Hit', trigger:'passive', description:'Improves or worsens hit thresholds for filtered attacks.' },
+      { id:'modify_save', label:'Modify Save', trigger:'passive', description:'Improves or worsens saves in this lane.' }
+    ];
+  }
+})();
 </script>
 
 
@@ -16284,7 +17181,7 @@ function displayRange(r) {
     if (clearSave) localStorage.removeItem('grim_save');
     closeSetupOverlays();
 
-    let loaded = { repo: CARDS, lists: {1:null,2:null}, laneDeck: DEFAULT_LANE_EFFECTS };
+    let loaded = { repo: CARDS, lists: {1:null,2:null}, laneDeck: [] };
     try {
       if (typeof window.revCleanRepos === 'function') window.revCleanRepos();
       loaded = loadFromStorage();
@@ -17032,6 +17929,696 @@ function displayRange(r) {
   padding-right: 6px !important;
 }
 </style>
+
+
+
+<style id="rev-patch-200-lane-reveal-paced-ack">
+/* Patch 200 — slower lane reveal with manual acknowledge/apply step */
+.round-end-overlay.lane-reveal-sequence {
+  background: rgba(0,0,0,0.22) !important;
+  gap: 10px !important;
+  pointer-events: none;
+}
+.round-end-overlay.lane-reveal-sequence.awaiting-ack {
+  pointer-events: all !important;
+}
+.lane-reveal-board-cue {
+  font-family: 'Spectral', Georgia, serif;
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #f0d080;
+  text-shadow: 0 0 16px rgba(240,208,128,.38);
+  background: rgba(0,0,0,.48);
+  border: 1px solid rgba(200,160,96,.22);
+  border-radius: 999px;
+  padding: 7px 12px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .35s ease, transform .35s ease;
+}
+.lane-reveal-board-cue.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lane-reveal-card {
+  transition: opacity .46s ease, transform .58s cubic-bezier(.18,.86,.26,1.05) !important;
+}
+.lane-reveal-flipper {
+  transition: transform .72s cubic-bezier(.2,.7,.22,1) !important;
+}
+.lane-reveal-card.returning-home {
+  pointer-events: none;
+  transition: left .52s cubic-bezier(.2,.8,.2,1), top .52s cubic-bezier(.2,.8,.2,1), width .52s cubic-bezier(.2,.8,.2,1), height .52s cubic-bezier(.2,.8,.2,1), opacity .42s ease, transform .52s cubic-bezier(.2,.8,.2,1) !important;
+}
+.lane-reveal-effect-text {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .34s ease, transform .34s ease;
+}
+.lane-reveal-effect-text.ready {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lane-reveal-ack-btn {
+  margin-top: 4px;
+  font-family: 'Spectral', Georgia, serif;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #f0d080;
+  background: linear-gradient(160deg,#2a2010,#110c06);
+  border: 1px solid #c08020;
+  border-radius: 6px;
+  padding: 10px 26px;
+  box-shadow: 0 0 18px rgba(200,160,60,.28);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .26s ease, transform .26s ease, filter .16s ease;
+}
+.lane-reveal-ack-btn.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.lane-reveal-ack-btn:active { filter: brightness(1.22); }
+.round-end-overlay.scoring-active {
+  background: transparent !important;
+  pointer-events: none !important;
+}
+</style>
+
+<script id="rev-patch-200-lane-reveal-paced-ack">
+(function(){
+  if (window.__revPatch200LaneRevealPacedAck) return;
+  window.__revPatch200LaneRevealPacedAck = true;
+
+  function clearLaneRevealOverlayChrome(ov) {
+    if (!ov) return;
+    ov.classList.remove('lane-reveal-sequence','awaiting-ack','dim');
+    ov.classList.add('scoring-active');
+    ov.innerHTML = '';
+  }
+
+  function resetLaneRevealedFlags() {
+    if (!state || !state.laneEffects) return;
+    ['A','B'].forEach(lane => {
+      if (state.laneEffects[lane]) state.laneEffects[lane].revealed = false;
+    });
+    if (typeof renderLaneEffects === 'function') renderLaneEffects();
+  }
+
+  function animateLaneRevealCardHome(lane, done) {
+    const card = document.getElementById('lane-reveal-card');
+    const badge = document.getElementById(`lane-badge-${lane}`);
+    if (!card || !badge) { done?.(); return; }
+    const from = card.getBoundingClientRect();
+    const to = badge.getBoundingClientRect();
+    card.classList.add('returning-home');
+    card.style.position = 'fixed';
+    card.style.left = `${from.left}px`;
+    card.style.top = `${from.top}px`;
+    card.style.width = `${from.width}px`;
+    card.style.height = `${from.height}px`;
+    card.style.margin = '0';
+    card.style.zIndex = '130';
+    card.style.transform = 'scale(1)';
+    requestAnimationFrame(() => {
+      card.style.left = `${to.left + to.width / 2 - from.width * 0.11}px`;
+      card.style.top = `${to.top + to.height / 2 - from.height * 0.11}px`;
+      card.style.width = `${Math.max(34, from.width * 0.22)}px`;
+      card.style.height = `${Math.max(48, from.height * 0.22)}px`;
+      card.style.opacity = '0';
+      card.style.transform = 'scale(.78)';
+    });
+    setTimeout(() => done?.(), 560);
+  }
+
+  window.focusBoardForLaneReveal = function(lane) {
+    document.body.classList.add('lane-reveal-mode');
+    scale = Math.max(minScale || 1, 1.2);
+    const ow = outer.clientWidth;
+    const oh = outer.clientHeight;
+    const laneFrac = lane === 'A' ? 0.33 : 0.67;
+    const laneX = inner.offsetWidth * laneFrac * scale;
+    tx = clamp(ow / 2 - laneX, ow - inner.offsetWidth * scale, 0);
+    ty = clamp(oh * 0.055, oh - inner.offsetHeight * scale, 0);
+    setBoardTransition(900, 'cubic-bezier(.2,.78,.22,1)');
+    applyTransform(false);
+    setLaneRevealTargetFocus(lane, true);
+  };
+
+  window.revealLaneEffects = function(ov, callback) {
+    const lanes = ['A','B'].filter(lane => state.laneEffects?.[lane] && !state.laneEffects[lane].revealed);
+    if (!lanes.length) { callback?.(); return; }
+    const savedView = { scale, tx, ty };
+    ov.classList.remove('dim','scoring-active');
+    ov.classList.add('lane-reveal-sequence');
+    ov.style.pointerEvents = 'none';
+
+    let idx = 0;
+
+    function finishRevealSequence() {
+      restoreBoardAfterLaneReveal(savedView);
+      clearLaneRevealOverlayChrome(ov);
+      setTimeout(() => callback?.(), 520);
+    }
+
+    function nextLane() {
+      ov.classList.remove('awaiting-ack');
+      if (idx >= lanes.length) {
+        finishRevealSequence();
+        return;
+      }
+
+      const lane = lanes[idx++];
+      const fx = state.laneEffects[lane];
+      focusBoardForLaneReveal(lane);
+      ov.innerHTML = `<div class="lane-reveal-board-cue" id="lane-reveal-board-cue">${laneRevealLabel(lane)} Control Zone</div>`;
+
+      requestAnimationFrame(() => {
+        document.getElementById('lane-reveal-board-cue')?.classList.add('show');
+      });
+
+      setTimeout(() => {
+        ov.innerHTML = `
+          <div class="lane-reveal-stage-label">${laneRevealLabel(lane)}</div>
+          ${laneRevealCardMarkup(fx, lane)}
+          <div class="lane-reveal-effect-text" id="lane-reveal-effect-text">Revealing lane effect…</div>
+          <button class="lane-reveal-ack-btn" id="lane-reveal-ack-btn">Continue ▶</button>`;
+
+        requestAnimationFrame(() => {
+          document.getElementById('lane-reveal-card')?.classList.add('deal-in');
+        });
+
+        setTimeout(() => {
+          const card = document.getElementById('lane-reveal-card');
+          card?.classList.add('flipped');
+          if (fx) fx.revealed = true;
+          renderLaneEffects();
+        }, 780);
+
+        setTimeout(() => {
+          const text = document.getElementById('lane-reveal-effect-text');
+          const btn = document.getElementById('lane-reveal-ack-btn');
+          const trigger = normaliseLaneTrigger(fx?.trigger || 'passive');
+          const message = laneRevealEffectText(fx, lane);
+          if (text) {
+            text.textContent = message;
+            if (trigger !== 'on_reveal') text.classList.add('passive');
+            text.classList.add('ready');
+          }
+          if (btn) {
+            btn.textContent = trigger === 'on_reveal' ? 'Apply ▶' : 'Continue ▶';
+            btn.classList.add('show');
+            btn.onclick = () => {
+              btn.disabled = true;
+              ov.classList.remove('awaiting-ack');
+              const applied = applyLaneRevealEffect(fx, lane);
+              if (applied && text) text.textContent = 'Effect resolved.';
+              setTimeout(() => {
+                animateLaneRevealCardHome(lane, () => {
+                  setTimeout(nextLane, 220);
+                });
+              }, applied ? 520 : 180);
+            };
+          }
+          ov.classList.add('awaiting-ack');
+        }, 1650);
+      }, 940);
+    }
+
+    nextLane();
+  };
+
+  const originalLoadGame = window.loadGame;
+  window.loadGame = function(){
+    const result = originalLoadGame?.apply(this, arguments);
+    resetLaneRevealedFlags();
+    return result;
+  };
+  try { loadGame = window.loadGame; } catch(err) {}
+
+  const originalRevFreshSetup = window.revFreshSetupFromStorage;
+  if (typeof originalRevFreshSetup === 'function') {
+    window.revFreshSetupFromStorage = function(){
+      const result = originalRevFreshSetup.apply(this, arguments);
+      resetLaneRevealedFlags();
+      return result;
+    };
+  }
+
+  const originalResetGame = window.resetGame;
+  window.resetGame = function(){
+    const result = originalResetGame?.apply(this, arguments);
+    resetLaneRevealedFlags();
+    return result;
+  };
+  try { resetGame = window.resetGame; } catch(err) {}
+})();
+</script>
+
+
+
+<style id="rev-patch-201-lane-reveal-damage-next-round-fix">
+/* Patch 201 — lane reveal art/emoji focus, delayed effect resolution, damage icon floats, next-round click fix */
+.lane-reveal-front {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+}
+.lane-reveal-art-panel {
+  width: calc(100% - 24px);
+  aspect-ratio: 1.12 / .78;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(200,160,96,.34);
+  background: radial-gradient(circle at 50% 42%, rgba(200,160,96,.18), rgba(10,8,5,.92) 70%);
+  box-shadow: inset 0 0 20px rgba(240,208,128,.08), 0 0 18px rgba(0,0,0,.48);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.lane-reveal-art-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,.06), transparent 45%, rgba(0,0,0,.18));
+  pointer-events: none;
+}
+.lane-reveal-art-emoji {
+  font-size: 54px;
+  line-height: 1;
+  filter: drop-shadow(0 0 14px rgba(240,208,128,.34));
+}
+.lane-reveal-front .lane-reveal-emoji {
+  display: none !important;
+}
+.dmg-float {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  white-space: nowrap !important;
+}
+.dmg-float .dmg-icon {
+  font-size: .92em;
+  filter: drop-shadow(0 0 5px rgba(204,48,48,.55));
+}
+.round-end-overlay.next-round-ready {
+  pointer-events: all !important;
+  background: rgba(0,0,0,0.58) !important;
+}
+</style>
+
+<script id="rev-patch-201-lane-reveal-damage-next-round-fix">
+(function(){
+  if (window.__revPatch201LaneRevealDamageNextRoundFix) return;
+  window.__revPatch201LaneRevealDamageNextRoundFix = true;
+
+  function laneIconFor(fx) {
+    return fx?.emoji || fx?.icon || '◇';
+  }
+
+  window.laneRevealCardMarkup = function(fx, lane) {
+    const icon = laneIconFor(fx);
+    const trigger = String(fx?.trigger || 'passive').replace(/_/g, ' ');
+    return `
+      <div class="lane-reveal-card" id="lane-reveal-card">
+        <div class="lane-reveal-flipper">
+          <div class="lane-reveal-face lane-reveal-back">
+            <div class="lane-reveal-back-title">Revenant</div>
+            <div class="lane-reveal-back-sub">Lane Effect</div>
+          </div>
+          <div class="lane-reveal-face lane-reveal-front">
+            <div class="lane-reveal-lane">${laneRevealLabel(lane)}</div>
+            <div class="lane-reveal-art-panel"><div class="lane-reveal-art-emoji">${icon}</div></div>
+            <div class="lane-reveal-name">${formatCardName(fx?.name || 'Unknown Lane')}</div>
+            <div class="lane-reveal-trigger">${trigger}</div>
+            <div class="lane-reveal-desc">${fx?.description || laneRevealEffectText(fx, lane)}</div>
+          </div>
+        </div>
+      </div>`;
+  };
+  try { laneRevealCardMarkup = window.laneRevealCardMarkup; } catch(err) {}
+
+  window.showDamageFloat = function(tileId, amount) {
+    const tile = document.querySelector(`[data-id="${tileId}"]`);
+    if (!tile) return;
+    const r = tile.getBoundingClientRect();
+    const fl = document.createElement('div');
+    fl.className = 'dmg-float';
+    fl.innerHTML = `<span class="dmg-icon">💀</span><span>−${amount}</span>`;
+    fl.style.left = (r.left + r.width/2) + 'px';
+    fl.style.top  = (r.top  + r.height/2) + 'px';
+    document.body.appendChild(fl);
+    setTimeout(()=>fl.remove(), 1200);
+  };
+  try { showDamageFloat = window.showDamageFloat; } catch(err) {}
+
+  function clearLaneRevealOverlayForScoring(ov) {
+    if (!ov) return;
+    ov.classList.remove('lane-reveal-sequence','awaiting-ack','dim','next-round-ready');
+    ov.classList.add('scoring-active');
+    ov.innerHTML = '';
+    ov.style.pointerEvents = 'none';
+  }
+
+  function animateLaneRevealCardHome201(lane, done) {
+    const card = document.getElementById('lane-reveal-card');
+    const badge = document.getElementById(`lane-badge-${lane}`);
+    if (!card || !badge) { done?.(); return; }
+    const from = card.getBoundingClientRect();
+    const to = badge.getBoundingClientRect();
+    card.classList.add('returning-home');
+    card.style.position = 'fixed';
+    card.style.left = `${from.left}px`;
+    card.style.top = `${from.top}px`;
+    card.style.width = `${from.width}px`;
+    card.style.height = `${from.height}px`;
+    card.style.margin = '0';
+    card.style.zIndex = '130';
+    card.style.transform = 'scale(1)';
+    requestAnimationFrame(() => {
+      card.style.left = `${to.left + to.width / 2 - from.width * 0.11}px`;
+      card.style.top = `${to.top + to.height / 2 - from.height * 0.11}px`;
+      card.style.width = `${Math.max(34, from.width * 0.22)}px`;
+      card.style.height = `${Math.max(48, from.height * 0.22)}px`;
+      card.style.opacity = '0';
+      card.style.transform = 'scale(.78)';
+    });
+    setTimeout(() => done?.(), 560);
+  }
+
+  window.revealLaneEffects = function(ov, callback) {
+    const lanes = ['A','B'].filter(lane => state.laneEffects?.[lane] && !state.laneEffects[lane].revealed);
+    if (!lanes.length) { callback?.(); return; }
+    const savedView = { scale, tx, ty };
+    ov.classList.remove('dim','scoring-active','next-round-ready');
+    ov.classList.add('lane-reveal-sequence');
+    ov.style.pointerEvents = 'none';
+
+    let idx = 0;
+
+    function finishRevealSequence() {
+      if (typeof restoreBoardAfterLaneReveal === 'function') restoreBoardAfterLaneReveal(savedView);
+      clearLaneRevealOverlayForScoring(ov);
+      setTimeout(() => callback?.(), 520);
+    }
+
+    function nextLane() {
+      ov.classList.remove('awaiting-ack');
+      if (idx >= lanes.length) {
+        finishRevealSequence();
+        return;
+      }
+
+      const lane = lanes[idx++];
+      const fx = state.laneEffects[lane];
+      focusBoardForLaneReveal(lane);
+      ov.innerHTML = `<div class="lane-reveal-board-cue" id="lane-reveal-board-cue">${laneRevealLabel(lane)} Control Zone</div>`;
+
+      requestAnimationFrame(() => {
+        document.getElementById('lane-reveal-board-cue')?.classList.add('show');
+      });
+
+      setTimeout(() => {
+        ov.innerHTML = `
+          <div class="lane-reveal-stage-label">${laneRevealLabel(lane)}</div>
+          ${laneRevealCardMarkup(fx, lane)}
+          <div class="lane-reveal-effect-text" id="lane-reveal-effect-text">Revealing lane effect…</div>
+          <button class="lane-reveal-ack-btn" id="lane-reveal-ack-btn">Continue ▶</button>`;
+
+        requestAnimationFrame(() => {
+          document.getElementById('lane-reveal-card')?.classList.add('deal-in');
+        });
+
+        setTimeout(() => {
+          const card = document.getElementById('lane-reveal-card');
+          card?.classList.add('flipped');
+          if (fx) fx.revealed = true;
+          renderLaneEffects();
+        }, 780);
+
+        setTimeout(() => {
+          const text = document.getElementById('lane-reveal-effect-text');
+          const btn = document.getElementById('lane-reveal-ack-btn');
+          const trigger = normaliseLaneTrigger(fx?.trigger || 'passive');
+          const message = laneRevealEffectText(fx, lane);
+          if (text) {
+            text.textContent = message;
+            if (trigger !== 'on_reveal') text.classList.add('passive');
+            text.classList.add('ready');
+          }
+          if (btn) {
+            btn.textContent = trigger === 'on_reveal' ? 'Apply ▶' : 'Continue ▶';
+            btn.classList.add('show');
+            btn.onclick = () => {
+              btn.disabled = true;
+              ov.classList.remove('awaiting-ack');
+              animateLaneRevealCardHome201(lane, () => {
+                let applied = false;
+                if (trigger === 'on_reveal') applied = applyLaneRevealEffect(fx, lane);
+                if (applied && text) text.textContent = 'Effect resolved.';
+                setTimeout(nextLane, applied ? 520 : 220);
+              });
+            };
+          }
+          ov.classList.add('awaiting-ack');
+        }, 1650);
+      }, 940);
+    }
+
+    nextLane();
+  };
+  try { revealLaneEffects = window.revealLaneEffects; } catch(err) {}
+
+  window.finishRoundOverlay = function(ov, topBar) {
+    ov.classList.remove('scoring-active','lane-reveal-sequence','awaiting-ack','dim');
+    ov.classList.add('show','next-round-ready');
+    ov.style.pointerEvents = 'all';
+    ov.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.className = 'round-end-btn';
+    btn.textContent = 'Next Round ▶';
+    ov.appendChild(btn);
+    btn.addEventListener('click', ()=>{
+      ov.remove();
+      if (topBar) topBar.style.zIndex = '';
+      state.round++;
+      if(state.round > state.maxRounds){ showEndGame(); return; }
+      requisitionPhase();
+    });
+  };
+  try { finishRoundOverlay = window.finishRoundOverlay; } catch(err) {}
+})();
+</script>
+
+
+
+<style id="rev-patch-202-lane-emoji-art-zoom-position">
+/* Patch 202 — make revealed lane cards show emoji/art panels, not tiny green labels; nudge zoom cards down. */
+.card-zoom-overlay {
+  padding-top: calc(13px + env(safe-area-inset-top)) !important;
+}
+.card-zoom-shell {
+  margin-top: 8px !important;
+}
+.card-zoom-art {
+  max-height: calc(100vh - 44px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+}
+.tile.centre.revealed-lane-card {
+  overflow: visible;
+  border-color: rgba(200,160,96,0.52) !important;
+  background: radial-gradient(circle at 50% 38%, rgba(200,160,96,0.13), rgba(6,8,5,0.96) 68%) !important;
+  box-shadow: inset 0 0 14px rgba(240,208,128,0.08), 0 0 10px rgba(64,168,112,0.16) !important;
+}
+.tile.centre.revealed-lane-card > .tile-symbol {
+  display: none !important;
+}
+.lane-effect-art-slot {
+  position: absolute;
+  inset: 3px;
+  z-index: 3;
+  border-radius: 5px;
+  border: 1px solid rgba(200,160,96,0.34);
+  background: radial-gradient(circle at 50% 40%, rgba(240,208,128,0.16), rgba(4,8,5,0.95) 68%);
+  box-shadow: inset 0 0 16px rgba(240,208,128,0.08), 0 0 12px rgba(0,0,0,0.55);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+  overflow: hidden;
+}
+.tile.centre.revealed-lane-card .lane-effect-art-slot {
+  display: flex;
+}
+.lane-effect-art-emoji {
+  font-size: clamp(21px, 6.2vw, 32px);
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(240,208,128,0.38));
+}
+.lane-effect-art-name {
+  max-width: 94%;
+  color: #f0d080;
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  line-height: .98;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tile.centre.revealed-lane-card .lane-effect-badge {
+  display: none !important;
+}
+.lane-reveal-front .lane-reveal-art-panel {
+  display: flex !important;
+  min-height: 72px;
+}
+.lane-reveal-front .lane-reveal-art-emoji {
+  display: block !important;
+  font-size: 58px !important;
+}
+.lane-reveal-front > .lane-reveal-emoji {
+  display: none !important;
+}
+.card-zoom-art.lane-effect-zoom {
+  position: relative;
+  background: radial-gradient(circle at 50% 34%, rgba(64,168,112,0.18), transparent 38%), linear-gradient(160deg,#0e1a12,#060806 72%) !important;
+}
+.lane-zoom-art-emoji {
+  position: absolute;
+  left: 50%;
+  top: 36%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  font-size: clamp(74px, 26vw, 124px);
+  line-height: 1;
+  filter: drop-shadow(0 0 24px rgba(240,208,128,0.34));
+  pointer-events: none;
+}
+.card-zoom-art.lane-effect-zoom .card-zoom-fallback-name {
+  display: none !important;
+}
+</style>
+
+<script id="rev-patch-202-lane-emoji-art-zoom-position">
+(function(){
+  if (window.__revPatch202LaneEmojiArtZoomPosition) return;
+  window.__revPatch202LaneEmojiArtZoomPosition = true;
+
+  function laneFxIcon(fx) {
+    return fx?.emoji || fx?.icon || '◇';
+  }
+
+  function safeName(fx, lane) {
+    const raw = fx?.name || `Lane ${lane}`;
+    try { return formatCardName(raw); }
+    catch(err) { return String(raw || '').toUpperCase(); }
+  }
+
+  function ensureLaneArtSlot(lane, fx) {
+    const badge = document.getElementById(`lane-badge-${lane}`);
+    const tile = badge?.closest?.('.tile.centre') || document.querySelector(`.tile.centre[data-lane="${lane}"]`);
+    if (!tile) return;
+    let slot = tile.querySelector('.lane-effect-art-slot');
+    if (!slot) {
+      slot = document.createElement('div');
+      slot.className = 'lane-effect-art-slot';
+      tile.appendChild(slot);
+    }
+    slot.innerHTML = `<div class="lane-effect-art-emoji">${laneFxIcon(fx)}</div><div class="lane-effect-art-name">${safeName(fx, lane)}</div>`;
+  }
+
+  window.renderLaneEffects = function() {
+    ['A','B'].forEach(lane => {
+      const badge = document.getElementById(`lane-badge-${lane}`);
+      if (!badge) return;
+      const tile = badge.closest?.('.tile.centre') || document.querySelector(`.tile.centre[data-lane="${lane}"]`);
+      const fx = state.laneEffects?.[lane];
+      if (!fx) {
+        badge.style.display = 'none';
+        tile?.classList.remove('revealed-lane-card');
+        const slot = tile?.querySelector('.lane-effect-art-slot');
+        if (slot) slot.style.display = 'none';
+        return;
+      }
+      badge.style.display = '';
+      ensureLaneArtSlot(lane, fx);
+      if (fx.revealed) {
+        badge.textContent = '';
+        badge.classList.remove('hidden');
+        tile?.classList.add('revealed-lane-card');
+        const slot = tile?.querySelector('.lane-effect-art-slot');
+        if (slot) slot.style.display = 'flex';
+      } else {
+        badge.textContent = '?';
+        badge.classList.add('hidden');
+        tile?.classList.remove('revealed-lane-card');
+        const slot = tile?.querySelector('.lane-effect-art-slot');
+        if (slot) slot.style.display = 'none';
+      }
+    });
+  };
+  try { renderLaneEffects = window.renderLaneEffects; } catch(err) {}
+
+  window.laneRevealCardMarkup = function(fx, lane) {
+    const icon = laneFxIcon(fx);
+    const trigger = String(fx?.trigger || 'passive').replace(/_/g, ' ');
+    const desc = fx?.description || laneRevealEffectText(fx, lane);
+    return `
+      <div class="lane-reveal-card" id="lane-reveal-card">
+        <div class="lane-reveal-flipper">
+          <div class="lane-reveal-face lane-reveal-back">
+            <div class="lane-reveal-back-title">Revenant</div>
+            <div class="lane-reveal-back-sub">Lane Effect</div>
+          </div>
+          <div class="lane-reveal-face lane-reveal-front">
+            <div class="lane-reveal-lane">${laneRevealLabel(lane)}</div>
+            <div class="lane-reveal-art-panel"><div class="lane-reveal-art-emoji">${icon}</div></div>
+            <div class="lane-reveal-name">${safeName(fx, lane)}</div>
+            <div class="lane-reveal-trigger">${trigger}</div>
+            <div class="lane-reveal-desc">${desc}</div>
+          </div>
+        </div>
+      </div>`;
+  };
+  try { laneRevealCardMarkup = window.laneRevealCardMarkup; } catch(err) {}
+
+  window.showLaneEffectOverlay = function(lane, tile) {
+    document.querySelectorAll('.lane-effect-overlay').forEach(e=>e.remove());
+    const fx = state.laneEffects?.[lane];
+    openCardZoom(laneEffectCardForZoom(lane));
+    const artEl = document.getElementById('czoom-art');
+    if (artEl) {
+      artEl.classList.add('lane-effect-zoom');
+      const old = artEl.querySelector('.lane-zoom-art-emoji');
+      if (old) old.remove();
+      const emoji = document.createElement('div');
+      emoji.className = 'lane-zoom-art-emoji';
+      emoji.textContent = laneFxIcon(fx);
+      artEl.appendChild(emoji);
+    }
+  };
+  try { showLaneEffectOverlay = window.showLaneEffectOverlay; } catch(err) {}
+
+  // Re-render immediately in case a save/load left lane cards already revealed.
+  setTimeout(() => { try { renderLaneEffects(); } catch(err) {} }, 0);
+})();
+</script>
 
 </body>
 </html>
