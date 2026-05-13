@@ -3775,7 +3775,7 @@ body.p2-turn .player-area-glow {
 /* Base ownership state — always visible on board units. */
 .tile .unit-on-tile.p1-unit {
   border: 2px solid var(--p1) !important;
-  background: linear-gradient(160deg,#22345f,#162443) !important;
+  background-color: #162443;
   box-shadow:
     0 0 0 1px rgba(74,120,216,0.38),
     0 0 8px rgba(74,120,216,0.42) !important;
@@ -3783,7 +3783,7 @@ body.p2-turn .player-area-glow {
 
 .tile .unit-on-tile.p2-unit {
   border: 2px solid var(--p2) !important;
-  background: linear-gradient(160deg,#5a1a1a,#3f1111) !important;
+  background-color: #3f1111;
   box-shadow:
     0 0 0 1px rgba(204,48,48,0.38),
     0 0 8px rgba(204,48,48,0.42) !important;
@@ -3878,6 +3878,415 @@ body.p2-turn .player-area-glow {
 .tile .unit-on-tile.exhausted.p1-unit,
 .tile .unit-on-tile.exhausted.p2-unit {
   filter: brightness(0.72) saturate(0.78);
+}
+
+
+/* ── PATCH 177: card visual polish / activation hold / stronger art read ── */
+
+/* Card zoom is higher on screen and leaves more art visible. */
+.card-zoom-overlay {
+  justify-content: flex-start !important;
+  padding-top: calc(5px + env(safe-area-inset-top)) !important;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  overflow: hidden !important;
+}
+.card-zoom-shell {
+  width: min(292px, 84vw) !important;
+  margin-top: 0 !important;
+  gap: 0 !important;
+}
+.card-zoom-art {
+  width: min(292px, 84vw) !important;
+  max-height: calc(100vh - 28px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+  background-size: cover !important;
+  background-position: center top !important;
+}
+.card-zoom-bottom {
+  height: 34% !important;
+  min-height: 34% !important;
+  max-height: 34% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  padding: 0 0 6px !important;
+  background: linear-gradient(180deg,
+    rgba(5,4,6,0) 0%,
+    rgba(5,4,6,0.08) 10%,
+    rgba(7,6,10,0.74) 26%,
+    rgba(7,6,10,0.97) 54%,
+    rgba(7,6,10,0.99) 100%) !important;
+}
+.card-zoom-titleband {
+  grid-template-columns: 32px 1fr 32px !important;
+  gap: 6px !important;
+  padding: 6px 10px 7px !important;
+}
+.card-zoom-side-icon {
+  font-size: 22px !important;
+}
+.card-zoom-order {
+  font-size: 8.5px !important;
+}
+.card-zoom-name {
+  font-size: 17px !important;
+  line-height: 1.02 !important;
+}
+.card-zoom-weapon {
+  font-size: 10px !important;
+}
+.card-zoom-quote {
+  display: none !important;
+}
+.card-zoom-attack-pill {
+  margin: 6px 10px 4px !important;
+  padding: 5px 7px !important;
+  gap: 5px !important;
+}
+.card-zoom-special {
+  margin: 0 10px !important;
+  padding: 4px 7px 5px !important;
+  font-size: 10.5px !important;
+  line-height: 1.22 !important;
+  max-height: 34px !important;
+  overflow: hidden !important;
+}
+.card-zoom-stat-rail {
+  top: 18px !important;
+  left: 8px !important;
+  gap: 7px !important;
+}
+.card-zoom-fallback-name {
+  top: 38% !important;
+}
+
+/* Board card art should read through the ownership frame. */
+.tile .unit-on-tile.unit-has-art {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+.tile .unit-on-tile.unit-has-art .unit-name {
+  background: rgba(0,0,0,0.52);
+  border: 1px solid rgba(240,208,128,0.22);
+  border-radius: 3px;
+  padding: 2px 3px;
+  text-shadow: 0 1px 3px #000;
+}
+.card,
+.prof-card-visual,
+.card-zoom-art,
+.battle-card-art,
+.draw-reveal-front,
+.hand-hold-preview {
+  background-size: cover !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Brighter activation rune on board cards. */
+.unit-rune {
+  width: 10px !important;
+  height: 10px !important;
+  background: radial-gradient(circle, #ffe7a0 0%, #d9901e 42%, #7a3c08 100%) !important;
+  border: 1.5px solid #ffd27a !important;
+  box-shadow:
+    0 0 7px rgba(255,194,80,0.95),
+    0 0 14px rgba(217,121,24,0.58) !important;
+}
+.unit-rune.unit-rune-spent {
+  background: #1a1408 !important;
+  border-color: #2e2010 !important;
+  box-shadow: none !important;
+}
+.tile.activation-holding .unit-on-tile {
+  filter: brightness(1.22) saturate(1.12);
+  box-shadow:
+    0 0 0 1px rgba(240,208,128,0.72),
+    0 0 18px rgba(240,208,128,0.72),
+    0 0 34px rgba(217,121,24,0.30) !important;
+}
+
+/* Hold-to-activate fill on the inspector card. */
+.prof-card-visual {
+  overflow: hidden;
+}
+.prof-card-visual::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0%;
+  z-index: 8;
+  pointer-events: none;
+  background: linear-gradient(0deg,
+    rgba(240,208,128,0.38),
+    rgba(217,121,24,0.20),
+    rgba(255,255,255,0.05));
+  opacity: 0;
+}
+.prof-card-visual.activate-holding {
+  border-color: #f0d080 !important;
+  box-shadow:
+    0 0 14px rgba(240,208,128,0.72),
+    0 0 30px rgba(217,121,24,0.38),
+    0 8px 32px rgba(0,0,0,0.70) !important;
+}
+.prof-card-visual.activate-holding::after {
+  opacity: 1;
+  animation: activate-card-fill var(--activate-hold-ms,620ms) linear forwards;
+}
+.prof-card-visual.activate-held {
+  border-color: #fff0b8 !important;
+  box-shadow:
+    0 0 18px rgba(255,240,184,0.92),
+    0 0 36px rgba(240,208,128,0.55) !important;
+}
+@keyframes activate-card-fill {
+  from { height: 0%; }
+  to   { height: 100%; }
+}
+.prof-cv-diamond,
+.res-diamond {
+  box-shadow:
+    0 0 10px rgba(217,121,24,0.62),
+    0 0 22px rgba(217,121,24,0.28),
+    inset 0 0 8px rgba(255,216,120,0.18) !important;
+}
+.prof-card-visual.cv-pulse {
+  animation: cv-pulse 1.25s ease-in-out infinite !important;
+}
+
+/* Stronger player hand glow — clearer territory layer behind the hand/action zone. */
+.player-area-glow {
+  height: calc(270px + env(safe-area-inset-bottom)) !important;
+  opacity: 1 !important;
+  z-index: 9 !important;
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      rgba(74,120,216,0.70) 0%,
+      rgba(74,120,216,0.46) 26%,
+      rgba(74,120,216,0.24) 52%,
+      rgba(74,120,216,0.08) 76%,
+      rgba(74,120,216,0.00) 100%),
+    linear-gradient(0deg,
+      rgba(74,120,216,0.22) 0%,
+      rgba(74,120,216,0.10) 48%,
+      rgba(74,120,216,0.00) 100%) !important;
+  mix-blend-mode: screen !important;
+}
+body.p2-turn .player-area-glow {
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      rgba(204,48,48,0.70) 0%,
+      rgba(204,48,48,0.46) 26%,
+      rgba(204,48,48,0.24) 52%,
+      rgba(204,48,48,0.08) 76%,
+      rgba(204,48,48,0.00) 100%),
+    linear-gradient(0deg,
+      rgba(204,48,48,0.22) 0%,
+      rgba(204,48,48,0.10) 48%,
+      rgba(204,48,48,0.00) 100%) !important;
+}
+
+
+/* ── PATCH 178: hold-to-activate is on the board card ── */
+.unit-on-tile {
+  overflow: hidden;
+}
+.unit-on-tile::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0%;
+  z-index: 12;
+  pointer-events: none;
+  background: linear-gradient(0deg,
+    rgba(240,208,128,0.42),
+    rgba(217,121,24,0.25),
+    rgba(255,255,255,0.07));
+  opacity: 0;
+}
+.unit-on-tile.activate-holding {
+  border-color: #f0d080 !important;
+  filter: brightness(1.22) saturate(1.14);
+  box-shadow:
+    0 0 0 1px rgba(240,208,128,0.75),
+    0 0 18px rgba(240,208,128,0.82),
+    0 0 34px rgba(217,121,24,0.38) !important;
+}
+.unit-on-tile.activate-holding::after {
+  opacity: 1;
+  animation: activate-board-card-fill var(--activate-hold-ms,620ms) linear forwards;
+}
+.unit-on-tile.activate-held {
+  border-color: #fff0b8 !important;
+  box-shadow:
+    0 0 20px rgba(255,240,184,0.98),
+    0 0 42px rgba(240,208,128,0.58) !important;
+}
+@keyframes activate-board-card-fill {
+  from { height: 0%; }
+  to   { height: 100%; }
+}
+
+/* Inspector card no longer performs hold activation; remove the fill overlay there. */
+.prof-card-visual.activate-holding,
+.prof-card-visual.activate-held {
+  animation: none !important;
+}
+.prof-card-visual.activate-holding::after,
+.prof-card-visual.activate-held::after {
+  display: none !important;
+}
+
+
+/* ── PATCH 179: board hold activates into the normal active inspector flow ── */
+.tile.unit-active .unit-on-tile.activate-held {
+  pointer-events: none;
+}
+
+
+/* ── PATCH 180: hold activation forces active action-bar UI ── */
+.hub-actions.active {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+.hub-row.activated .hub-actions.active {
+  display: flex !important;
+}
+.hub-row.activated #hub-btn,
+.hub-row.activated #hub-diamond-wrap,
+.hub-row.activated #hub-pass-btn {
+  display: none !important;
+}
+
+
+/* ── PATCH 181: active unit UI authority + active-player hand glow ── */
+#hub-actions.active {
+  display: flex !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+#hub-row.activated #hub-actions {
+  display: flex !important;
+}
+#hub-row.activated #hub-btn,
+#hub-row.activated #hub-diamond-wrap,
+#hub-row.activated #hub-pass-btn,
+#hub-row.activated #hub-deck-count {
+  display: none !important;
+}
+
+/* Explicit glow ownership classes. */
+.player-area-glow.p1-glow,
+body.p1-turn .player-area-glow {
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      rgba(74,120,216,0.70) 0%,
+      rgba(74,120,216,0.46) 26%,
+      rgba(74,120,216,0.24) 52%,
+      rgba(74,120,216,0.08) 76%,
+      rgba(74,120,216,0.00) 100%),
+    linear-gradient(0deg,
+      rgba(74,120,216,0.22) 0%,
+      rgba(74,120,216,0.10) 48%,
+      rgba(74,120,216,0.00) 100%) !important;
+}
+.player-area-glow.p2-glow,
+body.p2-turn .player-area-glow {
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      rgba(204,48,48,0.70) 0%,
+      rgba(204,48,48,0.46) 26%,
+      rgba(204,48,48,0.24) 52%,
+      rgba(204,48,48,0.08) 76%,
+      rgba(204,48,48,0.00) 100%),
+    linear-gradient(0deg,
+      rgba(204,48,48,0.22) 0%,
+      rgba(204,48,48,0.10) 48%,
+      rgba(204,48,48,0.00) 100%) !important;
+}
+
+
+/* ── PATCH 182: deployment polish + Secret Tunnel deployment fix ── */
+.tile.drag-hover {
+  transform: scale(1.045) !important;
+}
+.tile.deploy-hover-tile,
+.tile.structure-deploy-point.highlight-deploy {
+  border-color: #f0d080 !important;
+  box-shadow:
+    0 0 14px rgba(240,208,128,0.72),
+    inset 0 0 10px rgba(240,208,128,0.22) !important;
+}
+.tile.structure-deploy-point.highlight-deploy::after {
+  content: 'TUNNEL';
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  transform: translateX(-50%);
+  z-index: 8;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  color: #f0d080;
+  background: rgba(8,6,4,0.92);
+  border: 1px solid rgba(240,208,128,0.52);
+  border-radius: 999px;
+  padding: 1px 5px;
+  pointer-events: none;
+}
+.deploy-hover-preview,
+.pending-deploy-preview {
+  inset: 2px !important;
+  z-index: 9 !important;
+  opacity: 0.66;
+  pointer-events: none;
+  transform: scale(0.92);
+  transform-origin: center center;
+  animation: deployPreviewIn .12s ease-out forwards;
+}
+.pending-deploy-preview {
+  opacity: 0.84;
+  transform: scale(0.96);
+}
+@keyframes deployPreviewIn {
+  from { opacity: 0; transform: scale(0.78); }
+  to   { opacity: 0.72; transform: scale(0.92); }
+}
+.deploy-drag-shrunk {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.56), 0 0 14px rgba(240,208,128,0.22) !important;
+  filter: saturate(0.9) brightness(0.92);
+}
+.structure-marker {
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.52), 0 0 8px rgba(0,0,0,0.3);
+}
+.structure-marker.p1-structure {
+  outline: 1px dashed rgba(74,120,216,0.85);
+}
+.structure-marker.p2-structure {
+  outline: 1px dashed rgba(204,48,48,0.85);
+}
+
+
+/* ── PATCH 183: clear clashing UI states cleanly ── */
+#hub-actions {
+  display: none;
+}
+#hub-row:not(.activated) #hub-actions {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+#hub-row:not(.activated) #hub-btn {
+  display: flex;
+}
+#hub-row:not(.activated) #hub-diamond-wrap {
+  display: flex;
+}
+#hub-row:not(.activated) #hub-pass-btn.show {
+  display: flex;
 }
 
 </style>
@@ -4999,6 +5408,19 @@ const state = {
     </div>`;
   }
 
+
+  function underdogRequisitionBonus(player) {
+    const opponent = player === 1 ? 2 : 1;
+    return Number(state.players[player]?.score || 0) < Number(state.players[opponent]?.score || 0) ? 1 : 0;
+  }
+
+  function underdogRequisitionMessage(bonuses) {
+    const bonusPlayers = [1,2].filter(p => Number(bonuses?.[p] || 0) > 0);
+    if (!bonusPlayers.length) return '';
+    const names = bonusPlayers.map(p => state.players[p].name).join(' & ');
+    return `${names}: Underdog Bonus: +1 Requisition`;
+  }
+
   function showDevSetup() {
     const ov = document.createElement('div');
     ov.id = 'dev-setup-overlay';
@@ -5115,8 +5537,10 @@ const state = {
     // Clear death markers from previous round
     document.querySelectorAll('.unit-skull').forEach(e=>e.remove());
     const gain = 5 + state.round;
+    const underdogBonuses = { 1: underdogRequisitionBonus(1), 2: underdogRequisitionBonus(2) };
+    state._lastRequisitionGain = { 1: gain + underdogBonuses[1], 2: gain + underdogBonuses[2] };
     [1,2].forEach(p=>{
-      state.players[p].resources += gain;
+      state.players[p].resources += state._lastRequisitionGain[p];
       state.players[p].passed = false;
       state.players[p].drawnThisRound = false;
       drawCard(p);
@@ -5131,10 +5555,11 @@ const state = {
     const gainEl = document.getElementById('req-gain-num');
     if(gainEl) gainEl.textContent = `+${gain}`;
     const p = state.players[first];
+    const underdogMsg = underdogRequisitionMessage(underdogBonuses);
     showOverlay(
       `Round ${state.round} of ${state.maxRounds}`,
       'Requisition Phase',
-      `${p.name} goes first`,
+      `${p.name} goes first${underdogMsg ? ` · ${underdogMsg}` : ''}`,
       0,
       ()=>startBattlePhase(),
       true,
@@ -5227,7 +5652,8 @@ const state = {
 
   function flashResGain() {
     const diamond = document.getElementById('hub-res-diamond');
-    const gain = 5 + state.round;
+    if (!diamond) return;
+    const gain = state._lastRequisitionGain?.[state.activePlayer] ?? (5 + state.round);
     const el = document.createElement('div');
     el.className = 'res-gain';
     el.textContent = `+${gain}`;
@@ -5336,6 +5762,13 @@ const state = {
     // hub-name replaced by hub-unit-info
     document.getElementById('hub-res').textContent=p.resources;
     document.getElementById('player-bar').className=`player-bar ${col}-active`;
+    document.body.classList.toggle('p1-turn', state.activePlayer === 1);
+    document.body.classList.toggle('p2-turn', state.activePlayer === 2);
+    const playerGlow = document.getElementById('player-area-glow');
+    if (playerGlow) {
+      playerGlow.classList.toggle('p1-glow', state.activePlayer === 1);
+      playerGlow.classList.toggle('p2-glow', state.activePlayer === 2);
+    }
     const inspector=document.getElementById('inspector');
     inspector.className=`inspector${inspector.classList.contains('open')?' open':''} ${col}-active`;
     // Deck pile
@@ -5355,8 +5788,11 @@ const state = {
     if (passBtn) passBtn.innerHTML = myPassed
       ? `<span class="hub-pass-icon">☠</span><span class="hub-pass-copy"><span class="hub-pass-label">Passed ✓</span><span class="hub-pass-sub">—</span></span>`
       : `<span class="hub-pass-icon">☠</span><span class="hub-pass-copy"><span class="hub-pass-label">Pass</span><span class="hub-pass-sub">(Hold)</span></span>`;
-    // Ensure default bar state is set correctly
-    if (state._ctaAction === 'pass' || state._ctaAction === 'draw' || !state._ctaAction) {
+    // Ensure bar state is set correctly.
+    // Active unit controls are authoritative; never reapply draw/pass UI while a unit is active.
+    if (state.activeUnit?.card && (state.activeUnit.card.actionsLeft ?? 0) > 0) {
+      forceActivatedActionUi(state.activeUnit.card);
+    } else if (state._ctaAction === 'pass' || state._ctaAction === 'draw' || !state._ctaAction) {
       setBarState('default');
     }
     // Top bar sides
@@ -5746,8 +6182,42 @@ const state = {
     }
   }
 
+  function clearDeployHoverPreview() {
+    document.querySelectorAll('.deploy-hover-preview').forEach(e => e.remove());
+    document.querySelectorAll('.tile.deploy-hover-tile').forEach(t => t.classList.remove('deploy-hover-tile'));
+  }
+
+  function buildDeployPreviewCard(card, className='deploy-hover-preview') {
+    const col = state.players[state.activePlayer]?.color || 'p1';
+    const preview = document.createElement('div');
+    preview.className = `unit-on-tile ${col}-unit ${className}`;
+    preview.innerHTML = `
+      <div class="unit-hp ${col}-hp"><span>${escapeHtml(card?.hp ?? '')}</span></div>
+      <div class="unit-name">${cardDisplayName(card)}</div>
+      <div class="unit-rune"></div>`;
+    if (card?.artId) {
+      preview.classList.add('unit-has-art');
+      preview.setAttribute('style', artStyle(card));
+      artCandidates(card.artId).forEach(src => {
+        const img = new Image();
+        img.onload = () => { const n = preview.querySelector('.unit-name'); if (n) n.style.display = 'none'; };
+        img.src = src;
+      });
+    }
+    return preview;
+  }
+
+  function showDeployHoverPreview(tile, card) {
+    if (!tile || !card || normalisedCardType(card) === 'Power') return;
+    clearDeployHoverPreview();
+    tile.classList.add('deploy-hover-tile');
+    const preview = buildDeployPreviewCard(card, 'deploy-hover-preview');
+    tile.appendChild(preview);
+  }
+
   function clearDragHover() {
     document.querySelectorAll('.tile.drag-hover').forEach(t => t.classList.remove('drag-hover'));
+    clearDeployHoverPreview();
   }
 
   function onHandDragMove(e) {
@@ -5783,8 +6253,18 @@ const state = {
     if (newHoverTile !== dragState.hoverTile) {
       clearDragHover();
       dragState.hoverTile = newHoverTile;
-      if (newHoverTile) newHoverTile.classList.add('drag-hover');
+      if (newHoverTile) {
+        newHoverTile.classList.add('drag-hover');
+        if (newHoverTile.classList.contains('highlight-deploy') && normalisedCardType(dragState.card) !== 'Power') {
+          showDeployHoverPreview(newHoverTile, dragState.card);
+        }
+      }
     }
+
+    const overDeployTile = !!(dragState.hoverTile && dragState.hoverTile.classList.contains('highlight-deploy') && normalisedCardType(dragState.card) !== 'Power');
+    dragState.ghostEl.classList.toggle('deploy-drag-shrunk', overDeployTile);
+    dragState.ghostEl.style.opacity = overDeployTile ? '0.44' : '0.92';
+    dragState.ghostEl.style.transform = overDeployTile ? 'scale(0.72)' : 'scale(1.15)';
     // Cluster detection with padding — prevents edge flicker
     const CLUSTER_PAD_Y = 40;
     const clusters = getDeployClusters();
@@ -5895,6 +6375,10 @@ const state = {
     const p=state.players[state.activePlayer];
     document.getElementById('hub-res').textContent=p.resources;
     document.getElementById('hub-res-diamond').classList.remove('depleted');
+    if (!state.activeUnit) {
+      resetBottomUiState();
+      setBarState('default');
+    }
     renderHand();
   }
 
@@ -5909,9 +6393,11 @@ const state = {
       Object.entries(state.structures).forEach(([tid, s]) => {
         if(s.owner === state.activePlayer && !state.board[tid]) {
           const t = document.querySelector(`[data-id="${tid}"]`);
-          if(t) t.classList.add('highlight-deploy');
+          if(t) t.classList.add('highlight-deploy','structure-deploy-point');
         }
       });
+    } else {
+      document.querySelectorAll('.structure-deploy-point').forEach(t => t.classList.remove('structure-deploy-point'));
     }
   }
 
@@ -6316,7 +6802,7 @@ const state = {
       const tile = document.querySelector(`[data-id="${tileId}"]`);
       if(!tile) return;
       const el = document.createElement('div');
-      el.className = 'structure-marker';
+      el.className = `structure-marker ${s.owner === 1 ? 'p1-structure' : 'p2-structure'}`;
       el.style.cssText = 'position:absolute;inset:0;z-index:1;border-radius:3px;opacity:0.7;pointer-events:none;';
       const col = s.owner === 1 ? 'rgba(74,120,216,0.3)' : 'rgba(204,48,48,0.3)';
       el.style.background = col;
@@ -6816,6 +7302,10 @@ const state = {
   }
 
   function onTileTap(tileId) {
+    if (state._suppressNextBoardTap) {
+      state._suppressNextBoardTap = false;
+      return;
+    }
     if (state._suppressNextMoveTap) {
       state._suppressNextMoveTap = false;
       return;
@@ -6914,12 +7404,6 @@ const state = {
       return;
     }
 
-    // Deployed structures / ongoing power cards can be zoomed from their tile.
-    if (state.structures?.[tileId]?.card) {
-      openCardZoom(state.structures[tileId].card);
-      return;
-    }
-
     // Move mode — tapping a valid highlighted tile
     if(state.activeAction==='move' && tile.classList.contains('highlight-move')) {
       if(pendingMoveTile===tileId){ clearMoveConfirm(); return; }
@@ -6927,17 +7411,25 @@ const state = {
       return;
     }
 
-    // Tapping empty non-relevant tile while action is active — clear action
-    if(state.activeAction){ state.activeAction=null; clearHighlights(); return; }
-
-    // Deploy flow — blocked for Power cards
+    // Deploy flow — blocked for Power cards.
+    // This must happen before structure zoom, because Secret Tunnel tiles are structures that also act as deployment points.
     if(!state.selectedHandCard && profileContext==='hand' && profileCard && tile.classList.contains('highlight-deploy') && (profileCard.type||'').trim() !== 'Power'){
       selectHandCard(profileCard);
     }
     if(state.selectedHandCard && (state.selectedHandCard.type||'').trim() !== 'Power' && tile.classList.contains('highlight-deploy')){
       if(state.pendingTile===tileId){ clearConfirm(); state.pendingTile=null; return; }
       clearConfirm(); state.pendingTile=tileId; showConfirm(tileId);
+      return;
     }
+
+    // Deployed structures / ongoing power cards can be zoomed from their tile when not being used as a deploy point.
+    if (state.structures?.[tileId]?.card) {
+      openCardZoom(state.structures[tileId].card);
+      return;
+    }
+
+    // Tapping empty non-relevant tile while action is active — clear action
+    if(state.activeAction){ state.activeAction=null; clearHighlights(); return; }
   }
 
   // ── EXECUTE MOVE ──
@@ -6970,11 +7462,8 @@ const state = {
     // Show card preview on tile
     const card = state.selectedHandCard;
     if (card) {
-      const col = state.players[state.activePlayer].color;
-      const preview = document.createElement('div');
-      preview.className = `unit-on-tile ${col}-unit pending-deploy-preview`;
-      preview.style.cssText = 'opacity:0.7;';
-      preview.innerHTML = `<div class="unit-name-on-tile" style="font-size:var(--fs-xs);line-height:1.2;text-align:center;padding:2px;">${cardDisplayName(card)}</div>`;
+      const preview = buildDeployPreviewCard(card, 'pending-deploy-preview');
+      preview.style.opacity = '0.82';
       tile.appendChild(preview);
     }
     const cost = card?.cost ?? 0;
@@ -6986,6 +7475,7 @@ const state = {
     document.querySelectorAll('.power-confirm-tile').forEach(t=>t.classList.remove('power-confirm-tile'));
     document.querySelectorAll('.power-ready-overlay').forEach(e=>e.remove());
     document.querySelectorAll('.pending-deploy-preview').forEach(e=>e.remove());
+    clearDeployHoverPreview();
     state._pendingPowerDrop = null;
     const btn=document.getElementById('confirm-btn');
     if(btn) btn.remove();
@@ -7013,7 +7503,8 @@ const state = {
     state.board[tileId]={...card, owner:state.activePlayer, actionsLeft:null};
 
     const tile=document.querySelector(`[data-id="${tileId}"]`);
-    tile.classList.remove('confirm-tile','highlight-deploy');
+    tile.classList.remove('confirm-tile','highlight-deploy','drag-hover','deploy-hover-tile');
+    tile.querySelectorAll('.pending-deploy-preview,.deploy-hover-preview').forEach(e => e.remove());
     renderUnit(tile, state.board[tileId]);
 
     state.deployModeFromInspector = false;
@@ -7250,7 +7741,6 @@ const state = {
       document.getElementById('prof-row-actions').style.display = '';
       label.textContent = 'ENEMY'; label.className = 'prof-cv-label';
       label.style.display = ''; pips.style.display = 'none';
-      visual.onclick = () => openCardZoom(card);
       setResPulse(false);
       // Show move/attack pills but fully disabled
       const movePill = document.getElementById('btn-move');
@@ -7364,11 +7854,13 @@ const state = {
       <div class="unit-name">${cardDisplayName(unit)}</div>
       ${bottomHtml}`;
     if (unit.artId) {
+      el.classList.add('unit-has-art');
       el.setAttribute('style', artStyle(unit));
       const tryHide = (src) => { const p = new Image(); p.onload = () => { const n = el.querySelector('.unit-name'); if (n) n.style.display = 'none'; }; p.src = src; };
       artCandidates(unit.artId).forEach(tryHide);
     }
     tile.appendChild(el);
+    setupBoardActivateHold(el, tile.dataset.id);
   }
 
   function getDrawAvailability(player = state.activePlayer) {
@@ -7583,7 +8075,7 @@ const state = {
   function artStyle(card, overlay) {
     const id = card?.artId;
     if (!id) return '';
-    const dim = overlay ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.25)';
+    const dim = overlay ? 'rgba(0,0,0,0.24)' : 'rgba(0,0,0,0.12)';
     const urls = artCandidates(id).map(src => `url('${src}')`).join(', ');
     const layers = `linear-gradient(${dim},${dim}), ${urls}`;
     const sizes = ['cover', ...artCandidates(id).map(() => 'cover')].join(', ');
@@ -7631,6 +8123,65 @@ const state = {
       const unit = state.board[id];
       return unit && unit.owner !== owner;
     });
+  }
+
+
+  function tileDistance(fromTileId, toTileId) {
+    if (!fromTileId || !toTileId) return Infinity;
+    if (fromTileId === toTileId) return 0;
+    const dist = new Map([[fromTileId, 0]]);
+    const queue = [fromTileId];
+    while (queue.length) {
+      const cur = queue.shift();
+      const d = dist.get(cur);
+      for (const nid of getNeighbors(cur, true)) {
+        if (dist.has(nid)) continue;
+        if (!tileMap[nid]) continue;
+        const nd = d + 1;
+        if (nid === toTileId) return nd;
+        dist.set(nid, nd);
+        queue.push(nid);
+      }
+    }
+    return Infinity;
+  }
+
+  function isRangedWeaponAttack(unit, attackerTileId=null, targetTileId=null) {
+    const parsed = parseRange(unit?.weapon?.range ?? 1);
+    if (parsed.max === Infinity || Number(parsed.max) > 1 || Number(parsed.min) > 1) return true;
+    return attackerTileId && targetTileId && tileDistance(attackerTileId, targetTileId) > 1;
+  }
+
+  function isUnitEngagedAt(tileId, unit) {
+    if (!tileId || !unit) return false;
+    return getAdjacentEnemyTiles(tileId, unit.owner ?? state.activePlayer).length > 0;
+  }
+
+  function getShootingPenaltyContext(atk, def, attackerTileId=null, targetTileId=null) {
+    const ctx = { penalty: 0, labels: [], attackerTileId, targetTileId, ranged: false };
+    if (!atk || !def || !attackerTileId || !targetTileId) return ctx;
+    ctx.ranged = isRangedWeaponAttack(atk, attackerTileId, targetTileId);
+    if (!ctx.ranged) return ctx;
+    if (isUnitEngagedAt(attackerTileId, atk)) {
+      ctx.penalty += 1;
+      ctx.labels.push('Engaged shot: -1 to hit');
+    }
+    if (isUnitEngagedAt(targetTileId, def)) {
+      ctx.penalty += 1;
+      ctx.labels.push('Target in combat: -1 to hit');
+    }
+    return ctx;
+  }
+
+  function shootingPenaltyLabel(ctx) {
+    return ctx?.labels?.length ? ctx.labels.join(' · ') : '';
+  }
+
+  function hitTargetDisplay(baseHit, penaltyCtx=null) {
+    const base = parseInt(baseHit || '7', 10);
+    if (!Number.isFinite(base)) return baseHit || '';
+    const penalty = Math.max(0, Number(penaltyCtx?.penalty) || 0);
+    return `${Math.min(7, base + penalty)}+`;
   }
 
   function getBreakawayContester(tileId, unit) {
@@ -7814,6 +8365,7 @@ const state = {
       updateActionBar();
     } else {
       closeProfile();
+      clearActiveUnitState();
       endCurrentTurn();
       waitThenAdvance();
     }
@@ -7896,10 +8448,7 @@ const state = {
       state.breakawayState = null;
       removeSlain(fromTileId);
       closeProfile();
-      hideActionBar();
-      state.activeUnit = null;
-      state.activeAction = null;
-      clearHighlights();
+      clearActiveUnitState();
       waitThenAdvance();
     };
 
@@ -8633,6 +9182,9 @@ const state = {
     const def = state.board[targetTileId];
     if (!def) return;
     const combatCtx = pendingCombatContextFor(atk, targetTileId);
+    const attackerTileId = state.activeUnit?.tileId;
+    const shootingCtx = getShootingPenaltyContext(atk, def, attackerTileId, targetTileId);
+    const shootingMsg = shootingPenaltyLabel(shootingCtx);
     const displayDamage = (Number(atk.weapon?.damage) || 0) + (Number(combatCtx?.damageBonus) || 0);
 
     function battleCardHtml(card, role, currentHp) {
@@ -8847,14 +9399,14 @@ const state = {
     };
 
     setupGhostRow(attackRow, atk.weapon?.attacks ?? 0);
-    if (hitStatEl) hitStatEl.textContent = escapeHtml(atk.weapon?.hit ?? '');
+    if (hitStatEl) hitStatEl.textContent = escapeHtml(hitTargetDisplay(atk.weapon?.hit, shootingCtx));
     if (dmgStatEl) dmgStatEl.textContent = escapeHtml(displayDamage);
-    setAttackSummary('');
+    setAttackSummary(shootingMsg, shootingMsg ? 'bad' : '');
     setPreAttackDefenceRow();
     setRowButton('<button class="battle-attack-btn" id="battle-start-attack"><span class="battle-action-star">✦</span> Attack</button>', startAttackSequence);
 
     function startAttackSequence() {
-      const result = resolveCombat(atk, def, unitLane(targetTileId));
+      const result = resolveCombat(atk, def, unitLane(targetTileId), { attackerTileId, targetTileId });
       const hpBefore = def.hp;
       const hpAfter = Math.max(0, hpBefore - result.totalDmg);
       const slain = hpAfter <= 0;
@@ -8864,7 +9416,8 @@ const state = {
       if (attackProfile) attackProfile.classList.add('sequence-live');
       setRowButton('', null);
       setupGhostRow(attackRow, baseAttackCount ?? atkDice.length);
-      setAttackSummary('');
+      if (hitStatEl) hitStatEl.textContent = escapeHtml(hitTargetDisplay(atk.weapon?.hit, result.shootingPenaltyContext || shootingCtx));
+      setAttackSummary(shootingPenaltyLabel(result.shootingPenaltyContext || shootingCtx), shootingPenaltyLabel(result.shootingPenaltyContext || shootingCtx) ? 'bad' : '');
       setPreAttackDefenceRow();
 
       (async () => {
@@ -8898,7 +9451,8 @@ const state = {
           : result.chainRolls > 0
             ? ` · Chain Dice +${result.chainRolls}`
             : '';
-        setAttackSummary(`${hits} hit${hits !== 1 ? 's' : ''}${triggerNote}`, hits > 0 ? 'good' : 'bad');
+        const penaltyNote = shootingPenaltyLabel(result.shootingPenaltyContext || shootingCtx);
+        setAttackSummary(`${hits} hit${hits !== 1 ? 's' : ''}${triggerNote}${penaltyNote ? ` · ${penaltyNote}` : ''}`, hits > 0 ? 'good' : 'bad');
         await wait(POST_ATTACK_PAUSE);
 
         if (hits <= 0) {
@@ -9026,7 +9580,71 @@ const state = {
     else if (state._ctaAction === 'pass') { /* pass now requires hold */ }
   }
 
+
+  function resetBottomUiState() {
+    const deck      = document.getElementById('inspector-deck');
+    const diamond   = document.getElementById('hub-diamond-wrap');
+    const actions   = document.getElementById('hub-actions');
+    const btn       = document.getElementById('hub-btn');
+    const hubRow    = document.getElementById('hub-row');
+    const passBtn   = document.getElementById('hub-pass-btn');
+    const deckCount = document.getElementById('hub-deck-count');
+    const badges    = document.getElementById('hub-stat-badges');
+
+    if (actions) {
+      actions.classList.remove('active');
+      actions.style.display = '';
+      actions.style.opacity = '';
+      actions.style.pointerEvents = '';
+    }
+    if (hubRow) hubRow.classList.remove('activated');
+    if (btn) {
+      btn.style.display = '';
+      btn.classList.remove('state-ready','state-dim','state-pending','state-active');
+      btn.dataset.drawReason = '';
+    }
+    if (diamond) diamond.style.display = '';
+    if (passBtn) {
+      passBtn.style.display = '';
+      passBtn.classList.remove('show','hold-passing','hold-complete');
+    }
+    if (deckCount) {
+      deckCount.style.display = '';
+      deckCount.classList.remove('show');
+    }
+    if (deck) deck.style.display = 'none';
+    if (badges) badges.style.display = 'none';
+
+    document.querySelectorAll('.act-btn').forEach(b => {
+      b.classList.remove('act-selected','act-available','act-unavailable','act-breakaway');
+    });
+  }
+
+  function clearActiveUnitState({ keepProfile=false } = {}) {
+    state.activeUnit = null;
+    state.activeAction = null;
+    state.activeAbility = null;
+    state.chargeState = null;
+    state.breakawayState = null;
+    state.pendingCombatContext = null;
+    state.selectedBoardTile = null;
+    document.querySelectorAll('.unit-active,.unit-selected').forEach(t => t.classList.remove('unit-active','unit-selected'));
+    if (!keepProfile) {
+      profileContext = null;
+      profileCard = null;
+      profileTileId = null;
+    }
+    clearHighlights();
+    if (typeof clearMoveConfirm === 'function') clearMoveConfirm();
+    if (typeof clearJumpConfirm === 'function') clearJumpConfirm();
+    if (typeof clearChargeState === 'function') clearChargeState();
+    resetBottomUiState();
+    syncBoardSelectionHighlight();
+  }
+
   function setBarState(state_name, opts={}) {
+    resetBottomUiState();
+
     const deck    = document.getElementById('inspector-deck');
     const diamond  = document.getElementById('hub-diamond-wrap');
     const actions  = document.getElementById('hub-actions');
@@ -9034,19 +9652,15 @@ const state = {
     const hubRow   = document.getElementById('hub-row');
     const passBtn  = document.getElementById('hub-pass-btn');
     const badges   = document.getElementById('hub-stat-badges');
-
-    // Reset
-    const inspectorOpen = document.getElementById('inspector-card-view').classList.contains('active');
-    deck.style.display    = 'none';
-    diamond.style.display = 'none';
-    actions.classList.remove('active');
-    btn.style.display     = '';
-    hubRow.classList.remove('activated');
-    if (passBtn) passBtn.classList.remove('show');
     const deckCount = document.getElementById('hub-deck-count');
-    if (deckCount) deckCount.classList.remove('show');
+
+    const inspectorOpen = document.getElementById('inspector-card-view').classList.contains('active');
 
     if (state_name === 'default') {
+      if (state.activeUnit?.card && (state.activeUnit.card.actionsLeft ?? 0) > 0) {
+        forceActivatedActionUi(state.activeUnit.card);
+        return;
+      }
       if (!inspectorOpen) deck.style.display = '';
       diamond.style.display = '';
       if (deckCount) deckCount.classList.add('show');
@@ -9075,12 +9689,64 @@ const state = {
       state._ctaAction = null;
 
     } else if (state_name === 'activated') {
-      deck.style.display    = 'none';
-      btn.style.display     = 'none';
-      diamond.style.display = 'none';
-      actions.classList.add('active');
-      hubRow.classList.add('activated');
+      forceActivatedActionUi(state.activeUnit?.card);
     }
+  }
+
+
+  function forceActivatedActionUi(unit) {
+    resetBottomUiState();
+
+    const deck    = document.getElementById('inspector-deck');
+    const diamond = document.getElementById('hub-diamond-wrap');
+    const actions = document.getElementById('hub-actions');
+    const btn     = document.getElementById('hub-btn');
+    const hubRow  = document.getElementById('hub-row');
+    const passBtn = document.getElementById('hub-pass-btn');
+    const deckCount = document.getElementById('hub-deck-count');
+    const badges = document.getElementById('hub-stat-badges');
+
+    state._ctaAction = 'activated';
+
+    document.body.classList.toggle('p1-turn', state.activePlayer === 1);
+    document.body.classList.toggle('p2-turn', state.activePlayer === 2);
+    const playerGlow = document.getElementById('player-area-glow');
+    if (playerGlow) {
+      playerGlow.classList.toggle('p1-glow', state.activePlayer === 1);
+      playerGlow.classList.toggle('p2-glow', state.activePlayer === 2);
+    }
+
+    if (deck) deck.style.display = 'none';
+    if (diamond) diamond.style.display = 'none';
+    if (btn) {
+      btn.style.display = 'none';
+      btn.classList.remove('state-ready','state-dim','state-pending','state-active');
+    }
+    if (actions) {
+      actions.classList.add('active');
+      actions.style.display = 'flex';
+      actions.style.opacity = '1';
+      actions.style.pointerEvents = 'auto';
+    }
+    if (hubRow) hubRow.classList.add('activated');
+    if (passBtn) {
+      passBtn.classList.remove('show');
+      passBtn.style.display = 'none';
+    }
+    if (deckCount) {
+      deckCount.classList.remove('show');
+      deckCount.style.display = 'none';
+    }
+    if (badges) badges.style.display = '';
+
+    const ab = getUnitAbility(unit);
+    const btnAbility = document.getElementById('act-btn-ability');
+    if (btnAbility) btnAbility.style.display = ab ? 'flex' : 'none';
+
+    setActionButtonCost('act-cost-move', 1);
+    setActionButtonCost('act-cost-attack', 1);
+    setActionButtonCost('act-cost-ability', ab?.apCost || 1);
+    updateActionBar();
   }
 
   function showActionBar(unit) {
@@ -9092,10 +9758,12 @@ const state = {
     setActionButtonCost('act-cost-attack', 1);
     setActionButtonCost('act-cost-ability', ab?.apCost || 1);
     setBarState('activated');
+    forceActivatedActionUi(unit);
   }
 
   function hideActionBar() {
     state._ctaAction = null;
+    resetBottomUiState();
     setBarState('default');
   }
 
@@ -9145,26 +9813,152 @@ const state = {
     btnEnd.className = 'act-btn act-available';
   }
 
-  function activateUnit() {
-    const p=state.players[state.activePlayer];
-    const unit=state.board[profileTileId];
-    if(!unit || unit.owner !== state.activePlayer) return;
-    if(p.resources<1||!profileTileId) return;
-    p.resources-=1;
+
+  // ── HOLD TO ACTIVATE BOARD CARD ──
+  const ACTIVATE_HOLD_MS = 620;
+  let activateHoldTimer = null;
+  let activateHoldPointerId = null;
+  let activateHoldTileId = null;
+
+  function canHoldActivate(tileId = null) {
+    const targetTileId = tileId || profileTileId;
+    const p = state.players[state.activePlayer];
+    const unit = targetTileId ? state.board[targetTileId] : null;
+    return !!unit
+      && unit.owner === state.activePlayer
+      && unit.actionsLeft === null
+      && !state.activeUnit
+      && p?.resources >= 1;
+  }
+
+  function clearActivateHold() {
+    if (activateHoldTimer) clearTimeout(activateHoldTimer);
+    activateHoldTimer = null;
+    activateHoldPointerId = null;
+    activateHoldTileId = null;
+    document.getElementById('prof-card-visual')?.classList.remove('activate-holding','activate-held');
+    document.querySelectorAll('.tile.activation-holding').forEach(t => t.classList.remove('activation-holding'));
+    document.querySelectorAll('.unit-on-tile.activate-holding,.unit-on-tile.activate-held').forEach(el => el.classList.remove('activate-holding','activate-held'));
+  }
+
+  function startBoardActivateHold(e, tileId) {
+    if (!canHoldActivate(tileId)) return;
+
+    activateHoldPointerId = e.pointerId;
+    activateHoldTileId = tileId;
+
+    const tile = document.querySelector(`[data-id="${tileId}"]`);
+    const unitEl = tile?.querySelector('.unit-on-tile');
+    clearActivateHold();
+
+    activateHoldPointerId = e.pointerId;
+    activateHoldTileId = tileId;
+
+    unitEl?.style.setProperty('--activate-hold-ms', `${ACTIVATE_HOLD_MS}ms`);
+    unitEl?.classList.remove('activate-held');
+    unitEl?.classList.remove('activate-holding');
+    void unitEl?.offsetWidth;
+    unitEl?.classList.add('activate-holding');
+    tile?.classList.add('activation-holding');
+
+    activateHoldTimer = setTimeout(() => {
+      if (!canHoldActivate(tileId)) { clearActivateHold(); return; }
+
+      const heldTile = document.querySelector(`[data-id="${tileId}"]`);
+      const heldUnitEl = heldTile?.querySelector('.unit-on-tile');
+      heldUnitEl?.classList.remove('activate-holding');
+      heldUnitEl?.classList.add('activate-held');
+
+      state._suppressNextBoardTap = true;
+
+      try { navigator.vibrate?.(22); } catch(err) {}
+      activateUnitFromTile(tileId);
+
+      setTimeout(() => {
+        state._suppressNextBoardTap = false;
+        clearActivateHold();
+      }, 360);
+    }, ACTIVATE_HOLD_MS);
+  }
+
+  function cancelBoardActivateHold(e) {
+    if (activateHoldPointerId !== null && e?.pointerId !== activateHoldPointerId) return;
+    clearActivateHold();
+  }
+
+  function setupBoardActivateHold(unitEl, tileId) {
+    if (!unitEl || unitEl.dataset.boardActivateHoldReady === '1') return;
+    unitEl.dataset.boardActivateHoldReady = '1';
+
+    unitEl.addEventListener('pointerdown', e => {
+      startBoardActivateHold(e, tileId);
+    });
+    unitEl.addEventListener('pointerup', cancelBoardActivateHold);
+    unitEl.addEventListener('pointercancel', cancelBoardActivateHold);
+    unitEl.addEventListener('pointerleave', cancelBoardActivateHold);
+    unitEl.addEventListener('pointermove', e => {
+      if (activateHoldPointerId === e.pointerId && activateHoldTileId === tileId) {
+        const r = unitEl.getBoundingClientRect();
+        const pad = 14;
+        if (e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) {
+          clearActivateHold();
+        }
+      }
+    });
+  }
+
+  // Kept as a no-op wrapper for older call sites; activation hold now belongs to board cards.
+  function setupActivateHold(visual) {}
+
+  function activateUnitFromTile(tileId) {
+    const p = state.players[state.activePlayer];
+    const unit = tileId ? state.board[tileId] : null;
+    if (!unit || unit.owner !== state.activePlayer) return false;
+    if (unit.actionsLeft !== null) return false;
+    if (!p || p.resources < 1) return false;
+
+    p.resources -= 1;
     setResPulse(false);
-    unit.actionsLeft=2;
-    state.activeUnit={tileId:profileTileId, card:unit};
-    document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
-    const tile = document.querySelector(`[data-id="${profileTileId}"]`);
-    if(tile) { tile.classList.add('unit-active'); }
-    state.selectedBoardTile = profileTileId;
-    syncBoardSelectionHighlight();
-    renderUnit(tile, unit);
-    renderHub();
+
+    unit.actionsLeft = 2;
+    state.activeUnit = { tileId, card: unit };
+    state.activeAction = null;
+    state.activeAbility = null;
+    state.pendingTile = null;
+    state.selectedHandCard = null;
+    state.selectedBoardTile = tileId;
+    profileTileId = tileId;
+    profileCard = unit;
+    profileContext = 'board';
+
+    clearConfirm();
+    clearHighlights();
+    document.querySelectorAll('.unit-active').forEach(t => t.classList.remove('unit-active'));
+
+    const tile = document.querySelector(`[data-id="${tileId}"]`);
+    if (tile) {
+      tile.classList.add('unit-active');
+      renderUnit(tile, unit);
+    }
+
+    // Avoid renderHub() here because it can briefly re-apply draw/pass default UI during activation.
+    document.getElementById('score-p1').textContent = state.players[1].score;
+    document.getElementById('score-p2').textContent = state.players[2].score;
+    document.getElementById('res-badge-p1').querySelector('span').textContent = state.players[1].resources;
+    document.getElementById('res-badge-p2').querySelector('span').textContent = state.players[2].resources;
+    document.getElementById('hub-res').textContent = state.players[state.activePlayer].resources;
+
+    openProfile(unit, 'board', tileId);
     showActionBar(unit);
-    openProfile(unit,'board',profileTileId);
     selectAction('move');
+    forceActivatedActionUi(unit);
+    syncBoardSelectionHighlight();
     updateActionBar();
+    return true;
+  }
+
+  function activateUnit() {
+    return activateUnitFromTile(profileTileId);
   }
 
   // ── SELECT ACTION (Move / Attack) ──
@@ -9215,7 +10009,7 @@ const state = {
     if(unit.actionsLeft <= 0) {
       if (restorePendingReturnUnit()) return;
       closeProfile();
-      clearHighlights();
+      clearActiveUnitState();
       endCurrentTurn();
       advanceTurn();
     }
@@ -9272,10 +10066,8 @@ const state = {
   function endCurrentTurn() {
     deselectAll();
     closeProfile();
+    clearActiveUnitState();
     hideActionBar();
-    state.activeUnit=null; state.activeAction=null;
-    clearHighlights();
-    document.querySelectorAll('.unit-active').forEach(t=>t.classList.remove('unit-active'));
   }
 
   function restorePendingReturnUnit() {
@@ -14323,10 +15115,14 @@ document.addEventListener('click', function(e){
   }
 
   // Override combat maths with modular attack-roll triggers.
-  window.resolveCombat = resolveCombat = function resolveCombat(atk, def, laneKey=null) {
+  window.resolveCombat = resolveCombat = function resolveCombat(atk, def, laneKey=null, combatOptions={}) {
     const fx = getLaneEffect(laneKey);
     const eff = fx ? EFFECT_REGISTRY[fx.effect] : null;
-    const hitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    const baseHitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    const attackerTileId = combatOptions?.attackerTileId || state.activeUnit?.tileId || null;
+    const targetTileId = combatOptions?.targetTileId || state.pendingCombatContext?.targetTileId || null;
+    const shootingPenaltyContext = getShootingPenaltyContext(atk, def, attackerTileId, targetTileId);
+    const hitThresh = Math.min(7, baseHitThresh + Math.max(0, Number(shootingPenaltyContext.penalty) || 0));
     const saveThresh = parseInt(def.save || '7', 10);
     let modSave = saveThresh + (Number(atk.weapon?.ap) || 0);
     if (eff?.modifySave) modSave = eff.modifySave(fx, modSave);
@@ -14375,7 +15171,7 @@ document.addEventListener('click', function(e){
     const damagePerHit = (Number(atk.weapon?.damage) || 0) + damageBonus;
     let totalDmg = (hits - saved) * damagePerHit;
     if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
-    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls, damageBonus, damagePerHit };
+    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, baseHitThresh, shootingPenaltyContext, diceTrigger, bonusHits, chainRolls, damageBonus, damagePerHit };
   };
 
   // Draft editor ability fields are handled by the unified Ability Builder above.
