@@ -4491,6 +4491,149 @@ body.p2-turn .player-area-glow {
 }
 </style>
 
+
+<style id="rev-patch-189-round-start-v1">
+/* Patch 189 — head-to-head battle intro + clearer round-start sequence */
+.battle-begins-duel {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+.battle-begins-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 86px;
+}
+.battle-begins-screen .battle-begins-avatar {
+  display: flex;
+  margin: 0;
+  width: 64px;
+  height: 64px;
+  font-size: 28px;
+}
+.battle-begins-screen .battle-begins-avatar.p2 {
+  border-color: var(--p2);
+  background: radial-gradient(circle at 50% 38%, #5b1e24, #12060a 72%);
+  box-shadow: 0 0 18px rgba(200,48,48,0.38);
+  color: #ffd7d7;
+}
+.battle-begins-player-label.p2 {
+  color: var(--p2);
+}
+.battle-begins-duel-vs {
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #c8a060;
+  text-shadow: 0 0 14px rgba(200,160,60,0.35);
+  margin-top: -6px;
+}
+.req-overlay.round-start-flow {
+  background: linear-gradient(180deg, rgba(0,0,0,0.74), rgba(0,0,0,0.88));
+}
+.round-start-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(280px, calc(100vw - 48px));
+  margin-top: 14px;
+}
+.round-start-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(200,160,96,0.2);
+  background: linear-gradient(160deg, rgba(32,24,12,0.92), rgba(10,10,10,0.84));
+  color: #c8a060;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.round-start-line strong {
+  color: #f0d080;
+  font-size: var(--fs-sm);
+  letter-spacing: 0.06em;
+}
+.round-start-line.underdog strong,
+.round-start-line.underdog span {
+  color: #ffe19c;
+}
+.round-start-line.total {
+  border-color: rgba(240,208,128,0.42);
+  box-shadow: 0 0 18px rgba(200,160,60,0.16);
+}
+.round-start-draw-step {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+.round-start-draw-step .req-icon {
+  font-size: var(--fs-sm);
+  color: #c8a060;
+}
+.round-start-sequence .inspector-deck {
+  opacity: 0;
+  transform: translateY(28px);
+  pointer-events: none;
+}
+.round-start-sequence #hand-scroll {
+  opacity: 0;
+}
+.inspector-deck {
+  transition: opacity .26s ease, transform .26s ease;
+}
+.round-start-fly-token {
+  position: fixed;
+  z-index: 120;
+  transform: translate(-50%, -50%) scale(1);
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  background: var(--resources);
+  border: 1px solid var(--resources-hi);
+  box-shadow: 0 0 16px rgba(200,160,60,0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--resources-text);
+  font-size: 11px;
+  font-weight: 900;
+  transition: left .72s cubic-bezier(.2,.8,.2,1), top .72s cubic-bezier(.2,.8,.2,1), transform .72s cubic-bezier(.2,.8,.2,1), opacity .72s ease;
+}
+.round-start-fly-token.go {
+  transform: translate(-50%, -50%) scale(.78);
+  opacity: .92;
+}
+.round-start-fly-token.p1,
+.round-start-fly-token.p2 {
+  color: var(--resources-text);
+}
+.round-start-hit {
+  animation: roundStartHit .45s ease;
+}
+@keyframes roundStartHit {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.18); box-shadow: 0 0 16px rgba(200,160,60,0.42); }
+  100% { transform: scale(1); }
+}
+@media (max-height: 740px) {
+  .battle-begins-duel { gap: 14px; }
+  .battle-begins-screen .battle-begins-avatar { width: 58px; height: 58px; }
+  .round-start-breakdown { gap: 8px; }
+  .round-start-line { padding: 8px 10px; }
+}
+</style>
+
 </head>
 <body>
 
@@ -5612,82 +5755,277 @@ const state = {
     };
 
     window.devSetupBegin = function() {
+      const p1Avatar = document.querySelector('#side-p1 .avatar')?.textContent?.trim() || '⚔';
+      const p2Avatar = document.querySelector('#side-p2 .avatar')?.textContent?.trim() || '☠';
       ov.classList.add('battle-begins-screen');
-      const gain = 5 + 1; // Round 1
-      // Pre-assign starting resources so screen can show them
-      [1,2].forEach(p => { state.players[p].resources = gain; });
-      renderHub();
-
       ov.innerHTML = `
-        <div style="font-size:var(--fs-md);font-weight:900;color:#c8a060;letter-spacing:0.2em;text-transform:uppercase;text-shadow:0 0 20px rgba(217,121,24,0.4);">Battle Begins</div>
-        <div style="font-size:var(--fs-sm);font-weight:900;color:#c8a060;letter-spacing:0.15em;text-transform:uppercase;margin-top:-6px;">Round 1 of ${state.maxRounds}</div>
-
-        <div class="battle-begins-resource-block" style="width:100%;display:flex;flex-direction:column;align-items:center;">
-          <div class="battle-begins-avatar">♜</div>
-          <div class="battle-begins-player-label">Player I</div>
-          ${resourceGainHtml(1, gain, false)}
+        <div class="battle-begins-title">Battle Begins</div>
+        <div class="battle-begins-round-count">${state.maxRounds} Rounds</div>
+        <div class="battle-begins-duel">
+          <div class="battle-begins-player p1">
+            <div class="battle-begins-avatar">${p1Avatar}</div>
+            <div class="battle-begins-player-label">Player I</div>
+          </div>
+          <div class="battle-begins-duel-vs">VS</div>
+          <div class="battle-begins-player p2">
+            <div class="battle-begins-avatar p2">${p2Avatar}</div>
+            <div class="battle-begins-player-label p2">Player II</div>
+          </div>
         </div>
 
-        <div class="battle-begins-hand-label" style="font-size:var(--fs-xs);color:#4a78d8;text-transform:uppercase;letter-spacing:0.15em;align-self:flex-start;">Locked Starting Hand</div>
+        <div class="battle-begins-hand-label">Starting Hand</div>
         <div class="battle-begins-hand-grid">${state.players[1].hand.map((_,i)=>makeHandCard(1,i,false)).join('')}</div>
 
-        <button onclick="devBattleBegin()" class="battle-begins-ack-btn">Begin ▶</button>
+        <button onclick="devBattleBegin()" class="battle-begins-ack-btn">Begin Round ▶</button>
       `;
     };
 
     window.devBattleBegin = function() {
       ov.remove();
-      // Resources already assigned — just start battle phase directly
+      // Round start now owns the economy beat: resources are generated and one card is drawn there.
       [1,2].forEach(p => {
+        state.players[p].resources = 0;
         state.players[p].drawnThisRound = false;
         state.players[p].passed = false;
-        drawCard(p);
       });
-      const first = Math.random() < 0.5 ? 1 : 2;
-      Object.keys(state.board).forEach(tid => { state.board[tid].actionsLeft = null; delete state.board[tid].bonusAttacks; });
-      state.activePlayer = first;
-      setPerspective(first);
       renderHub();
-      startBattlePhase();
+      requisitionPhase();
     };
 
     renderOverlay();
   }
 
   // ── REQUISITION PHASE ──
+  function setRoundStartHandHidden(hidden=true) {
+    document.body.classList.toggle('round-start-sequence', !!hidden);
+  }
+
+  function roundStartPlayerLabel(player) {
+    return player === 2 ? 'Player II' : 'Player I';
+  }
+
+  function buildRoundStartBreakdown(player) {
+    const underdog = underdogRequisitionBonus(player);
+    const parts = [
+      { key:'base', label:'Base Requisition', value:5 },
+      { key:'round', label:`Round ${state.round} Bonus`, value:state.round }
+    ];
+    if (underdog) parts.push({ key:'underdog', label:'Underdog Bonus', value:underdog });
+    const partHtml = parts.map((part, idx) => `
+      ${idx ? `<div class="round-start-plus">+</div>` : ``}
+      <div class="round-req-card ${part.key}">
+        <div class="round-req-rune"><span>+${part.value}</span></div>
+        <div class="round-req-label">${part.label}</div>
+      </div>`).join('');
+    return `
+      <div class="round-start-flow-copy">Both players gain requisition</div>
+      <div class="round-start-requisition-row">${partHtml}</div>
+      <div class="round-start-draw-copy">
+        <span class="round-card-icon p1-card-icon"></span>
+        <span class="round-start-draw-text">Both players draw 1 card</span>
+        <span class="round-card-icon p2-card-icon"></span>
+      </div>`;
+  }
+
+  function showRoundStartStep({ title, sub, who, whoColor='', iconsHtml='', buttonLabel='Continue ▶', onBegin }) {
+    const ov = document.getElementById('req-overlay');
+    const beginBtn = document.getElementById('req-begin');
+    document.querySelector('.top-bar').style.zIndex = '60';
+    document.getElementById('req-title').textContent = title;
+    const subEl = document.getElementById('req-sub');
+    subEl.textContent = sub;
+    subEl.className = 'req-sub' + (whoColor ? ` ${whoColor}-first-text` : '');
+    ov.classList.toggle('p1-first', whoColor === 'p1');
+    ov.classList.toggle('p2-first', whoColor === 'p2');
+    const whoEl = document.getElementById('req-who');
+    whoEl.textContent = who;
+    whoEl.className = 'req-who' + (whoColor ? ` ${whoColor}` : '');
+    document.getElementById('req-icons').innerHTML = iconsHtml;
+    beginBtn.textContent = buttonLabel;
+    _beginCallback = onBegin || null;
+    beginBtn.style.display = 'block';
+    ov.classList.remove('auto-dismiss');
+    ov.classList.add('round-start-flow', 'show');
+  }
+
+  function applyPendingRequisition() {
+    const pending = state._pendingRequisitionGain || state._lastRequisitionGain || {};
+    [1,2].forEach(player => {
+      state.players[player].resources += pending[player] || 0;
+    });
+    state._lastRequisitionGain = { 1: pending[1] || 0, 2: pending[2] || 0 };
+    delete state._pendingRequisitionGain;
+    renderHub();
+  }
+
+  function animateRoundStartResources(onDone) {
+    const pending = state._pendingRequisitionGain || state._lastRequisitionGain || {};
+    const targets = [1,2].map(player => ({
+      player,
+      gain: pending[player] || 0,
+      target: document.querySelector(`#res-badge-p${player}`)
+    })).filter(x => x.target && x.gain > 0);
+    let applied = false;
+    const applyOnce = () => {
+      if (applied) return;
+      applied = true;
+      applyPendingRequisition();
+    };
+    if (!targets.length) {
+      applyOnce();
+      onDone?.();
+      return;
+    }
+    let remaining = targets.length;
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight * 0.48;
+    targets.forEach(({player, gain, target}, idx) => {
+      const token = document.createElement('div');
+      token.className = `round-start-fly-token p${player}`;
+      token.textContent = `+${gain}`;
+      document.body.appendChild(token);
+      const rect = target.getBoundingClientRect();
+      const endX = rect.left + rect.width / 2;
+      const endY = rect.top + rect.height / 2;
+      token.style.left = `${startX + (idx ? 18 : -18)}px`;
+      token.style.top = `${startY}px`;
+      requestAnimationFrame(() => {
+        token.classList.add('go');
+        token.style.left = `${endX}px`;
+        token.style.top = `${endY}px`;
+      });
+      setTimeout(() => {
+        applyOnce();
+        target.classList.add('round-start-hit');
+        setTimeout(() => target.classList.remove('round-start-hit'), 500);
+      }, 620 + idx * 45);
+      setTimeout(() => {
+        token.remove();
+        remaining -= 1;
+        if (remaining <= 0) {
+          applyOnce();
+          onDone?.();
+        }
+      }, 920 + idx * 45);
+    });
+  }
+
+  function takeCardFromDeck(player) {
+    const p = state.players[player];
+    if (!p?.deck?.length) return null;
+    const card = p.deck.shift();
+    if (card) card.type = (card.type || '').trim();
+    return card || null;
+  }
+
+  function addCardToHand(player, card) {
+    if (!card) return null;
+    state.players[player].hand.unshift(card);
+    return card;
+  }
+
+  function showRoundStartDrawReveal(card, player, onDone) {
+    if (!card) {
+      onDone?.();
+      return;
+    }
+    const old = document.getElementById('draw-reveal-overlay');
+    if (old) old.remove();
+    const ov = document.createElement('div');
+    ov.id = 'draw-reveal-overlay';
+    ov.className = 'draw-reveal-overlay round-start-draw-reveal';
+    ov.innerHTML = `${drawRevealCardMarkup(card, player)}<div class="draw-reveal-label">Drawing</div>`;
+    document.body.appendChild(ov);
+    const reveal = document.getElementById('draw-reveal-card');
+    const front = document.getElementById('draw-reveal-front');
+    const deckRect = document.getElementById('hub-deck-count')?.getBoundingClientRect() || document.getElementById('hub-btn')?.getBoundingClientRect();
+    const startX = deckRect ? deckRect.left + deckRect.width / 2 : window.innerWidth * .84;
+    const startY = deckRect ? deckRect.top + deckRect.height / 2 : window.innerHeight * .82;
+    const centreX = window.innerWidth / 2;
+    const centreY = window.innerHeight / 2;
+    reveal.style.left = `${startX}px`;
+    reveal.style.top = `${startY}px`;
+    reveal.style.transform = 'translate(-50%,-50%) scale(.18) rotate(5deg)';
+    const art = artStyle(card, true);
+    if (art && front) {
+      const existingStyle = front.getAttribute('style') || '';
+      front.setAttribute('style', `${existingStyle}${existingStyle && !existingStyle.trim().endsWith(';') ? ';' : ''}${art}`);
+    }
+    updateDrawRevealArtFallback(card);
+    requestAnimationFrame(() => {
+      ov.classList.add('show');
+      reveal.style.left = `${centreX}px`;
+      reveal.style.top = `${centreY}px`;
+      reveal.style.transform = 'translate(-50%,-50%) scale(1) rotate(0deg)';
+      reveal.classList.add('reveal-in');
+    });
+    setTimeout(() => {
+      reveal.classList.add('flipped');
+      ov.classList.add('revealed');
+    }, 650);
+    setTimeout(() => {
+      const handRect = document.getElementById('hand-scroll')?.getBoundingClientRect();
+      const endX = handRect ? handRect.left + handRect.width * 0.36 : window.innerWidth / 2;
+      const endY = handRect ? handRect.top + handRect.height * 0.48 : window.innerHeight * .82;
+      ov.classList.add('landing');
+      reveal.style.left = `${endX}px`;
+      reveal.style.top = `${endY}px`;
+      reveal.style.transform = 'translate(-50%,-50%) scale(.22) rotate(-7deg)';
+    }, 2050);
+    setTimeout(() => {
+      ov.classList.remove('show');
+      reveal.classList.add('reveal-out');
+      setTimeout(() => {
+        ov.remove();
+        onDone?.();
+      }, 240);
+    }, 2600);
+  }
+
+  function completeRoundStartDraw(player) {
+    const opponent = player === 1 ? 2 : 1;
+    const activeDrawnCard = takeCardFromDeck(player);
+    drawCard(opponent);
+    state.players[player].drawnThisRound = true;
+    state.players[opponent].drawnThisRound = true;
+    showRoundStartDrawReveal(activeDrawnCard, player, () => {
+      addCardToHand(player, activeDrawnCard);
+      state._skipStartBattleResFlash = true;
+      renderHub();
+      setTimeout(() => startBattlePhase(), 160);
+    });
+  }
+
   function requisitionPhase() {
     state.phase = 'requisition';
-    // Clear death markers from previous round
     document.querySelectorAll('.unit-skull').forEach(e=>e.remove());
     const gain = 5 + state.round;
     const underdogBonuses = { 1: underdogRequisitionBonus(1), 2: underdogRequisitionBonus(2) };
-    state._lastRequisitionGain = { 1: gain + underdogBonuses[1], 2: gain + underdogBonuses[2] };
+    state._pendingRequisitionGain = { 1: gain + underdogBonuses[1], 2: gain + underdogBonuses[2] };
+    state._lastRequisitionGain = { ...state._pendingRequisitionGain };
     [1,2].forEach(p=>{
-      state.players[p].resources += state._lastRequisitionGain[p];
       state.players[p].passed = false;
       state.players[p].drawnThisRound = false;
-      drawCard(p);
     });
-    // Roll for first player
     const first = Math.random() < 0.5 ? 1 : 2;
     Object.keys(state.board).forEach(tid=>{ state.board[tid].actionsLeft=null; delete state.board[tid].bonusAttacks; });
     state.activePlayer = first;
     setPerspective(first);
+    setRoundStartHandHidden(true);
     renderHub();
-    // Update gain number in icon
-    const gainEl = document.getElementById('req-gain-num');
-    if(gainEl) gainEl.textContent = `+${gain}`;
-    const p = state.players[first];
-    const underdogMsg = underdogRequisitionMessage(underdogBonuses);
-    showOverlay(
-      `Round ${state.round} of ${state.maxRounds}`,
-      'Requisition Phase',
-      `${p.name} goes first${underdogMsg ? ` · ${underdogMsg}` : ''}`,
-      0,
-      ()=>startBattlePhase(),
-      true,
-      p.color
-    );
+    showRoundStartStep({
+      title: `Round ${state.round}`,
+      sub: `${state.players[first].name} goes first`,
+      who: '',
+      whoColor: state.players[first].color,
+      iconsHtml: buildRoundStartBreakdown(first),
+      buttonLabel: 'Draw ▶',
+      onBegin: () => animateRoundStartResources(() => {
+        setRoundStartHandHidden(false);
+        renderHub();
+        setTimeout(() => completeRoundStartDraw(first), 520);
+      })
+    });
   }
 
   let _beginCallback = null;
@@ -5696,9 +6034,15 @@ const state = {
   function showOverlay(title, sub, who, duration, callback, tapToContinue=false, whoColor='') {
     const ov = document.getElementById('req-overlay');
     const beginBtn = document.getElementById('req-begin');
+    ov.classList.remove('round-start-flow','p1-first','p2-first');
+    const icons = document.getElementById('req-icons');
+    if (icons) icons.innerHTML = `<div class="req-icon"><div class="diamond"><span id="req-gain-num">2</span></div>Resources</div><div class="req-icon"><div class="card-icon"></div>Draw 1 Card</div>`;
+    if (beginBtn) beginBtn.textContent = 'Begin ▶';
     document.querySelector('.top-bar').style.zIndex = '60';
     document.getElementById('req-title').textContent = title;
-    document.getElementById('req-sub').textContent   = sub;
+    const subEl = document.getElementById('req-sub');
+    subEl.textContent = sub;
+    subEl.className = 'req-sub';
     const whoEl = document.getElementById('req-who');
     whoEl.textContent = who;
     whoEl.className = 'req-who' + (whoColor ? ` ${whoColor}` : '');
@@ -5750,7 +6094,9 @@ const state = {
   function startBattlePhase() {
     state.phase = 'battle';
     applyRoundStartEffects();
-    flashResGain();
+    if (!state._skipStartBattleResFlash) flashResGain();
+    state._skipStartBattleResFlash = false;
+    setRoundStartHandHidden(false);
     setPerspective(state.activePlayer);
     refreshAllUnitIndicators();
     renderHub();
@@ -5786,10 +6132,11 @@ const state = {
 
   function drawCard(player) {
     const p=state.players[player];
-    if(p.deck.length===0) return;
+    if(p.deck.length===0) return null;
     const card = p.deck.shift();
     if(card) card.type = (card.type||'').trim();
     p.hand.unshift(card);
+    return card || null;
   }
 
   // ── BUILD BOARD ──
@@ -9729,7 +10076,7 @@ const state = {
     if (diamond) diamond.style.display = '';
     if (passBtn) {
       passBtn.style.display = '';
-      passBtn.classList.remove('show','hold-passing','hold-complete');
+      passBtn.classList.remove('show','hold-passing','hold-complete','pass-suggested');
     }
     if (deckCount) {
       deckCount.style.display = '';
@@ -9787,7 +10134,11 @@ const state = {
       if (!inspectorOpen) deck.style.display = '';
       diamond.style.display = '';
       if (deckCount) deckCount.classList.add('show');
-      if (passBtn) passBtn.classList.add('show');
+      if (passBtn) {
+        passBtn.classList.add('show');
+        const noResourceOptions = (state.players[state.activePlayer]?.resources ?? 0) <= 0;
+        passBtn.classList.toggle('pass-suggested', !!noResourceOptions);
+      }
       if (badges) badges.style.display = 'none';
       const drawAvailability = getDrawAvailability(state.activePlayer);
       setHubBtn(
@@ -15778,6 +16129,83 @@ function displayRange(r) {
 .hub-row:not(.activated) .hub-deck-count.p1-deck-indicator { color: var(--p1); }
 .player-bar.p2-active .hub-row:not(.activated) .hub-deck-count,
 .hub-row:not(.activated) .hub-deck-count.p2-deck-indicator { color: var(--p2); }
+
+
+/* ── PATCH 188: Battle Begins clean intro + starting hand only ── */
+#dev-setup-overlay.battle-begins-screen {
+  justify-content: flex-start !important;
+  overflow: hidden !important;
+  padding: calc(18px + env(safe-area-inset-top)) 16px calc(150px + env(safe-area-inset-bottom)) !important;
+  gap: 10px !important;
+}
+.battle-begins-title {
+  font-size: var(--fs-md);
+  font-weight: 900;
+  color: #c8a060;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(217,121,24,0.4);
+  text-align: center;
+  width: 100%;
+}
+.battle-begins-match-meta {
+  width: min(300px, 88vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin: -2px auto 4px;
+  text-align: center;
+}
+.battle-begins-round-count {
+  font-size: var(--fs-sm);
+  font-weight: 900;
+  color: #c8a060;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.battle-begins-versus {
+  font-size: var(--fs-xs);
+  font-weight: 900;
+  color: #7a6030;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.25;
+}
+.battle-begins-versus span {
+  color: #5a4828;
+  padding: 0 5px;
+}
+.battle-begins-screen .battle-begins-resource-block,
+.battle-begins-screen .battle-begins-avatar,
+.battle-begins-screen .battle-begins-player-label,
+.battle-begins-screen .req-icon,
+.battle-begins-screen .req-icons {
+  display: none !important;
+}
+.battle-begins-screen .battle-begins-hand-label {
+  width: 100%;
+  align-self: center !important;
+  text-align: center !important;
+  margin: 3px auto 0 !important;
+  font-size: var(--fs-xs) !important;
+  color: #4a78d8 !important;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em !important;
+}
+.battle-begins-screen .battle-begins-hand-grid {
+  margin-top: 0;
+}
+@media (max-height: 720px) {
+  #dev-setup-overlay.battle-begins-screen {
+    padding-top: calc(12px + env(safe-area-inset-top)) !important;
+    gap: 7px !important;
+  }
+  .battle-begins-title { font-size: 20px; }
+  .battle-begins-round-count { font-size: 14px; }
+}
 </style>
 
 
@@ -15878,6 +16306,9 @@ function displayRange(r) {
     state.deployModeFromInspector = false;
     state._ctaAction = null;
     delete state._lastRequisitionGain;
+    delete state._pendingRequisitionGain;
+    delete state._roundStartDrawnCards;
+    delete state._skipStartBattleResFlash;
 
     state.players[1] = rebuildPlayerFromStorage(1, loaded.lists, loaded.repo);
     state.players[2] = rebuildPlayerFromStorage(2, loaded.lists, loaded.repo);
@@ -15972,6 +16403,468 @@ function displayRange(r) {
   });
 })();
 </script>
+
+
+<style id="rev-patch-190-192-round-start-combined">
+/* Patch 190–192 — final combined battle intro + requisition/draw flow */
+#dev-setup-overlay.battle-begins-screen {
+  gap: 8px !important;
+}
+.battle-begins-screen .battle-begins-duel {
+  display: flex !important;
+  width: min(310px, 90vw) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 16px !important;
+  margin: 4px auto 2px !important;
+}
+.battle-begins-screen .battle-begins-player {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-width: 76px !important;
+}
+.battle-begins-screen .battle-begins-avatar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--p1) !important;
+  background: radial-gradient(circle at 50% 38%, #1d376a, #071126 72%) !important;
+  box-shadow: 0 0 18px rgba(74,120,216,0.42) !important;
+  color: #cfe0ff !important;
+  font-size: 27px !important;
+}
+.battle-begins-screen .battle-begins-avatar.p2 {
+  border-color: var(--p2) !important;
+  background: radial-gradient(circle at 50% 38%, #5b1e24, #12060a 72%) !important;
+  box-shadow: 0 0 18px rgba(204,48,48,0.38) !important;
+  color: #ffd7d7 !important;
+}
+.battle-begins-screen .battle-begins-player-label {
+  display: block !important;
+  margin: 0 !important;
+  font-size: 10px !important;
+  color: var(--p1) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  text-align: center !important;
+}
+.battle-begins-screen .battle-begins-player-label.p2 {
+  color: var(--p2) !important;
+}
+.battle-begins-screen .battle-begins-duel-vs {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 52px !important;
+  height: 30px !important;
+  border: 1px solid rgba(200,160,96,0.36) !important;
+  border-radius: 999px !important;
+  background: rgba(8,6,4,0.72) !important;
+  color: #f0d080 !important;
+  font-size: 10px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 10px rgba(200,160,60,0.32) !important;
+}
+.req-overlay.round-start-flow {
+  background: radial-gradient(circle at 50% 42%, rgba(96,66,24,0.16), transparent 34%), rgba(0,0,0,0.82) !important;
+  gap: 8px;
+}
+.req-overlay.round-start-flow .req-title {
+  font-size: clamp(28px, 9vw, 42px);
+  line-height: 0.95;
+}
+.req-overlay.round-start-flow .req-sub {
+  font-size: var(--fs-sm);
+  color: #d0b06a;
+  margin-top: 0;
+  letter-spacing: 0.10em;
+}
+.req-overlay.round-start-flow .req-who {
+  min-height: 0;
+  margin: 0;
+  font-size: 0;
+}
+.req-overlay.round-start-flow #req-icons {
+  width: min(340px, 94vw);
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.round-start-flow-copy {
+  font-size: 10px;
+  color: #7a6030;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.round-start-requisition-row {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 6px;
+}
+.round-req-card {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100px;
+  min-height: 112px;
+  border: 1px solid rgba(200,160,96,0.28);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(34,24,10,0.96), rgba(8,6,4,0.94));
+  box-shadow: inset 0 0 0 1px rgba(255,232,170,0.04), 0 10px 26px rgba(0,0,0,0.34);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 6px;
+  box-sizing: border-box;
+}
+.round-req-card.underdog {
+  border-color: rgba(255,218,132,0.42);
+  box-shadow: 0 0 18px rgba(240,190,80,0.14), inset 0 0 0 1px rgba(255,232,170,0.05);
+}
+.round-req-rune {
+  width: 38px;
+  height: 38px;
+  transform: rotate(45deg);
+  border-radius: 5px;
+  background: var(--resources);
+  border: 2px solid var(--resources-hi);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(217,121,24,0.38);
+}
+.round-req-rune span {
+  transform: rotate(-45deg);
+  color: var(--resources-text);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+.round-req-label {
+  min-height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 9px;
+  color: #8f7446;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  line-height: 1.18;
+}
+.round-req-value {
+  font-size: 24px;
+  font-weight: 900;
+  color: #f0d080;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(240,208,128,0.28);
+}
+.round-start-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 10px;
+  color: #5a4828;
+  font-size: 18px;
+  font-weight: 900;
+}
+.round-start-draw-copy {
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(200,160,96,0.24);
+  background: rgba(8,6,4,0.68);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #c8a060;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  text-align: center;
+}
+.round-card-icon {
+  width: 14px;
+  height: 18px;
+  display: inline-block;
+  border-radius: 2px;
+  border: 1px solid #c8a060;
+  background: linear-gradient(160deg,#1a1610,#080604);
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.22);
+}
+.round-start-sequence #player-bar {
+  transform: translateY(calc(100% + 18px));
+  opacity: 0;
+  pointer-events: none;
+}
+#player-bar {
+  transition: transform .28s ease, opacity .24s ease;
+}
+.round-start-sequence .inspector-deck,
+.round-start-sequence #hand-scroll {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.round-start-fly-token {
+  width: 31px;
+  height: 31px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.draw-reveal-overlay.round-start-draw-reveal .draw-reveal-card {
+  transition: left .58s cubic-bezier(.18,.84,.28,1), top .58s cubic-bezier(.18,.84,.28,1), transform .58s cubic-bezier(.18,.84,.28,1), opacity .22s ease;
+}
+.draw-reveal-overlay.round-start-draw-reveal.landing .draw-reveal-card {
+  transition: left .42s cubic-bezier(.22,.82,.24,1), top .42s cubic-bezier(.22,.82,.24,1), transform .42s cubic-bezier(.22,.82,.24,1), opacity .22s ease;
+}
+.draw-reveal-overlay.round-start-draw-reveal.landing .draw-reveal-label {
+  opacity: 0;
+}
+@media (max-height: 720px) {
+  .battle-begins-screen .battle-begins-avatar { width: 52px !important; height: 52px !important; font-size: 24px !important; }
+  .battle-begins-screen .battle-begins-duel { gap: 12px !important; }
+  .round-req-card { min-height: 98px; padding: 6px 4px; }
+  .round-req-rune { width: 32px; height: 32px; }
+  .round-req-value { font-size: 21px; }
+  .round-req-label { font-size: 8px; }
+}
+@media (max-width: 340px) {
+  .round-start-requisition-row { gap: 4px; }
+  .round-start-plus { flex-basis: 7px; font-size: 14px; }
+  .round-req-card { min-height: 96px; }
+  .round-req-rune { width: 30px; height: 30px; }
+}
+</style>
+
+
+<style id="rev-patch-193-start-flow-polish">
+/* Patch 193 — start flow polish: centred intro, stronger VS, coloured first player, numeric requisition runes */
+#dev-setup-overlay.battle-begins-screen {
+  justify-content: center !important;
+  padding: calc(48px + env(safe-area-inset-top)) 16px calc(152px + env(safe-area-inset-bottom)) !important;
+  gap: 9px !important;
+}
+.battle-begins-screen .battle-begins-title {
+  margin-top: 6px !important;
+}
+.battle-begins-screen .battle-begins-duel {
+  margin: 9px auto 5px !important;
+}
+.battle-begins-screen .battle-begins-duel-vs {
+  min-width: 56px !important;
+  height: 40px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #f0d080 !important;
+  font-size: 22px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-shadow: 0 0 14px rgba(240,208,128,0.42), 0 2px 10px rgba(0,0,0,0.9) !important;
+}
+.req-overlay.round-start-flow .req-sub.p1-first-text {
+  color: var(--p1) !important;
+  text-shadow: 0 0 12px rgba(74,120,216,0.52) !important;
+}
+.req-overlay.round-start-flow .req-sub.p2-first-text {
+  color: var(--p2) !important;
+  text-shadow: 0 0 12px rgba(204,48,48,0.52) !important;
+}
+.round-req-card {
+  min-height: 104px !important;
+  gap: 8px !important;
+}
+.round-req-rune {
+  width: 46px !important;
+  height: 46px !important;
+}
+.round-req-rune span {
+  font-size: 17px !important;
+  letter-spacing: -0.02em !important;
+  white-space: nowrap !important;
+}
+.round-req-label {
+  min-height: 30px !important;
+  max-width: 82px;
+}
+.round-req-value {
+  display: none !important;
+}
+@media (max-height: 720px) {
+  #dev-setup-overlay.battle-begins-screen {
+    padding-top: calc(38px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(136px + env(safe-area-inset-bottom)) !important;
+  }
+  .battle-begins-screen .battle-begins-duel-vs {
+    height: 34px !important;
+    font-size: 19px !important;
+  }
+  .round-req-card { min-height: 94px !important; }
+  .round-req-rune { width: 38px !important; height: 38px !important; }
+  .round-req-rune span { font-size: 15px !important; }
+}
+</style>
+
+
+<style id="rev-patch-194-resource-rune-pass-draw-polish">
+/* Patch 194 — universal requisition rune language + pass prompt + dual-card draw pill */
+:root {
+  --req-rune-fill: radial-gradient(circle at 35% 28%, #ffd98a 0%, #f2a93a 34%, #d97918 68%, #8b3e08 100%);
+  --req-rune-rim: #ffd98a;
+  --req-rune-text: #1b0d04;
+  --req-rune-glow: 0 0 12px rgba(242,179,90,0.58), 0 0 24px rgba(217,121,24,0.24), inset 0 1px 0 rgba(255,244,196,0.58), inset 0 -2px 5px rgba(91,38,4,0.52);
+}
+
+/* The rune itself stays universal: gold/orange, regardless of player. */
+.res-badge,
+.res-diamond,
+.card-cost,
+.hub-btn-cost,
+.pile-cost-diamond,
+.prof-cv-diamond,
+.btn-diamond,
+.card-zoom-cost,
+.hand-hold-preview-cost,
+.round-req-rune,
+.round-start-fly-token,
+.revTileCostRune,
+.revDeckListPanel .revTileCostRune {
+  background: var(--req-rune-fill) !important;
+  border-color: var(--req-rune-rim) !important;
+  box-shadow: var(--req-rune-glow) !important;
+  color: var(--req-rune-text) !important;
+}
+
+.res-badge span,
+.res-diamond span,
+.card-cost span,
+.hub-btn-cost span,
+.pile-cost-diamond span,
+.prof-cv-diamond span,
+.btn-diamond span,
+.card-zoom-cost span,
+.hand-hold-preview-cost span,
+.round-req-rune span,
+.round-start-fly-token,
+.revTileCostRune,
+.revDeckListPanel .revTileCostRune {
+  color: var(--req-rune-text) !important;
+  text-shadow: 0 1px 0 rgba(255,231,166,0.32) !important;
+  font-weight: 900 !important;
+}
+
+/* Preserve depleted/disabled states so spent/unaffordable resources still read as unavailable. */
+.res-diamond.depleted,
+.hub-btn.state-dim .hub-btn-cost,
+.pile.deck.draw-exhausted .pile-cost-diamond,
+.card.unavailable .card-cost,
+.prof-cv-diamond.diamond-activated,
+.btn-diamond.act-0 {
+  background: linear-gradient(145deg,#211408,#070503) !important;
+  border-color: #3a2410 !important;
+  box-shadow: none !important;
+  color: #3a2410 !important;
+}
+.res-diamond.depleted span,
+.hub-btn.state-dim .hub-btn-cost span,
+.pile.deck.draw-exhausted .pile-cost-diamond span,
+.card.unavailable .card-cost span,
+.prof-cv-diamond.diamond-activated span,
+.btn-diamond.act-0 span {
+  color: #5a3214 !important;
+  text-shadow: none !important;
+}
+
+/* Round-start gain cards: blue/friendly context plate, universal gold rune inside. */
+.round-req-card {
+  border-color: rgba(74,120,216,0.46) !important;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(74,120,216,0.18), transparent 48%),
+    linear-gradient(180deg, rgba(12,18,34,0.96), rgba(6,6,8,0.94)) !important;
+  box-shadow: 0 0 18px rgba(74,120,216,0.16), inset 0 0 0 1px rgba(180,205,255,0.05) !important;
+}
+.round-req-card.underdog {
+  border-color: rgba(240,208,128,0.56) !important;
+  box-shadow: 0 0 18px rgba(240,190,80,0.20), inset 0 0 0 1px rgba(255,232,170,0.07) !important;
+}
+.round-req-label {
+  color: #9eb8e8 !important;
+}
+
+/* Pass prompt when resources are gone and the default decision is likely Pass. */
+.hub-pass-btn.pass-suggested {
+  display: flex !important;
+  color: #ffd8b0 !important;
+  border-color: #e08a40 !important;
+  background: linear-gradient(160deg,#3a1408,#160604) !important;
+  box-shadow: 0 0 16px rgba(224,110,40,0.38), inset 0 0 0 1px rgba(255,210,150,0.10) !important;
+  animation: passSuggestedPulse 1.05s ease-in-out infinite;
+}
+.hub-pass-btn.pass-suggested .hub-pass-icon {
+  color: #ffd0a8 !important;
+  text-shadow: 0 0 10px rgba(255,142,64,0.70) !important;
+}
+.hub-pass-btn.pass-suggested .hub-pass-label {
+  color: #ffe1bf !important;
+}
+.hub-pass-btn.pass-suggested .hub-pass-sub {
+  color: #d88858 !important;
+}
+@keyframes passSuggestedPulse {
+  0%, 100% { filter: brightness(1); transform: translateY(-6px) scale(1); }
+  50% { filter: brightness(1.24); transform: translateY(-6px) scale(1.035); }
+}
+
+/* Both players draw: blue card on left, red card on right. */
+.round-start-draw-copy {
+  min-width: min(300px, 92vw);
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+.round-start-draw-text {
+  flex: 1;
+  text-align: center;
+}
+.round-card-icon {
+  width: 18px !important;
+  height: 24px !important;
+  border-radius: 3px !important;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.22), 0 0 10px rgba(0,0,0,0.28) !important;
+  flex: 0 0 auto;
+}
+.round-card-icon.p1-card-icon {
+  border-color: var(--p1) !important;
+  background: linear-gradient(160deg,#22345f,#0a1328) !important;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.22), 0 0 10px rgba(74,120,216,0.42) !important;
+}
+.round-card-icon.p2-card-icon {
+  border-color: var(--p2) !important;
+  background: linear-gradient(160deg,#5a1a1a,#160606) !important;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,0.22), 0 0 10px rgba(204,48,48,0.38) !important;
+}
+</style>
 
 </body>
 </html>
