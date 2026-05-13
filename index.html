@@ -3448,6 +3448,438 @@ body.p2-turn .player-area-glow {
       rgba(204,48,48,0.00) 86%);
 }
 
+
+/* ── PATCH 171: Charge / move-then-fight targeting polish ── */
+.tile.charge-selected-target {
+  box-shadow: 0 0 18px rgba(146,84,220,0.82), inset 0 0 12px rgba(146,84,220,0.28) !important;
+}
+
+
+/* ── PATCH 173: contested Break Away movement ── */
+#act-btn-move.act-breakaway {
+  background: rgba(210,120,24,0.24);
+  color: rgba(255,186,92,0.82);
+}
+#act-btn-move.act-breakaway.act-selected {
+  background: #b86a18;
+  color: #fff;
+  box-shadow: inset 0 0 0 2px rgba(255,214,140,0.82), 0 0 16px rgba(210,120,24,0.72);
+}
+.tile.highlight-breakaway {
+  border-color: #d88424 !important;
+  box-shadow: 0 0 14px rgba(216,132,36,0.58), inset 0 0 10px rgba(216,132,36,0.20) !important;
+}
+.tile.highlight-breakaway::before {
+  background: linear-gradient(160deg, rgba(92,48,12,0.52), rgba(24,10,4,0.74)) !important;
+}
+.tile.highlight-breakaway-source {
+  box-shadow: 0 0 18px rgba(216,56,32,0.78), inset 0 0 12px rgba(216,56,32,0.22) !important;
+}
+.tile.highlight-breakaway-source .unit-on-tile {
+  border-color: #d83820 !important;
+  box-shadow: 0 0 14px rgba(216,56,32,0.72) !important;
+}
+.breakaway-warn {
+  position:absolute;
+  top:2px;
+  right:3px;
+  z-index:8;
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:900;
+  color:#180804;
+  background:#f0a040;
+  border:1px solid rgba(255,230,160,0.85);
+  box-shadow:0 0 10px rgba(240,160,64,0.72);
+  pointer-events:none;
+}
+.breakaway-confirm-tile {
+  box-shadow:0 0 22px rgba(240,160,64,0.9), inset 0 0 12px rgba(240,160,64,0.32) !important;
+}
+.breakaway-shell .battle-heading {
+  color:#f0a040;
+}
+.breakaway-rule {
+  width:100%;
+  padding:8px 10px;
+  border:1px solid rgba(240,160,64,0.28);
+  background:rgba(48,24,8,0.32);
+  border-radius:8px;
+  color:#caa66c;
+  font-size:12px;
+  line-height:1.35;
+}
+.breakaway-roll-panel {
+  width:100%;
+  border:1px solid rgba(216,196,154,0.16);
+  background:rgba(0,0,0,0.24);
+  border-radius:10px;
+  padding:10px;
+}
+.breakaway-power-row {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:12px;
+  color:#b8945e;
+}
+.breakaway-roll-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.breakaway-roll-side {
+  border:1px solid rgba(216,196,154,0.16);
+  background:rgba(10,8,6,0.65);
+  border-radius:8px;
+  padding:8px;
+  text-align:center;
+}
+.breakaway-roll-label {
+  font-size:11px;
+  color:#7a6848;
+  margin-bottom:6px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.breakaway-roll-equation {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  font-size:12px;
+  color:#c8a060;
+}
+.breakaway-hp,
+.breakaway-total {
+  font-weight:900;
+  color:#f0d080;
+}
+.breakaway-total {
+  font-size:17px;
+}
+.breakaway-result-title {
+  margin-top:8px;
+  text-align:center;
+  font-size:15px;
+  font-weight:900;
+  color:#d8c49a;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.breakaway-result-title.good { color:#80d890; }
+.breakaway-result-title.bad { color:#f09070; }
+.breakaway-reaction {
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.breakaway-mini-row {
+  display:grid;
+  grid-template-columns:70px 1fr;
+  gap:6px;
+  align-items:center;
+  margin-top:6px;
+  font-size:12px;
+  color:#a88a58;
+}
+.breakaway-dice-line {
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+}
+.breakaway-mini-note {
+  opacity:.7;
+}
+.breakaway-result-copy {
+  margin-top:8px;
+  text-align:center;
+  color:#caa66c;
+  font-size:12px;
+}
+.breakaway-roll-btn.counting {
+  animation: confirm-pulse 0.85s ease-in-out infinite;
+}
+
+
+/* ── PATCH 174: staged Break Away quick-resolve ── */
+.breakaway-quick-shell {
+  gap: 8px;
+}
+.breakaway-stage-subtitle {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #9c7a46;
+  letter-spacing: .04em;
+}
+.breakaway-quick-cards {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 8px;
+  align-items: stretch;
+}
+.breakaway-mini-card {
+  min-width: 0;
+  border: 1px solid rgba(216,196,154,0.16);
+  background: linear-gradient(160deg, rgba(24,18,10,0.88), rgba(6,5,4,0.86));
+  border-radius: 10px;
+  padding: 8px;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.035);
+}
+.breakaway-mini-card.p1 {
+  border-color: rgba(74,120,216,0.44);
+  box-shadow: 0 0 10px rgba(74,120,216,0.16), inset 0 0 0 1px rgba(255,255,255,0.035);
+}
+.breakaway-mini-card.p2 {
+  border-color: rgba(204,48,48,0.44);
+  box-shadow: 0 0 10px rgba(204,48,48,0.16), inset 0 0 0 1px rgba(255,255,255,0.035);
+}
+.breakaway-mini-role {
+  color: #7a6848;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 4px;
+}
+.breakaway-mini-name {
+  color: #d8c49a;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.1;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.breakaway-mini-hp {
+  margin-top: 6px;
+  color: #f0d080;
+  font-size: 16px;
+  font-weight: 900;
+}
+.breakaway-quick-vs {
+  align-self: center;
+  color: #f0a040;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  opacity: .85;
+}
+.breakaway-rule.compact {
+  font-size: 11px;
+  padding: 7px 9px;
+}
+.breakaway-stage-panel {
+  width: 100%;
+  border: 1px solid rgba(216,196,154,0.16);
+  background: rgba(0,0,0,0.26);
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 104px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.breakaway-stage-title {
+  text-align: center;
+  color: #f0d080;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .10em;
+  margin-bottom: 8px;
+}
+.breakaway-stage-title.danger {
+  color: #f09070;
+}
+.breakaway-roll-grid.compact {
+  gap: 6px;
+}
+.breakaway-reaction-loading {
+  text-align: center;
+  color: #9c7a46;
+  font-size: 12px;
+  padding: 12px 0;
+}
+.breakaway-survival-line {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+.breakaway-survival-line.good {
+  color: #80d890;
+}
+.breakaway-survival-line.bad {
+  color: #f09070;
+}
+.breakaway-quick-overlay .breakaway-reaction {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+.breakaway-quick-overlay .breakaway-result-title {
+  margin-top: 8px;
+}
+.breakaway-quick-overlay .battle-row-cta {
+  width: 100%;
+}
+
+
+/* ── PATCH 175: Break Away pre-roll CTA ── */
+.breakaway-pre-roll-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.breakaway-pre-roll-side {
+  border: 1px solid rgba(216,196,154,0.14);
+  background: rgba(10,8,6,0.58);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+}
+.breakaway-pre-equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.breakaway-pre-equation .die-ghost {
+  opacity: .75;
+  border-style: dashed;
+}
+.breakaway-roll-btn:disabled {
+  opacity: .85;
+  pointer-events: none;
+}
+
+
+/* ── PATCH 176: board card ownership / selection state layering ── */
+/*
+  Visual hierarchy:
+  1) card ownership border is always player colour
+  2) selected/active friendly unit gets scale + gold glow around the owned card
+  3) target/breakaway/ability states add outer glow without replacing ownership
+*/
+
+/* Base ownership state — always visible on board units. */
+.tile .unit-on-tile.p1-unit {
+  border: 2px solid var(--p1) !important;
+  background: linear-gradient(160deg,#22345f,#162443) !important;
+  box-shadow:
+    0 0 0 1px rgba(74,120,216,0.38),
+    0 0 8px rgba(74,120,216,0.42) !important;
+}
+
+.tile .unit-on-tile.p2-unit {
+  border: 2px solid var(--p2) !important;
+  background: linear-gradient(160deg,#5a1a1a,#3f1111) !important;
+  box-shadow:
+    0 0 0 1px rgba(204,48,48,0.38),
+    0 0 8px rgba(204,48,48,0.42) !important;
+}
+
+/* Active/selected friendly unit — tile/card is raised, ownership border remains. */
+.tile.unit-selected,
+.tile.unit-active {
+  z-index: 18;
+  transform: scale(1.17);
+  transform-origin: center center;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.tile.unit-selected .unit-on-tile,
+.tile.unit-active .unit-on-tile {
+  filter: brightness(1.08) saturate(1.08);
+}
+
+.tile.unit-selected .unit-on-tile.p1-unit,
+.tile.unit-active .unit-on-tile.p1-unit {
+  border-color: var(--p1) !important;
+  box-shadow:
+    0 0 0 1px rgba(74,120,216,0.62),
+    0 0 10px rgba(74,120,216,0.50),
+    0 0 18px rgba(240,208,128,0.72),
+    0 0 30px rgba(240,208,128,0.28) !important;
+}
+
+.tile.unit-selected .unit-on-tile.p2-unit,
+.tile.unit-active .unit-on-tile.p2-unit {
+  border-color: var(--p2) !important;
+  box-shadow:
+    0 0 0 1px rgba(204,48,48,0.62),
+    0 0 10px rgba(204,48,48,0.50),
+    0 0 18px rgba(240,208,128,0.72),
+    0 0 30px rgba(240,208,128,0.28) !important;
+}
+
+/* Targeting states sit on top as glows; they do not replace the owner border. */
+.tile.highlight-attack .unit-on-tile.p1-unit,
+.tile .unit-on-tile.highlight-target.p1-unit {
+  border-color: var(--p1) !important;
+  box-shadow:
+    0 0 0 1px rgba(74,120,216,0.52),
+    0 0 9px rgba(74,120,216,0.42),
+    0 0 16px rgba(220,70,54,0.78) !important;
+}
+
+.tile.highlight-attack .unit-on-tile.p2-unit,
+.tile .unit-on-tile.highlight-target.p2-unit {
+  border-color: var(--p2) !important;
+  box-shadow:
+    0 0 0 1px rgba(204,48,48,0.52),
+    0 0 9px rgba(204,48,48,0.42),
+    0 0 16px rgba(220,70,54,0.78) !important;
+}
+
+.tile.highlight-ability .unit-on-tile.p1-unit {
+  border-color: var(--p1) !important;
+  box-shadow:
+    0 0 0 1px rgba(74,120,216,0.50),
+    0 0 9px rgba(74,120,216,0.38),
+    0 0 16px rgba(146,84,220,0.78) !important;
+}
+
+.tile.highlight-ability .unit-on-tile.p2-unit {
+  border-color: var(--p2) !important;
+  box-shadow:
+    0 0 0 1px rgba(204,48,48,0.50),
+    0 0 9px rgba(204,48,48,0.38),
+    0 0 16px rgba(146,84,220,0.78) !important;
+}
+
+.tile.highlight-breakaway-source .unit-on-tile.p1-unit {
+  border-color: var(--p1) !important;
+  box-shadow:
+    0 0 0 1px rgba(74,120,216,0.54),
+    0 0 9px rgba(74,120,216,0.42),
+    0 0 18px rgba(216,56,32,0.82) !important;
+}
+
+.tile.highlight-breakaway-source .unit-on-tile.p2-unit {
+  border-color: var(--p2) !important;
+  box-shadow:
+    0 0 0 1px rgba(204,48,48,0.54),
+    0 0 9px rgba(204,48,48,0.42),
+    0 0 18px rgba(216,56,32,0.82) !important;
+}
+
+/* Exhausted units stay owned-colour but dimmed. */
+.tile .unit-on-tile.exhausted.p1-unit,
+.tile .unit-on-tile.exhausted.p2-unit {
+  filter: brightness(0.72) saturate(0.78);
+}
+
 </style>
 
 
@@ -3812,7 +4244,7 @@ window.addEventListener('unhandledrejection', e => {
       special:'None: No special ability.' },
     { id:'cmoklh74h2', name:'cavalry', internalName:'cavalry', variant:'', artId:'cavalry', type:'Common', faction:'order_of_iron', cost:3, hp:6, maxHp:6, move:2, save:'4+',
       weapon:{name:'Spears & Shields', range:1, attacks:5, hit:'4+', ap:1, damage:1},
-      special:'THUNDERING CHARGE (2AP): This unit must make a Move Action followed by an Attack Action. All Hits are resolved with +1 Lethality and +1 Damage' },
+      special:'None: No special ability.' },
     { id:'cmoklh74h3', name:'sentinels', internalName:'sentinels', variant:'', artId:'sentinels', type:'Uncommon', faction:'order_of_iron', cost:4, hp:8, maxHp:8, move:1, save:'2+',
       weapon:{name:'Ironwall Shields', range:1, attacks:3, hit:'3+', ap:1, damage:2},
       special:'Wall of Iron (1AP): For the rest of this Battle Round this Unit reduces all damage taken by 1' },
@@ -4045,6 +4477,7 @@ window.addEventListener('unhandledrejection', e => {
       none:'none', no:'none', na:'none',
       inspire:'command_unit', command:'command_unit', commandunit:'command_unit', order:'command_unit', giveaction:'command_unit', addaction:'add_action', rallyunit:'command_unit',
       jumplane:'jump_lane', jump:'jump_lane',
+      movethenfight:'move_then_fight', movefight:'move_then_fight', charge:'move_then_fight', cavalrycharge:'move_then_fight', thunderingcharge:'move_then_fight',
       explodinghits:'exploding_hits', explodinghit:'exploding_hits', explodehits:'exploding_hits', explodehit:'exploding_hits', exploding:'exploding_hits',
       chainhits:'chain_hits', chainhit:'chain_hits', chains:'chain_hits', chain:'chain_hits',
       damage:'damage', dealdamage:'damage',
@@ -4126,12 +4559,14 @@ window.addEventListener('unhandledrejection', e => {
   function makeRuntimeAbilityFromEffect(effectKey, card={}) {
     effectKey = normaliseAbilityEffectValue(effectKey);
     if (!effectKey || effectKey === 'none') return null;
-    const apCost = Number.isFinite(Number(card.apCost ?? card.abilityCost)) ? Number(card.apCost ?? card.abilityCost) : 1;
+    const defaultApCost = effectKey === 'move_then_fight' ? 2 : 1;
+    const apCost = Number.isFinite(Number(card.apCost ?? card.abilityCost)) ? Number(card.apCost ?? card.abilityCost) : defaultApCost;
     const value = card.value ?? card.unitValue ?? card.abilityValue ?? null;
     const labels = {
       command_unit: 'Command Unit',
       add_action: 'Add Action',
       jump_lane: 'Jump Lane',
+      move_then_fight: 'Charge',
       damage: 'Damage',
       heal: 'Heal',
       draw: 'Draw',
@@ -4150,6 +4585,7 @@ window.addEventListener('unhandledrejection', e => {
   function abilityTargetForEffect(effectKey) {
     effectKey = normaliseAbilityEffectValue(effectKey);
     if (effectKey === 'jump_lane') return { side:'empty', location:'opposite_lane_same_row', state:'empty', type:'tile' };
+    if (effectKey === 'move_then_fight') return { side:'enemy', location:'reachable_attack', state:'any', type:'unit' };
     if (effectKey === 'command_unit') return { side:'friendly', location:'same_lane', state:'any', type:'unit', unitType:'non_hero', faction:'any' };
     if (effectKey === 'add_action') return { side:'friendly', location:'same_lane', state:'any', type:'unit', unitType:'any', faction:'any' };
     if (effectKey === 'heal') return { side:'friendly', location:'same_lane', state:'damaged', type:'unit' };
@@ -4332,6 +4768,9 @@ const state = {
     activeUnit: null,
     activeAction: null,
     activeAbility: null,
+    chargeState: null,
+    breakawayState: null,
+    pendingCombatContext: null,
     pendingReturnUnit: null,
     deployModeFromInspector: false,
     laneEffects: { A: null, B: null },
@@ -6420,18 +6859,30 @@ const state = {
     }
 
     // Ability targeting mode — tapping a highlighted tile/unit resolves or confirms the ability
-    if (state.activeAction==='ability' && tile.classList.contains('highlight-ability')) {
+    if (state.activeAction==='ability') {
       const ability = getUnitAbility(state.activeUnit?.card);
-      const isJumpLane = ability?.key === 'jump_lane' || ability?.target?.location === 'opposite_lane_same_row';
-      if (isJumpLane) {
-        if (pendingJumpTile === tileId) { clearJumpConfirm(); return; }
-        clearJumpConfirm();
-        pendingJumpTile = tileId;
-        showJumpConfirm(tileId);
+      if (isMoveThenFightAbility(ability)) {
+        if (state.chargeState?.phase === 'destination' && tile.classList.contains('highlight-move')) {
+          executeChargeTo(tileId);
+          return;
+        }
+        if (tile.classList.contains('highlight-ability')) {
+          beginChargeDestinationSelection(tileId);
+          return;
+        }
+      }
+      if (tile.classList.contains('highlight-ability')) {
+        const isJumpLane = ability?.key === 'jump_lane' || ability?.target?.location === 'opposite_lane_same_row';
+        if (isJumpLane) {
+          if (pendingJumpTile === tileId) { clearJumpConfirm(); return; }
+          clearJumpConfirm();
+          pendingJumpTile = tileId;
+          showJumpConfirm(tileId);
+          return;
+        }
+        resolveAbility(tileId);
         return;
       }
-      resolveAbility(tileId);
-      return;
     }
 
     // Attack mode — enemy highlighted tile triggers battle
@@ -6490,48 +6941,22 @@ const state = {
   }
 
   // ── EXECUTE MOVE ──
-  function executeMove(toTileId) {
+  function executeMove(toTileId, options={}) {
     if (state._moveExecuting) return;
     if (!state.activeUnit?.tileId || !state.activeUnit?.card) return;
     const fromTileId = state.activeUnit.tileId;
     const unit = state.activeUnit.card;
     if (!state.board[fromTileId] || state.board[toTileId]) return;
-    state._moveExecuting = true;
-    clearMoveConfirm();
 
-    // Update board state
-    state.board[toTileId] = unit;
-    delete state.board[fromTileId];
-
-    // Update DOM
-    const fromTile = document.querySelector(`[data-id="${fromTileId}"]`);
-    fromTile.classList.remove('unit-active');
-    fromTile.querySelectorAll('.unit-on-tile,.act-indicator').forEach(e=>e.remove());
-    const toTile = document.querySelector(`[data-id="${toTileId}"]`);
-    renderUnit(toTile, unit);
-    toTile.classList.add('unit-active');
-
-    // Update activeUnit reference and tileId in profile
-    state.activeUnit.tileId = toTileId;
-    profileTileId = toTileId;
-    unit.actionsLeft--;
-    const updatedTile = document.querySelector(`[data-id="${toTileId}"]`);
-    if(updatedTile) renderUnit(updatedTile, unit);
-    clearHighlights();
-    setTimeout(() => { state._moveExecuting = false; }, 250);
-
-    if(unit.actionsLeft > 0) {
-      // Auto re-highlight from new position
-      getReachableTiles(toTileId, unit.move).forEach(id=>{
-        document.querySelector(`[data-id="${id}"]`)?.classList.add('highlight-move');
-      });
-      refreshActionButtons();
-      renderHub();
-    } else {
-      closeProfile();
-      endCurrentTurn();
-      waitThenAdvance();
+    if (!options.skipBreakaway) {
+      const contester = getBreakawayContester(fromTileId, unit);
+      if (contester?.tileId) {
+        openBreakawayOverlay(fromTileId, toTileId, contester.tileId);
+        return;
+      }
     }
+
+    performMove(toTileId, options);
   }
 
   function showConfirm(tileId) {
@@ -6603,27 +7028,29 @@ const state = {
   let pendingJumpTile = null;
 
   function showMoveConfirm(tileId) {
+    const breakaway = isBreakawayMove(state.activeUnit?.tileId, tileId, state.activeUnit?.card);
     // Dim other move options
     document.querySelectorAll('.highlight-move').forEach(t=>{
       if(t.dataset.id!==tileId) t.classList.add('dim-move');
     });
-    // Arrow icon on source unit tile
+    // Arrow / warning icon on source unit tile
     const srcTile=document.querySelector(`[data-id="${state.activeUnit.tileId}"]`);
-    if(srcTile){ const ic=document.createElement('div'); ic.className='move-src-icon'; ic.textContent='→'; srcTile.appendChild(ic); }
+    if(srcTile){ const ic=document.createElement('div'); ic.className='move-src-icon'; ic.textContent=breakaway?'!':'→'; srcTile.appendChild(ic); }
     // Confirm button on destination
     const tile=document.querySelector(`[data-id="${tileId}"]`);
     if(!tile) return;
     tile.classList.add('confirm-tile');
+    if (breakaway) tile.classList.add('breakaway-confirm-tile');
     const btn=document.createElement('div');
     btn.className='confirm-btn'; btn.id='move-confirm-btn';
-    btn.innerHTML='<span>→✓</span>';
+    btn.innerHTML=breakaway?'<span>!✓</span>':'<span>→✓</span>';
     btn.addEventListener('click',e=>{ e.stopPropagation(); clearMoveConfirm(); executeMove(tileId); });
     tile.appendChild(btn);
   }
   function clearMoveConfirm() {
     document.querySelectorAll('.highlight-move.dim-move').forEach(t=>t.classList.remove('dim-move'));
     document.querySelectorAll('.move-src-icon,.move-longpress-tick').forEach(e=>e.remove());
-    document.querySelectorAll('.confirm-tile').forEach(t=>t.classList.remove('confirm-tile'));
+    document.querySelectorAll('.confirm-tile').forEach(t=>t.classList.remove('confirm-tile','breakaway-confirm-tile'));
     const btn=document.getElementById('move-confirm-btn');
     if(btn) btn.remove();
     pendingMoveTile=null;
@@ -7197,13 +7624,382 @@ const state = {
     return [...dist.keys()].filter(id=>tileMap[id]?.zone!=='centre' && dist.get(id)>=min);
   }
 
+
+  function getAdjacentEnemyTiles(tileId, owner) {
+    if (!tileId || owner == null) return [];
+    return getNeighbors(tileId, false).filter(id => {
+      const unit = state.board[id];
+      return unit && unit.owner !== owner;
+    });
+  }
+
+  function getBreakawayContester(tileId, unit) {
+    if (!tileId || !unit) return null;
+    const enemies = getAdjacentEnemyTiles(tileId, unit.owner ?? state.activePlayer);
+    if (!enemies.length) return null;
+    enemies.sort((a,b) => {
+      const ahp = Number(state.board[a]?.hp) || 0;
+      const bhp = Number(state.board[b]?.hp) || 0;
+      if (bhp !== ahp) return bhp - ahp;
+      return String(a).localeCompare(String(b));
+    });
+    const tileIdWinner = enemies[0];
+    return { tileId: tileIdWinner, unit: state.board[tileIdWinner] };
+  }
+
+  function isBreakawayMove(fromTileId, toTileId, unit=null) {
+    const mover = unit || state.activeUnit?.card;
+    if (!fromTileId || !toTileId || !mover) return false;
+    return !!getBreakawayContester(fromTileId, mover);
+  }
+
+  function addBreakawayWarning(tile) {
+    if (!tile || tile.querySelector('.breakaway-warn')) return;
+    const warn = document.createElement('div');
+    warn.className = 'breakaway-warn';
+    warn.textContent = '!';
+    tile.appendChild(warn);
+  }
+
+  function highlightMoveTilesForActiveUnit() {
+    const unit = state.activeUnit?.card;
+    const tid = state.activeUnit?.tileId;
+    if (!unit || !tid) return;
+    const contester = getBreakawayContester(tid, unit);
+    if (contester?.tileId) {
+      document.querySelector(`[data-id="${contester.tileId}"]`)?.classList.add('highlight-breakaway-source');
+    }
+    getReachableTiles(tid, unit.move).forEach(id => {
+      const mt = document.querySelector(`[data-id="${id}"]`);
+      if (!mt) return;
+      mt.classList.add('highlight-move');
+      if (contester) {
+        mt.classList.add('highlight-breakaway');
+        addBreakawayWarning(mt);
+      }
+      // Long press on move tile = auto-confirm move. Bound once per tile to avoid stacked listeners.
+      if (mt.dataset.moveHoldBound !== '1') {
+        mt.dataset.moveHoldBound = '1';
+        let _mvTimer = null;
+        let _mvFired = false;
+        mt.addEventListener('touchstart', e=>{
+          if(e.touches.length>1) return;
+          _mvFired = false;
+          const targetId = mt.dataset.id;
+          clearTimeout(_mvTimer);
+          _mvTimer = setTimeout(()=>{
+            if(mt.classList.contains('highlight-move') && state.activeAction === 'move' && !state._moveExecuting){
+              _mvFired = true;
+              state._suppressNextMoveTap = true;
+              mt.querySelectorAll('.move-longpress-tick').forEach(el=>el.remove());
+              const tick = document.createElement('div');
+              tick.className = 'move-longpress-tick';
+              tick.textContent = mt.classList.contains('highlight-breakaway') ? '!' : '✓';
+              mt.appendChild(tick);
+              setTimeout(()=> executeMove(targetId), 120);
+            }
+          }, 260);
+        }, {passive:true});
+        mt.addEventListener('touchend', ()=>{
+          clearTimeout(_mvTimer);
+          if (_mvFired) setTimeout(()=>{ state._suppressNextMoveTap = false; }, 220);
+        }, {passive:true});
+        mt.addEventListener('touchcancel', ()=>clearTimeout(_mvTimer), {passive:true});
+        mt.addEventListener('touchmove', ()=>clearTimeout(_mvTimer), {passive:true});
+      }
+    });
+  }
+
+  function breakawayContestResult(moverDie, enemyDie, moverHp, enemyHp) {
+    const moverTotal = moverDie + moverHp;
+    const enemyTotal = enemyDie + enemyHp;
+    let success;
+    let reason = '';
+    if (moverDie === 1) {
+      success = false;
+      reason = 'Natural 1 — failed';
+    } else if (moverDie === 6) {
+      success = true;
+      reason = 'Natural 6 — escaped';
+    } else if (enemyDie === 1) {
+      success = true;
+      reason = 'Enemy natural 1 — escaped';
+    } else if (enemyDie === 6) {
+      success = false;
+      reason = 'Enemy natural 6 — caught';
+    } else {
+      success = moverTotal > enemyTotal;
+      reason = success ? 'Escaped' : (moverTotal === enemyTotal ? 'Tie — caught' : 'Caught');
+    }
+    return { success, moverTotal, enemyTotal, reason };
+  }
+
+  function breakawayCardHtml(card, role, subtitle='') {
+    const ownerCol = card.owner === 1 ? 'p1' : card.owner === 2 ? 'p2' : '';
+    const art = artStyle(card, true);
+    return `<div class="battle-zoom-card ${role}">
+      <div class="battle-card-role">${escapeHtml(subtitle || role)}</div>
+      <div class="battle-card-art ${ownerCol}-unit" style="${art}">
+        <div class="battle-target-hp ${ownerCol}-stat">${escapeHtml(card.hp ?? '')}</div>
+        <div class="battle-card-fallback">${escapeHtml(expectedArtLabel(card))}</div>
+      </div>
+      <div class="battle-card-name">${cardDisplayName(card)}</div>
+      ${card.weapon?.name ? `<div class="battle-card-weapon">${escapeHtml(card.weapon.name)}</div>` : ''}
+    </div>`;
+  }
+
+  function breakawayDiceHtml(label, die, hp, total, cls='') {
+    return `<div class="breakaway-roll-side ${cls}">
+      <div class="breakaway-roll-label">${escapeHtml(label)}</div>
+      <div class="breakaway-roll-equation">
+        <span class="die die-reveal ${cls}">${escapeHtml(die)}</span>
+        <span class="breakaway-plus">+</span>
+        <span class="breakaway-hp">${escapeHtml(hp)} HP</span>
+        <span class="breakaway-eq">=</span>
+        <span class="breakaway-total">${escapeHtml(total)}</span>
+      </div>
+    </div>`;
+  }
+
+  function reactionDiceSummaryHtml(result) {
+    const atkDice = result.atkDice || [];
+    const saveDice = result.saveDice || [];
+    const atkRow = atkDice.map(d => `<span class="die ${d >= result.hitThresh ? 'die-hit die-hit-active' : 'die-miss'}">${escapeHtml(d)}</span>`).join('');
+    const saveRow = result.autoFail
+      ? '<span class="breakaway-mini-note">No saves</span>'
+      : saveDice.map(d => `<span class="die ${d >= result.modSave ? 'die-saved' : 'die-failed'}">${escapeHtml(d)}</span>`).join('');
+    const unsaved = Math.max(0, (result.hits || 0) - (result.saved || 0));
+    return `<div class="breakaway-reaction">
+      <div class="breakaway-result-title">Reaction Attack</div>
+      <div class="breakaway-mini-row"><strong>Attack</strong><div class="breakaway-dice-line">${atkRow || '<span class="breakaway-mini-note">No dice</span>'}</div></div>
+      <div class="breakaway-mini-row"><strong>Defence</strong><div class="breakaway-dice-line">${saveRow}</div></div>
+      <div class="breakaway-result-copy">${escapeHtml(result.hits || 0)} hit${(result.hits || 0) === 1 ? '' : 's'} · ${escapeHtml(result.saved || 0)} saved · ${escapeHtml(unsaved)} unsaved · ${escapeHtml(result.totalDmg || 0)} damage</div>
+    </div>`;
+  }
+
+  function performMove(toTileId, options={}) {
+    if (state._moveExecuting) return;
+    if (!state.activeUnit?.tileId || !state.activeUnit?.card) return;
+    const fromTileId = state.activeUnit.tileId;
+    const unit = state.activeUnit.card;
+    if (!state.board[fromTileId] || state.board[toTileId]) return;
+    state._moveExecuting = true;
+    clearMoveConfirm();
+
+    state.board[toTileId] = unit;
+    delete state.board[fromTileId];
+
+    const fromTile = document.querySelector(`[data-id="${fromTileId}"]`);
+    fromTile?.classList.remove('unit-active');
+    fromTile?.querySelectorAll('.unit-on-tile,.act-indicator').forEach(e=>e.remove());
+    const toTile = document.querySelector(`[data-id="${toTileId}"]`);
+    if (toTile) {
+      renderUnit(toTile, unit);
+      toTile.classList.add('unit-active');
+    }
+
+    state.activeUnit.tileId = toTileId;
+    profileTileId = toTileId;
+    unit.actionsLeft = Math.max(0, (unit.actionsLeft ?? 1) - 1);
+    const updatedTile = document.querySelector(`[data-id="${toTileId}"]`);
+    if(updatedTile) renderUnit(updatedTile, unit);
+    clearHighlights();
+    setTimeout(() => { state._moveExecuting = false; }, 250);
+
+    if(unit.actionsLeft > 0) {
+      state.activeAction = 'move';
+      highlightMoveTilesForActiveUnit();
+      refreshActionButtons();
+      renderHub();
+      updateActionBar();
+    } else {
+      closeProfile();
+      endCurrentTurn();
+      waitThenAdvance();
+    }
+  }
+
+  function openBreakawayOverlay(fromTileId, toTileId, contesterTileId) {
+    const mover = state.board[fromTileId] || state.activeUnit?.card;
+    const enemy = state.board[contesterTileId];
+    if (!mover || !enemy) return performMove(toTileId, { skipBreakaway:true });
+    clearMoveConfirm();
+
+    const moverHp = Math.max(0, Number(mover.hp) || 0);
+    const enemyHp = Math.max(0, Number(enemy.hp) || 0);
+
+    const ov = document.createElement('div');
+    ov.className = 'battle-overlay breakaway-overlay breakaway-quick-overlay';
+    ov.innerHTML = `
+      <div class="battle-shell breakaway-shell breakaway-quick-shell" onclick="event.stopPropagation()">
+        <div class="battle-header">
+          <div>
+            <div class="battle-heading">Break Away</div>
+            <div class="breakaway-stage-subtitle" id="breakaway-stage-subtitle">Choose whether to risk the escape</div>
+          </div>
+          <div class="battle-close" id="breakaway-close">✕</div>
+        </div>
+
+        <div class="breakaway-quick-cards">
+          <div class="breakaway-mini-card p${escapeHtml(mover.owner || '')}">
+            <div class="breakaway-mini-role">Escaping</div>
+            <div class="breakaway-mini-name">${cardDisplayName(mover)}</div>
+            <div class="breakaway-mini-hp">${escapeHtml(moverHp)} HP</div>
+          </div>
+          <div class="breakaway-quick-vs">vs</div>
+          <div class="breakaway-mini-card p${escapeHtml(enemy.owner || '')}">
+            <div class="breakaway-mini-role">Contesting</div>
+            <div class="breakaway-mini-name">${cardDisplayName(enemy)}</div>
+            <div class="breakaway-mini-hp">${escapeHtml(enemyHp)} HP</div>
+          </div>
+        </div>
+
+        <div class="breakaway-rule compact" id="breakaway-rule">
+          Roll <strong>d6 + current HP</strong>. Escape on success. Failure triggers a reaction attack before the move.
+        </div>
+
+        <div class="breakaway-stage-panel" id="breakaway-stage-panel">
+          <div class="breakaway-stage-title">Break Away Contest</div>
+          <div class="breakaway-pre-roll-grid">
+            <div class="breakaway-pre-roll-side">
+              <div class="breakaway-roll-label">${cardDisplayName(mover)}</div>
+              <div class="breakaway-pre-equation"><span class="breakaway-hp">${escapeHtml(moverHp)} HP</span><span class="breakaway-plus">+</span><span class="die die-ghost">?</span></div>
+            </div>
+            <div class="breakaway-pre-roll-side">
+              <div class="breakaway-roll-label">${cardDisplayName(enemy)}</div>
+              <div class="breakaway-pre-equation"><span class="breakaway-hp">${escapeHtml(enemyHp)} HP</span><span class="breakaway-plus">+</span><span class="die die-ghost">?</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="battle-row-cta" id="breakaway-cta">
+          <button class="battle-attack-btn breakaway-roll-btn" id="breakaway-roll-btn"><span class="battle-action-star">✦</span> Attempt Break Away</button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    requestAnimationFrame(() => ov.classList.add('show'));
+
+    const close = () => { ov.remove(); state.breakawayState = null; };
+    ov.addEventListener('click', e => { if (e.target === ov) close(); });
+    ov.querySelector('#breakaway-close')?.addEventListener('click', close);
+
+    state.breakawayState = { fromTileId, toTileId, contesterTileId };
+    const stageSubtitle = ov.querySelector('#breakaway-stage-subtitle');
+    const stagePanel = ov.querySelector('#breakaway-stage-panel');
+    const cta = ov.querySelector('#breakaway-cta');
+    const rollBtn = ov.querySelector('#breakaway-roll-btn');
+    let rolled = false;
+    let reactionResolved = false;
+
+    const finishDestroyed = () => {
+      ov.remove();
+      state.breakawayState = null;
+      removeSlain(fromTileId);
+      closeProfile();
+      hideActionBar();
+      state.activeUnit = null;
+      state.activeAction = null;
+      clearHighlights();
+      waitThenAdvance();
+    };
+
+    const finishMove = () => {
+      ov.remove();
+      state.breakawayState = null;
+      performMove(toTileId, { skipBreakaway:true });
+    };
+
+    const showReactionStage = () => {
+      if (reactionResolved) return;
+      reactionResolved = true;
+      if (stageSubtitle) stageSubtitle.textContent = 'Caught — resolve the reaction attack';
+      stagePanel.innerHTML = `
+        <div class="breakaway-stage-title danger">Reaction Attack</div>
+        <div class="breakaway-result-copy">
+          ${cardDisplayName(enemy)} catches ${cardDisplayName(mover)} as it breaks away.
+        </div>
+        <div class="breakaway-reaction-loading">Rolling reaction attack…</div>
+      `;
+      cta.innerHTML = '';
+
+      setTimeout(() => {
+        const result = resolveCombat(enemy, mover, unitLane(fromTileId));
+        const hpBefore = Number(mover.hp) || 0;
+        const hpAfter = Math.max(0, hpBefore - (Number(result.totalDmg) || 0));
+        const slain = hpAfter <= 0;
+
+        stagePanel.innerHTML = `
+          <div class="breakaway-stage-title danger">Reaction Attack</div>
+          ${reactionDiceSummaryHtml(result)}
+          <div class="breakaway-survival-line ${slain ? 'bad' : 'good'}">
+            ${slain
+              ? `${cardDisplayName(mover)} is destroyed before moving.`
+              : `${cardDisplayName(mover)} survives on ${escapeHtml(hpAfter)} HP and completes the move.`}
+          </div>
+        `;
+        cta.innerHTML = `<button class="battle-done-btn" id="breakaway-resolve">${slain ? 'Destroyed' : 'Resolve Move'} ▶</button>`;
+        ov.querySelector('#breakaway-resolve')?.addEventListener('click', () => {
+          if (slain) {
+            finishDestroyed();
+            return;
+          }
+          mover.hp = hpAfter;
+          const srcTile = document.querySelector(`[data-id="${fromTileId}"]`);
+          if (srcTile) renderUnit(srcTile, mover);
+          finishMove();
+        });
+      }, 420);
+    };
+
+    const runContest = () => {
+      if (rolled) return;
+      rolled = true;
+      rollBtn?.classList.remove('counting');
+      if (rollBtn) {
+        rollBtn.disabled = true;
+        rollBtn.innerHTML = '<span class="battle-action-star">✦</span> Rolling…';
+      }
+
+      const moverDie = Math.ceil(Math.random() * 6);
+      const enemyDie = Math.ceil(Math.random() * 6);
+      const contest = breakawayContestResult(moverDie, enemyDie, moverHp, enemyHp);
+      const goodClass = contest.success ? 'good' : 'bad';
+
+      setTimeout(() => {
+        if (stageSubtitle) stageSubtitle.textContent = contest.success ? 'Escaped cleanly' : 'Caught during the escape';
+        stagePanel.innerHTML = `
+          <div class="breakaway-stage-title">Break Away Contest</div>
+          <div class="breakaway-roll-grid compact">
+            ${breakawayDiceHtml(cardDisplayName(mover), moverDie, moverHp, contest.moverTotal, contest.success ? 'die-saved' : 'die-failed')}
+            ${breakawayDiceHtml(cardDisplayName(enemy), enemyDie, enemyHp, contest.enemyTotal, contest.success ? 'die-failed' : 'die-hit die-hit-active')}
+          </div>
+          <div class="breakaway-result-title ${goodClass}">${escapeHtml(contest.reason)}</div>
+        `;
+
+        if (contest.success) {
+          cta.innerHTML = '<button class="battle-done-btn" id="breakaway-resolve">Move ▶</button>';
+          ov.querySelector('#breakaway-resolve')?.addEventListener('click', finishMove);
+          return;
+        }
+
+        cta.innerHTML = '<button class="battle-attack-btn breakaway-roll-btn" id="breakaway-reaction-btn"><span class="battle-action-star">✦</span> Reaction Attack</button>';
+        const reactionBtn = ov.querySelector('#breakaway-reaction-btn');
+        reactionBtn?.addEventListener('click', showReactionStage);
+      }, 360);
+    };
+
+    rollBtn?.addEventListener('click', runContest);
+  }
+
   function clearHighlights() {
-    document.querySelectorAll('.highlight-move,.highlight-attack,.highlight-ability').forEach(t=>{
-      t.classList.remove('highlight-move','highlight-attack','highlight-ability','dim-ability');
+    document.querySelectorAll('.highlight-move,.highlight-attack,.highlight-ability,.highlight-breakaway,.highlight-breakaway-source').forEach(t=>{
+      t.classList.remove('highlight-move','highlight-attack','highlight-ability','highlight-breakaway','highlight-breakaway-source','dim-ability');
     });
     document.querySelectorAll('.highlight-target').forEach(u=>u.classList.remove('highlight-target'));
+    document.querySelectorAll('.breakaway-warn').forEach(e=>e.remove());
     clearMoveConfirm();
     if (typeof clearJumpConfirm === 'function') clearJumpConfirm();
+    if (typeof clearChargeState === 'function') clearChargeState();
   }
 
   function selectAbility() {
@@ -7258,7 +8054,7 @@ const state = {
     const key = String(raw).trim().toLowerCase().replace(/\+/g,'plus').replace(/[^a-z0-9]+/g,'');
     const map = {
       none:'none', inspire:'command_unit', command:'command_unit', commandunit:'command_unit', giveaction:'command_unit', addaction:'add_action',
-      jumplane:'jump_lane', jump:'jump_lane', explodinghits:'exploding_hits', chainhits:'chain_hits',
+      jumplane:'jump_lane', jump:'jump_lane', movethenfight:'move_then_fight', movefight:'move_then_fight', charge:'move_then_fight', cavalrycharge:'move_then_fight', thunderingcharge:'move_then_fight', explodinghits:'exploding_hits', chainhits:'chain_hits',
       damage:'damage', heal:'heal', draw:'draw', addresource:'add_resource', addresources:'add_resource'
     };
     return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw;
@@ -7368,9 +8164,158 @@ const state = {
     return true;
   }
 
+
+  function isMoveThenFightAbility(ability) {
+    return normaliseAbilityEffectValue(ability?.key || ability?.effect || '') === 'move_then_fight';
+  }
+
+  function chargeDamageBonus(ability) {
+    return Math.max(0, Number(ability?.damageBonus ?? ability?.bonusAmount ?? ability?.value ?? 1) || 0);
+  }
+
+  function chargeActionCost(ability) {
+    return Math.max(1, Number(ability?.apCost ?? ability?.abilityCost ?? 2) || 2);
+  }
+
+  function getChargeDestinations(casterTileId, targetTileId, ability) {
+    const caster = state.board[casterTileId] || state.activeUnit?.card;
+    const target = state.board[targetTileId];
+    if (!caster || !target || target.owner === (caster.owner ?? state.activePlayer)) return [];
+    const moveSteps = Math.max(0, Number(caster.move) || 0);
+    if (moveSteps <= 0) return [];
+    const weaponRange = caster.weapon?.range ?? 1;
+    return getReachableTiles(casterTileId, moveSteps).filter(destId => {
+      if (!tileMap[destId] || tileMap[destId].zone === 'centre') return false;
+      if (state.board[destId]) return false;
+      return getAttackTiles(destId, weaponRange).includes(targetTileId);
+    });
+  }
+
+  function getChargeTargets(ability, casterTileId) {
+    const caster = state.board[casterTileId] || state.activeUnit?.card;
+    if (!caster) return [];
+    const casterOwner = caster.owner ?? state.activePlayer;
+    return Object.keys(state.board).filter(tid => {
+      const unit = state.board[tid];
+      return unit && unit.owner !== casterOwner && getChargeDestinations(casterTileId, tid, ability).length > 0;
+    });
+  }
+
+  function clearChargeState() {
+    state.chargeState = null;
+    document.querySelectorAll('.charge-selected-target').forEach(t => t.classList.remove('charge-selected-target'));
+  }
+
+  function beginChargeDestinationSelection(targetTileId) {
+    const casterTileId = state.activeUnit?.tileId;
+    const caster = state.activeUnit?.card;
+    const ability = getUnitAbility(caster);
+    if (!casterTileId || !caster || !isMoveThenFightAbility(ability)) return false;
+    const destinations = getChargeDestinations(casterTileId, targetTileId, ability);
+    if (!destinations.length) return false;
+
+    state.chargeState = {
+      phase: 'destination',
+      casterTileId,
+      targetTileId,
+      ability
+    };
+
+    document.querySelectorAll('.highlight-ability,.highlight-move,.highlight-target,.charge-selected-target').forEach(el => {
+      el.classList.remove('highlight-ability','highlight-move','highlight-target','charge-selected-target');
+    });
+
+    const targetTile = document.querySelector(`[data-id="${targetTileId}"]`);
+    targetTile?.classList.add('highlight-ability','charge-selected-target');
+    targetTile?.querySelector('.unit-on-tile')?.classList.add('highlight-target');
+
+    destinations.forEach(destId => {
+      document.querySelector(`[data-id="${destId}"]`)?.classList.add('highlight-move');
+    });
+
+    updateActionBar();
+    return true;
+  }
+
+  function pendingCombatContextFor(atk, targetTileId) {
+    const ctx = state.pendingCombatContext;
+    if (!ctx || !atk) return null;
+    if (ctx.targetTileId && ctx.targetTileId !== targetTileId) return null;
+    const uid = atk.uid || atk.id || atk.name;
+    return ctx.attackerRef === uid ? ctx : null;
+  }
+
+  function clearPendingCombatContext(targetTileId=null) {
+    if (!state.pendingCombatContext) return;
+    if (targetTileId && state.pendingCombatContext.targetTileId && state.pendingCombatContext.targetTileId !== targetTileId) return;
+    state.pendingCombatContext = null;
+  }
+
+  async function executeChargeTo(destinationTileId) {
+    const charge = state.chargeState;
+    const casterTileId = charge?.casterTileId;
+    const targetTileId = charge?.targetTileId;
+    const ability = charge?.ability || getUnitAbility(state.activeUnit?.card);
+    const caster = state.activeUnit?.card;
+    if (!casterTileId || !targetTileId || !destinationTileId || !caster || !isMoveThenFightAbility(ability)) return false;
+
+    const validDestinations = getChargeDestinations(casterTileId, targetTileId, ability);
+    if (!validDestinations.includes(destinationTileId)) return false;
+
+    const cost = chargeActionCost(ability);
+    if ((caster.actionsLeft ?? 0) < cost) return false;
+    if (!state.board[casterTileId] || state.board[destinationTileId] || !state.board[targetTileId]) return false;
+
+    state._moveExecuting = true;
+    const targetTile = document.querySelector(`[data-id="${targetTileId}"]`);
+    clearChargeState();
+    clearHighlights();
+
+    await animateUnitMove(casterTileId, destinationTileId, { style:'charge', duration:320 });
+
+    delete state.board[casterTileId];
+    state.board[destinationTileId] = caster;
+
+    const sourceTile = document.querySelector(`[data-id="${casterTileId}"]`);
+    const destTile = document.querySelector(`[data-id="${destinationTileId}"]`);
+    sourceTile?.classList.remove('unit-active');
+    sourceTile?.querySelectorAll('.unit-on-tile,.act-indicator').forEach(e => e.remove());
+    if (destTile) {
+      renderUnit(destTile, caster);
+      destTile.classList.add('unit-active');
+    }
+
+    state.activeUnit = { tileId: destinationTileId, card: caster };
+    profileTileId = destinationTileId;
+    state.selectedBoardTile = destinationTileId;
+    syncBoardSelectionHighlight();
+
+    // Normal combat spends one action when resolved; pre-spend the remainder of the ability cost now.
+    const preSpend = Math.max(0, cost - 1);
+    caster.actionsLeft = Math.max(1, (caster.actionsLeft ?? cost) - preSpend);
+
+    state.pendingCombatContext = {
+      source: 'move_then_fight',
+      name: ability.name || 'Charge',
+      attackerRef: caster.uid || caster.id || caster.name,
+      targetTileId,
+      damageBonus: chargeDamageBonus(ability)
+    };
+
+    renderHub();
+    if (destTile) renderUnit(destTile, caster);
+    state._moveExecuting = false;
+    state.activeAction = null;
+    state.activeAbility = null;
+
+    openBattleOverlay(targetTileId);
+    return true;
+  }
+
   function getAbilityTargets(ability, casterTileId) {
     if (!ability || !casterTileId) return [];
     const caster = state.board[casterTileId] || state.activeUnit?.card;
+    if (isMoveThenFightAbility(ability)) return getChargeTargets(ability, casterTileId);
     const target = normaliseAbilityTarget(ability.target || abilityTargetForEffect(ability.key), caster || {});
     const casterOwner = caster?.owner ?? state.activePlayer;
 
@@ -7675,15 +8620,20 @@ const state = {
 
     const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
     const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
-    let totalDmg = (hits - saved) * (Number(atk.weapon?.damage) || 0);
+    const combatCtx = typeof pendingCombatContextFor === 'function' ? pendingCombatContextFor(atk, state.pendingCombatContext?.targetTileId) : null;
+    const damageBonus = Math.max(0, Number(combatCtx?.damageBonus) || 0);
+    const damagePerHit = (Number(atk.weapon?.damage) || 0) + damageBonus;
+    let totalDmg = (hits - saved) * damagePerHit;
     if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
-    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
+    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls, damageBonus, damagePerHit };
   }
 
   function openBattleOverlay(targetTileId) {
     const atk = state.activeUnit.card;
     const def = state.board[targetTileId];
     if (!def) return;
+    const combatCtx = pendingCombatContextFor(atk, targetTileId);
+    const displayDamage = (Number(atk.weapon?.damage) || 0) + (Number(combatCtx?.damageBonus) || 0);
 
     function battleCardHtml(card, role, currentHp) {
       const ownerCol = card.owner === 1 ? 'p1' : card.owner === 2 ? 'p2' : '';
@@ -7735,7 +8685,7 @@ const state = {
           ${battleCardHtml(def,'defender',def.hp)}
         </div>
         <div class="battle-attack-profile">
-          ${battleAttackProfileHtml(atk)}
+          ${battleAttackProfileHtml(combatCtx ? {...atk, weapon:{...atk.weapon, damage:displayDamage}} : atk)}
         </div>
         <div class="battle-cta" id="battle-cta"></div>
       </div>`;
@@ -7744,8 +8694,8 @@ const state = {
     updateBattleFallback(def, 'defender');
     requestAnimationFrame(() => ov.classList.add('show'));
 
-    ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
-    ov.querySelector('#battle-close').addEventListener('click', () => ov.remove());
+    ov.addEventListener('click', e => { if (e.target === ov) { clearPendingCombatContext(targetTileId); ov.remove(); } });
+    ov.querySelector('#battle-close').addEventListener('click', () => { clearPendingCombatContext(targetTileId); ov.remove(); });
 
     const cta = document.getElementById('battle-cta');
     cta.innerHTML = `
@@ -7759,7 +8709,7 @@ const state = {
             <div class="battle-dice-wrap"><div class="battle-dice-row" id="battle-attack-row"></div></div>
             <div class="battle-roll-stat damage right" id="battle-dmg-box">
               <div class="battle-roll-stat-icon">💀</div>
-              <div class="battle-roll-stat-value" id="battle-dmg-stat">${escapeHtml(atk.weapon?.damage ?? '')}</div>
+              <div class="battle-roll-stat-value" id="battle-dmg-stat">${escapeHtml(displayDamage)}</div>
             </div>
           </div>
           <div class="battle-row-summary" id="battle-attack-summary"></div>
@@ -7872,6 +8822,7 @@ const state = {
       return btn;
     };
     const applyResolve = (result, hpAfter, slain) => {
+      clearPendingCombatContext(targetTileId);
       ov.remove();
       clearHighlights();
       setUILock(true);
@@ -7897,7 +8848,7 @@ const state = {
 
     setupGhostRow(attackRow, atk.weapon?.attacks ?? 0);
     if (hitStatEl) hitStatEl.textContent = escapeHtml(atk.weapon?.hit ?? '');
-    if (dmgStatEl) dmgStatEl.textContent = escapeHtml(atk.weapon?.damage ?? '');
+    if (dmgStatEl) dmgStatEl.textContent = escapeHtml(displayDamage);
     setAttackSummary('');
     setPreAttackDefenceRow();
     setRowButton('<button class="battle-attack-btn" id="battle-start-attack"><span class="battle-action-star">✦</span> Attack</button>', startAttackSequence);
@@ -8160,6 +9111,12 @@ const state = {
     const btnAbility = document.getElementById('act-btn-ability');
     const btnEnd     = document.getElementById('act-btn-skip');
     const ab = getUnitAbility(unit);
+    const engagedForBreakaway = !!getBreakawayContester(state.activeUnit?.tileId, unit);
+    const moveLabel = btnMove?.querySelector('.act-label');
+    const moveIcon = btnMove?.querySelector('.act-icon');
+    if (moveLabel) moveLabel.textContent = engagedForBreakaway ? 'Break' : 'Move';
+    if (moveIcon) moveIcon.textContent = engagedForBreakaway ? '!' : '➤';
+    if (btnMove) btnMove.classList.toggle('act-breakaway', engagedForBreakaway);
 
     setActionButtonCost('act-cost-move', 1);
     setActionButtonCost('act-cost-attack', 1);
@@ -8229,41 +9186,7 @@ const state = {
     const tid=state.activeUnit?.tileId;
     if(!unit||!tid) return;
     if(action==='move'){
-      getReachableTiles(tid, unit.move).forEach(id=>{
-        const mt = document.querySelector(`[data-id="${id}"]`);
-        if (!mt) return;
-        mt.classList.add('highlight-move');
-        // Long press on move tile = auto-confirm move. Bound once per tile to avoid stacked listeners.
-        if (mt.dataset.moveHoldBound !== '1') {
-          mt.dataset.moveHoldBound = '1';
-          let _mvTimer = null;
-          let _mvFired = false;
-          mt.addEventListener('touchstart', e=>{
-            if(e.touches.length>1) return;
-            _mvFired = false;
-            const targetId = mt.dataset.id;
-            clearTimeout(_mvTimer);
-            _mvTimer = setTimeout(()=>{
-              if(mt.classList.contains('highlight-move') && state.activeAction === 'move' && !state._moveExecuting){
-                _mvFired = true;
-                state._suppressNextMoveTap = true;
-                mt.querySelectorAll('.move-longpress-tick').forEach(el=>el.remove());
-                const tick = document.createElement('div');
-                tick.className = 'move-longpress-tick';
-                tick.textContent = '✓';
-                mt.appendChild(tick);
-                setTimeout(()=> executeMove(targetId), 120);
-              }
-            }, 260);
-          }, {passive:true});
-          mt.addEventListener('touchend', ()=>{
-            clearTimeout(_mvTimer);
-            if (_mvFired) setTimeout(()=>{ state._suppressNextMoveTap = false; }, 220);
-          }, {passive:true});
-          mt.addEventListener('touchcancel', ()=>clearTimeout(_mvTimer), {passive:true});
-          mt.addEventListener('touchmove', ()=>clearTimeout(_mvTimer), {passive:true});
-        }
-      });
+      highlightMoveTilesForActiveUnit();
     } else {
       const enemy=state.activePlayer===1?2:1;
       const lane = unitLane(tid);
@@ -9452,6 +10375,7 @@ inspire:'command_unit',command:'command_unit',commandunit:'command_unit',order:'
 explodinghits:'exploding_hits',explodinghit:'exploding_hits',explodehits:'exploding_hits',explodehit:'exploding_hits',exploding:'exploding_hits',
 chainhits:'chain_hits',chainhit:'chain_hits',chains:'chain_hits',chain:'chain_hits',
 jumplane:'jump_lane',jump:'jump_lane',
+movethenfight:'move_then_fight',movefight:'move_then_fight',charge:'move_then_fight',cavalrycharge:'move_then_fight',thunderingcharge:'move_then_fight',
 damage:'damage',dealdamage:'damage',heal:'heal',healing:'heal',draw:'draw',drawcards:'draw',
 addresource:'add_resource',addresources:'add_resource',resource:'add_resource',resources:'add_resource'
 };
@@ -9465,7 +10389,7 @@ return raw.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
 }
 
 function csvAbilityLabel(effect){
-const labels = {command_unit:'Command Unit',add_action:'Add Action',jump_lane:'Jump Lane',damage:'Damage',heal:'Heal',draw:'Draw',add_resource:'Add Resource',exploding_hits:'Exploding Hits',chain_hits:'Chain Hits'};
+const labels = {command_unit:'Command Unit',add_action:'Add Action',jump_lane:'Jump Lane',move_then_fight:'Move + Fight',damage:'Damage',heal:'Heal',draw:'Draw',add_resource:'Add Resource',exploding_hits:'Exploding Hits',chain_hits:'Chain Hits'};
 return labels[effect] || effect;
 }
 
@@ -10715,15 +11639,16 @@ window.REV_MECHANIC_REGISTRY = {
   ],
 
   effects: [
-    { id:'command_unit', description:'Give a valid unit action(s) and immediately switch control to that unit.' },
-    { id:'add_action', description:'Add action(s) to a valid unit without immediately taking control.' },
-    { id:'heal', description:'Restore health to a target.' },
-    { id:'damage', description:'Deal damage to a target.' },
-    { id:'draw', description:'Draw cards.' },
-    { id:'add_resource', description:'Add resources to the player.' },
-    { id:'jump_lane', description:'Action ability. Move this unit to an empty tile in the same row of the opposite lane.' },
-    { id:'exploding_hits', description:'On matching attack dice, create extra hits without rolling extra dice.' },
-    { id:'chain_hits', description:'On matching attack dice, roll extra attack dice. Extra dice can continue the chain.' }
+    { id:'command_unit', label:'Command Unit / Inspire', description:'Give a valid unit action(s) and immediately switch control to that unit.' },
+    { id:'add_action', label:'Add Action', description:'Add action(s) to a valid unit without immediately taking control.' },
+    { id:'heal', label:'Heal', description:'Restore health to a target.' },
+    { id:'damage', label:'Damage', description:'Deal damage to a target.' },
+    { id:'draw', label:'Draw', description:'Draw cards.' },
+    { id:'add_resource', label:'Add Resource', description:'Add resources to the player.' },
+    { id:'jump_lane', label:'Jump Lane', description:'Action ability. Move this unit to an empty tile in the same row of the opposite lane.' },
+    { id:'move_then_fight', label:'Charge / Move + Fight', description:'Action ability. Choose a reachable enemy, choose a valid charge position, move there, then Fight with a temporary damage bonus. Recommended defaults: trigger action, cost 2, target enemy unit, target location reachable_attack, value 1.' },
+    { id:'exploding_hits', label:'Exploding Hits', description:'On matching attack dice, create extra hits without rolling extra dice.' },
+    { id:'chain_hits', label:'Chain Hits', description:'On matching attack dice, roll extra attack dice. Extra dice can continue the chain.' }
   ]
 };
 
@@ -11315,7 +12240,7 @@ function renderDeckFilters(parent, player){
 
 function field(label, key, value, full=false, textarea=false, extraClass=''){
   const safeVal = escapeHtml(value ?? '');
-  const numericKeys = new Set(['cost','hp','move','weaponAttacks','weaponAp','weaponDamage','unitValue']);
+  const numericKeys = new Set(['cost','hp','move','weaponAttacks','weaponAp','weaponDamage','unitValue','abilityCost']);
   const softNumericKeys = new Set(['value']);
   const numericAttrs = numericKeys.has(key)
     ? ' type="number" inputmode="numeric" step="1" data-select-on-focus="1"'
@@ -11374,9 +12299,24 @@ function triggerOptions(){
 
 function simpleEffectOptions(){
   const registry = window.REV_MECHANIC_REGISTRY || { effects:[] };
-  const base = ['none','command_unit','add_action','jump_lane','damage','heal','draw','add_resource'];
-  const ids = [...new Set([...base, ...(registry.effects || []).map(e => e.id)])];
-  return ids.map(id => ({ value:id, label:id }));
+  const base = [
+    { id:'none', label:'None' },
+    { id:'command_unit', label:'Command Unit / Inspire' },
+    { id:'add_action', label:'Add Action' },
+    { id:'jump_lane', label:'Jump Lane' },
+    { id:'move_then_fight', label:'Charge / Move + Fight' },
+    { id:'damage', label:'Damage' },
+    { id:'heal', label:'Heal' },
+    { id:'draw', label:'Draw' },
+    { id:'add_resource', label:'Add Resource' }
+  ];
+  const byId = new Map();
+  [...base, ...(registry.effects || [])].forEach(effect => {
+    const id = effect.id || effect.value;
+    if (!id) return;
+    byId.set(id, { value:id, label: effect.label || effect.name || id });
+  });
+  return [...byId.values()];
 }
 
 function factionOptions(){
@@ -11444,15 +12384,18 @@ function draftAbilityState(card={}){
   const rawEffect = card.unitEffect || card.mechanic?.effect || card.effect || dt.effect || 'none';
   const attackEffect = (rawEffect === 'chain_hits' || rawEffect === 'exploding_hits') ? rawEffect : (dt.effect || 'exploding_hits');
   const value = card.unitValue ?? card.mechanic?.value ?? card.value ?? dt.value ?? '';
+  const cleanEffect = normaliseAbilityEffectValue(rawEffect);
+  const abilityCost = card.abilityCost ?? card.apCost ?? card.ability?.apCost ?? card.mechanic?.abilityCost ?? (cleanEffect === 'move_then_fight' ? 2 : '');
   return {
     trigger,
-    effect: trigger === 'on_attack_roll' ? attackEffect : rawEffect,
+    effect: trigger === 'on_attack_roll' ? attackEffect : cleanEffect,
     value,
+    abilityCost,
     threshold: String(dt.threshold ?? card.threshold ?? card.diceThreshold ?? 6)
   };
 }
 
-function draftAbilityContextHtml(trigger, effect='none', value='', threshold='6'){
+function draftAbilityContextHtml(trigger, effect='none', value='', threshold='6', abilityCost=''){
   const cleanTrigger = normaliseAbilityTriggerValue(trigger);
   if (!cleanTrigger) return '';
 
@@ -11466,8 +12409,28 @@ function draftAbilityContextHtml(trigger, effect='none', value='', threshold='6'
     `;
   }
 
+  const cleanEffect = normaliseAbilityEffectValue(effect || 'none');
+  if (cleanTrigger === 'action') {
+    const costValue = abilityCost === '' || abilityCost == null
+      ? (cleanEffect === 'move_then_fight' ? 2 : 1)
+      : abilityCost;
+    const valueLabel = cleanEffect === 'move_then_fight' ? 'Damage Bonus' : 'Value';
+    const defaultValue = value === '' || value == null
+      ? (cleanEffect === 'move_then_fight' ? 1 : '')
+      : value;
+    const help = cleanEffect === 'move_then_fight'
+      ? '<div class="revDraftHint full revUnitField" style="margin:0;">Charge defaults: target enemy unit, reachable_attack, choose target then position, then Fight with +Damage Bonus.</div>'
+      : '';
+    return `
+      ${selectField('Effect','unitEffect',cleanEffect,simpleEffectOptions(),true,'revUnitField')}
+      ${field('Action Cost','abilityCost',costValue,false,false,'revUnitField')}
+      ${field(valueLabel,'unitValue',defaultValue,false,false,'revUnitField')}
+      ${help}
+    `;
+  }
+
   return `
-    ${selectField('Effect','unitEffect',effect || 'none',simpleEffectOptions(),true,'revUnitField')}
+    ${selectField('Effect','unitEffect',cleanEffect || 'none',simpleEffectOptions(),true,'revUnitField')}
     ${field('Value','unitValue',value ?? '',false,false,'revUnitField full')}
   `;
 }
@@ -11481,7 +12444,8 @@ function updateDraftAbilityContext(editor){
   const currentEffect = editor.querySelector('[data-field="unitEffect"]')?.value || 'none';
   const currentValue = editor.querySelector('[data-field="unitValue"]')?.value || '';
   const currentThreshold = editor.querySelector('[data-field="diceThreshold"]')?.value || '6';
-  contextEl.innerHTML = draftAbilityContextHtml(trigger, currentEffect, currentValue, currentThreshold);
+  const currentAbilityCost = editor.querySelector('[data-field="abilityCost"]')?.value || '';
+  contextEl.innerHTML = draftAbilityContextHtml(trigger, currentEffect, currentValue, currentThreshold, currentAbilityCost);
 }
 
 function draftEditorHtml(card, id){
@@ -11516,7 +12480,7 @@ function draftEditorHtml(card, id){
         <div class="full revUnitField revAbilityBuilderTitle" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.12);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.9;">Ability Builder</div>
         ${selectField('Ability Trigger','trigger',abilityState.trigger,abilityTriggerOptions(),true,'revUnitField revAbilityTriggerField')}
         <div class="full revUnitField revAbilityContextFields">
-          ${draftAbilityContextHtml(abilityState.trigger, abilityState.effect, abilityState.value, abilityState.threshold)}
+          ${draftAbilityContextHtml(abilityState.trigger, abilityState.effect, abilityState.value, abilityState.threshold, abilityState.abilityCost)}
         </div>
 
         ${selectField('Power Trigger','trigger',card.trigger || 'on_play',triggerOptions(),false,'revPowerField')}
@@ -11550,6 +12514,12 @@ function collectDraftFields(tile, original){
   const trigger = normaliseAbilityTriggerValue(get('trigger')) || (kind === 'Power' ? 'on_play' : '');
   const unitEffect = get('unitEffect') || 'none';
   const unitValue = parseDraftValue(get('unitValue'));
+  const abilityCost = Number.isFinite(Number(get('abilityCost')))
+    ? Number(get('abilityCost'))
+    : (unitEffect === 'move_then_fight' ? 2 : null);
+  const abilityTarget = unitEffect === 'move_then_fight'
+    ? { side:'enemy', location:'reachable_attack', state:'any', type:'unit' }
+    : (original.abilityTarget || original.target || original.mechanic?.target || null);
   const weapon = kind === 'Power'
     ? {
         name: get('weaponName') || original.weapon?.name || get('effect') || 'Power',
@@ -11580,6 +12550,8 @@ function collectDraftFields(tile, original){
     trigger,
     effect:unitEffect,
     value:unitValue,
+    abilityCost,
+    target: abilityTarget,
     diceTrigger
   };
   const card = {
@@ -11603,6 +12575,9 @@ function collectDraftFields(tile, original){
     value: kind === 'Power' ? parseDraftValue(get('value')) : unitValue,
     unitEffect: kind === 'Power' ? null : unitEffect,
     unitValue: kind === 'Power' ? null : unitValue,
+    abilityCost: kind === 'Power' ? null : abilityCost,
+    apCost: kind === 'Power' ? null : abilityCost,
+    abilityTarget,
     mechanic,
     diceTrigger,
     weapon,
@@ -11813,7 +12788,11 @@ function renderMechanics(panel){
   registry.effects.forEach(effect => {
     const card = document.createElement('div');
     card.className = 'revMechanicCard';
-    card.innerHTML = `<div class="revMechanicTitle">${escapeHtml(effect.id)}</div><div>${escapeHtml(effect.description)}</div><div class="revMechanicSyntax">effect: ${escapeHtml(effect.id)}\nvalue: ?</div>`;
+    const title = effect.label ? `${effect.label} (${effect.id})` : effect.id;
+    const syntax = effect.id === 'move_then_fight'
+      ? 'trigger: action\neffect: move_then_fight\naction cost: 2\ntarget: enemy unit / reachable_attack\nvalue: damage bonus'
+      : `effect: ${effect.id}\nvalue: ?`;
+    card.innerHTML = `<div class="revMechanicTitle">${escapeHtml(title)}</div><div>${escapeHtml(effect.description)}</div><div class="revMechanicSyntax">${escapeHtml(syntax)}</div>`;
     effectGrid.appendChild(card);
   });
   effectSection.appendChild(effectGrid);
@@ -12119,11 +13098,19 @@ window.addEventListener('load', scheduleEditorInstall);
 
 // Dynamic draft-card form: switching Unit/Power immediately hides irrelevant fields.
 document.addEventListener('change', function(e){
-  const kindSelect = e.target.closest('[data-field="kind"]');
-  if (!kindSelect) return;
-  const editor = kindSelect.closest('.revDraftEditor');
+  const fieldEl = e.target.closest('[data-field]');
+  if (!fieldEl) return;
+  const editor = fieldEl.closest('.revDraftEditor');
   if (!editor) return;
-  editor.dataset.cardKind = kindSelect.value === 'Power' ? 'Power' : 'Unit';
+
+  if (fieldEl.dataset.field === 'kind') {
+    editor.dataset.cardKind = fieldEl.value === 'Power' ? 'Power' : 'Unit';
+    return;
+  }
+
+  if (fieldEl.dataset.field === 'trigger' || fieldEl.dataset.field === 'unitEffect') {
+    updateDraftAbilityContext(editor);
+  }
 }, true);
 
 // Delegated handlers override older delete/save behaviour and refresh in-place.
@@ -13383,9 +14370,12 @@ document.addEventListener('click', function(e){
 
     const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
     const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
-    let totalDmg = (hits - saved) * (Number(atk.weapon?.damage) || 0);
+    const combatCtx = typeof pendingCombatContextFor === 'function' ? pendingCombatContextFor(atk, state.pendingCombatContext?.targetTileId) : null;
+    const damageBonus = Math.max(0, Number(combatCtx?.damageBonus) || 0);
+    const damagePerHit = (Number(atk.weapon?.damage) || 0) + damageBonus;
+    let totalDmg = (hits - saved) * damagePerHit;
     if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
-    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls };
+    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, diceTrigger, bonusHits, chainRolls, damageBonus, damagePerHit };
   };
 
   // Draft editor ability fields are handled by the unified Ability Builder above.
