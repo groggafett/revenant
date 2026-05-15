@@ -4828,6 +4828,89 @@ body.p2-turn .player-area-glow {
 }
 </style>
 
+
+<style id="rev-patch-204-tide-turns-underdog">
+/* Patch 204 — Round 3 comeback splash + underdog unlock. */
+.req-overlay.tide-turns-flow {
+  background: radial-gradient(circle at 50% 34%, rgba(72,98,160,.24), rgba(0,0,0,.9) 58%, rgba(0,0,0,.96));
+}
+.req-overlay.tide-turns-flow .req-title {
+  font-size: 24px;
+  letter-spacing: .22em;
+  color: #f0d080;
+  text-shadow: 0 0 24px rgba(240,160,56,.55), 0 0 40px rgba(74,120,216,.24);
+}
+.tide-turns-sub {
+  color: #c8a060 !important;
+}
+.tide-turns-who {
+  max-width: min(320px, calc(100vw - 48px));
+  text-align: center;
+  line-height: 1.35;
+  color: #d8c090 !important;
+  text-shadow: 0 0 12px rgba(200,160,96,.25);
+}
+.tide-turns-panel {
+  width: min(310px, calc(100vw - 44px));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+.tide-turns-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(200,160,96,.28);
+  border-radius: 8px;
+  background: linear-gradient(160deg, rgba(32,24,12,.9), rgba(10,10,10,.84));
+  color: #d8c090;
+  font-size: var(--fs-xs);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.tide-turns-icon {
+  width: 26px; height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f0d080;
+  border: 1px solid rgba(240,208,128,.45);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(240,160,56,.25);
+  flex-shrink: 0;
+}
+</style>
+
+
+<style id="rev-patch-208-purple-modified-stats">
+/* Patch 208 — any currently modified stat is shown in ability purple. */
+:root { --stat-modified-purple: #c77dff; --stat-modified-purple-hi: #f0d0ff; }
+.stat-modified,
+.stat-modified span,
+.cz-val.stat-modified,
+.pill-val.stat-modified,
+.battle-roll-stat-value.stat-modified,
+.battle-ap-chip-value.stat-modified,
+.hub-stat-badge.stat-modified span,
+.unit-hp.stat-modified span {
+  color: var(--stat-modified-purple-hi) !important;
+  text-shadow: 0 0 7px rgba(199,125,255,.88), 0 0 15px rgba(120,60,220,.45) !important;
+}
+.hub-stat-badge.stat-modified,
+.unit-hp.stat-modified,
+.battle-roll-stat-value.stat-modified,
+.battle-ap-chip-value.stat-modified {
+  border-color: var(--stat-modified-purple) !important;
+  box-shadow: 0 0 10px rgba(199,125,255,.58), inset 0 0 8px rgba(199,125,255,.22) !important;
+}
+.card-zoom-attack-pill .cz-val.stat-modified,
+.battle-attack-profile .cz-val.stat-modified {
+  color: var(--stat-modified-purple-hi) !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -4894,6 +4977,7 @@ body.p2-turn .player-area-glow {
     <div class="save-menu" id="save-menu">
       <div class="save-menu-item" onclick="saveGame();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Save</div>
       <div class="save-menu-item" onclick="loadGame();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Load</div>
+      <div class="save-menu-item" onclick="openInGameEditor();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Open Editor</div>
       <div class="save-menu-item danger" onclick="resetGame();document.getElementById('save-menu').classList.remove('open');event.stopPropagation()">Reset</div>
     </div>
   </div>
@@ -5580,9 +5664,29 @@ window.addEventListener('unhandledrejection', e => {
       damage:'damage', dealdamage:'damage',
       heal:'heal', healing:'heal',
       draw:'draw', drawcards:'draw',
-      addresource:'add_resource', addresources:'add_resource', resource:'add_resource', resources:'add_resource'
+      addresource:'add_resource', addresources:'add_resource', resource:'add_resource', resources:'add_resource', applymodifier:'apply_modifier', modifier:'apply_modifier', buff:'apply_modifier', debuff:'apply_modifier', stance:'apply_modifier'
     };
     return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw;
+  }
+
+
+  function normaliseAbilityModifierStat(value, fallback='damage') {
+    const raw = String(value ?? '').trim();
+    if (!raw) return fallback;
+    const key = normaliseMechanicKey(raw);
+    const map = {
+      none:'none', no:'none', na:'none', blank:'none',
+      damage:'damage', dmg:'damage', wound:'damage', wounds:'damage',
+      ap:'ap', armourpiercing:'ap', armorpiercing:'ap', piercing:'ap', rend:'ap', lethality:'ap',
+      hit:'hit', tohit:'hit', accuracy:'hit', attackroll:'hit',
+      attacks:'attacks', attack:'attacks', dice:'attacks', attackdice:'attacks', hits:'attacks',
+      range:'range', weaponrange:'range', reach:'range',
+      move:'move', movement:'move', speed:'move',
+      save:'save', armour:'save', armor:'save', armoursave:'save', armorsave:'save', defence:'save', defense:'save',
+      hp:'hp', health:'hp', woundsstat:'hp', maxhp:'max_hp', maxhealth:'max_hp',
+      cost:'cost', resourcecost:'cost', requisitioncost:'cost', damagetaken:'damage_taken', incomingdamage:'damage_taken', damagereceived:'damage_taken', aptaken:'ap_taken', incomingap:'ap_taken', apreceived:'ap_taken', hittaken:'hit_taken', incominghit:'hit_taken', hitreceived:'hit_taken', attackstaken:'attacks_taken', incomingattacks:'attacks_taken', rangetaken:'range_taken', movetaken:'move_taken'
+    };
+    return Object.prototype.hasOwnProperty.call(map, key) ? map[key] : raw.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
   }
 
   function normaliseCardTypeValue(value) {
@@ -5658,7 +5762,11 @@ window.addEventListener('unhandledrejection', e => {
     if (!effectKey || effectKey === 'none') return null;
     const defaultApCost = effectKey === 'move_then_fight' ? 2 : 1;
     const apCost = Number.isFinite(Number(card.apCost ?? card.abilityCost)) ? Number(card.apCost ?? card.abilityCost) : defaultApCost;
-    const value = card.value ?? card.unitValue ?? card.abilityValue ?? null;
+    const value = card.abilityValue ?? card.ability_value ?? card.unitValue ?? card.unit_value ?? card.value ?? null;
+    const modifierStat = normaliseAbilityModifierStat(
+      card.modifierStat ?? card.modifier_stat ?? card.abilityModifierStat ?? card.ability_modifier_stat ?? card.bonusStat ?? card.bonus_stat,
+      effectKey === 'move_then_fight' ? 'damage' : 'none'
+    );
     const labels = {
       command_unit: 'Command Unit',
       add_action: 'Add Action',
@@ -5667,13 +5775,16 @@ window.addEventListener('unhandledrejection', e => {
       damage: 'Damage',
       heal: 'Heal',
       draw: 'Draw',
-      add_resource: 'Add Resource'
+      add_resource: 'Add Resource',
+      apply_modifier: 'Apply Modifier'
     };
     const target = card.abilityTarget || card.target || abilityTargetForEffect(effectKey);
     return {
       key: effectKey,
       apCost,
       value,
+      modifierStat,
+      duration: normaliseAbilityDurationValue(card.duration ?? card.abilityDuration ?? card.ability_duration ?? card.mechanic?.duration ?? 'end_turn'),
       name: labels[effectKey] || effectKey,
       target: normaliseAbilityTarget(target, card)
     };
@@ -5683,6 +5794,7 @@ window.addEventListener('unhandledrejection', e => {
     effectKey = normaliseAbilityEffectValue(effectKey);
     if (effectKey === 'jump_lane') return { side:'empty', location:'opposite_lane_same_row', state:'empty', type:'tile' };
     if (effectKey === 'move_then_fight') return { side:'enemy', location:'reachable_attack', state:'any', type:'unit' };
+    if (effectKey === 'apply_modifier') return { side:'self', location:'self', state:'any', type:'unit' };
     if (effectKey === 'command_unit') return { side:'friendly', location:'same_lane', state:'any', type:'unit', unitType:'non_hero', faction:'any' };
     if (effectKey === 'add_action') return { side:'friendly', location:'same_lane', state:'any', type:'unit', unitType:'any', faction:'any' };
     if (effectKey === 'heal') return { side:'friendly', location:'same_lane', state:'damaged', type:'unit' };
@@ -5712,7 +5824,7 @@ window.addEventListener('unhandledrejection', e => {
       ? { ...card.ability, key: normaliseAbilityEffectValue(card.ability.key), target: normaliseAbilityTarget(card.ability.target || abilityTarget, card) }
       : null;
     const ability = existingAbility || ((type !== 'Power' && triggerKey === 'action' && effectKey && effectKey !== 'none')
-      ? makeRuntimeAbilityFromEffect(effectKey, { ...card, abilityTarget, value: card.value ?? card.unitValue, apCost: card.apCost ?? card.abilityCost })
+      ? makeRuntimeAbilityFromEffect(effectKey, { ...card, abilityTarget, abilityValue: card.abilityValue ?? card.unitValue ?? card.value, value: card.abilityValue ?? card.unitValue ?? card.value, apCost: card.apCost ?? card.abilityCost })
       : null);
     return {
       ...card,
@@ -6100,6 +6212,7 @@ const state = {
 
 
   function underdogRequisitionBonus(player) {
+    if (Number(state.round || 1) < 3) return 0;
     const opponent = player === 1 ? 2 : 1;
     return Number(state.players[player]?.score || 0) < Number(state.players[opponent]?.score || 0) ? 1 : 0;
   }
@@ -6275,7 +6388,7 @@ const state = {
     beginBtn.textContent = buttonLabel;
     _beginCallback = onBegin || null;
     beginBtn.style.display = 'block';
-    ov.classList.remove('auto-dismiss');
+    ov.classList.remove('auto-dismiss','tide-turns-flow');
     ov.classList.add('round-start-flow', 'show');
   }
 
@@ -6427,7 +6540,46 @@ const state = {
     });
   }
 
+  function showTideTurnsSplash(onDone) {
+    const ov = document.getElementById('req-overlay');
+    const beginBtn = document.getElementById('req-begin');
+    document.querySelector('.top-bar').style.zIndex = '60';
+    document.getElementById('req-title').textContent = 'The Tide Turns';
+    const subEl = document.getElementById('req-sub');
+    subEl.textContent = 'Round 3';
+    subEl.className = 'req-sub tide-turns-sub';
+    const whoEl = document.getElementById('req-who');
+    whoEl.textContent = 'Underdog Bonus unlocked · Power Plays drawn';
+    whoEl.className = 'req-who tide-turns-who';
+    const icons = document.getElementById('req-icons');
+    if (icons) {
+      icons.innerHTML = `
+        <div class="tide-turns-panel">
+          <div class="tide-turns-row"><span class="tide-turns-icon">↯</span><span>Trailing player gains +1 Requisition each round.</span></div>
+          <div class="tide-turns-row"><span class="tide-turns-icon">✦</span><span>Power Plays drawn.</span></div>
+        </div>`;
+    }
+    beginBtn.textContent = 'Continue ▶';
+    _beginCallback = () => {
+      state.tideTurnsShown = true;
+      onDone?.();
+    };
+    beginBtn.style.display = 'block';
+    ov.classList.remove('auto-dismiss','round-start-flow','p1-first','p2-first');
+    ov.classList.add('tide-turns-flow','show');
+  }
+
   function requisitionPhase() {
+    if (Number(state.round || 1) === 3 && !state.tideTurnsShown) {
+      showTideTurnsSplash(() => runRequisitionPhaseCore());
+      return;
+    }
+    runRequisitionPhaseCore();
+  }
+
+  function runRequisitionPhaseCore() {
+    const reqOv = document.getElementById('req-overlay');
+    if (reqOv) reqOv.classList.remove('tide-turns-flow');
     state.phase = 'requisition';
     document.querySelectorAll('.unit-skull').forEach(e=>e.remove());
     const gain = 5 + state.round;
@@ -6498,7 +6650,11 @@ const state = {
     document.getElementById('req-begin').style.display = 'none';
     document.querySelector('.top-bar').style.zIndex = '';
     ov.classList.remove('show');
-    setTimeout(()=>{ if(_beginCallback) { _beginCallback(); _beginCallback=null; } }, 300);
+    setTimeout(()=>{
+      const cb = _beginCallback;
+      _beginCallback = null;
+      if (cb) cb();
+    }, 300);
   }
 
   const TURN_TOAST_MS = 700;
@@ -7874,13 +8030,15 @@ const state = {
   function battleAttackProfileHtml(card) {
     const w = card.weapon || {};
     if (!w || (!w.name && w.attacks == null)) return '';
+    const modified = new Set(card._modifiedStats || card.modifiedStats || []);
+    const cls = stat => modified.has(stat) ? ' stat-modified' : '';
     const apVal = w.ap == null ? '' : `−${w.ap}`;
     return `<div class="card-zoom-attack-pill">
       <div class="card-zoom-weapon-icon">⚔</div>
-      <div class="card-zoom-statpair"><span class="cz-icon">🎲</span><span class="cz-val">${escapeHtml(w.attacks ?? '')}</span></div>
-      <div class="card-zoom-statpair"><span class="cz-icon">🎯</span><span class="cz-val">${escapeHtml(w.hit ?? '')}</span></div>
-      <div class="card-zoom-statpair"><span class="cz-icon">🛡</span><span class="cz-val">${escapeHtml(apVal)}</span></div>
-      <div class="card-zoom-statpair"><span class="cz-icon">💀</span><span class="cz-val">${escapeHtml(w.damage ?? '')}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🎲</span><span class="cz-val${cls('attacks')}">${escapeHtml(w.attacks ?? '')}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🎯</span><span class="cz-val${cls('hit')}">${escapeHtml(w.hit ?? '')}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">🛡</span><span class="cz-val${cls('ap')}">${escapeHtml(apVal)}</span></div>
+      <div class="card-zoom-statpair"><span class="cz-icon">💀</span><span class="cz-val${cls('damage')}">${escapeHtml(w.damage ?? '')}</span></div>
     </div>`;
   }
 
@@ -8556,6 +8714,9 @@ const state = {
       document.getElementById('badge-move-val').textContent = card.move ?? '';
       document.getElementById('badge-save-val').textContent = card.save ?? '';
       document.getElementById('badge-hp').className = 'hub-stat-badge badge-hp' + (col==='p2'?' p2-badge':'');
+      document.getElementById('badge-hp')?.classList.toggle('stat-modified', !!(card._tempStatMods?.hp || card._tempStatMods?.max_hp));
+      document.getElementById('badge-move')?.classList.toggle('stat-modified', !!card._tempStatMods?.move);
+      document.getElementById('badge-save')?.classList.toggle('stat-modified', !!card._tempStatMods?.save);
       badges.style.display = cardTypeEarly === 'Power' ? 'none' : '';
     }
     if (unitInfo) unitInfo.style.display = 'none';
@@ -8575,6 +8736,12 @@ const state = {
     document.getElementById('prof-hit').textContent = card.weapon?.hit ?? '';
     document.getElementById('prof-ap').textContent = card.weapon?.ap ?? '';
     document.getElementById('prof-dmg').textContent = card.weapon?.damage ?? '';
+    ['range','atk','hit','ap','dmg'].forEach(id => document.getElementById(`prof-${id}`)?.classList.remove('stat-modified'));
+    document.getElementById('prof-range')?.classList.toggle('stat-modified', !!card._tempStatMods?.range);
+    document.getElementById('prof-atk')?.classList.toggle('stat-modified', !!card._tempStatMods?.attacks);
+    document.getElementById('prof-hit')?.classList.toggle('stat-modified', !!card._tempStatMods?.hit);
+    document.getElementById('prof-ap')?.classList.toggle('stat-modified', !!card._tempStatMods?.ap);
+    document.getElementById('prof-dmg')?.classList.toggle('stat-modified', !!card._tempStatMods?.damage);
     const cardType = (card.type||'').trim();
     document.getElementById('inspector-card-view').classList.toggle('power-card', cardType === 'Power');
     // Hide HP/save stat icons for Power cards
@@ -8761,7 +8928,7 @@ const state = {
     }
 
     el.innerHTML = `
-      <div class="unit-hp ${unit.owner===1?'p1-hp':unit.owner===2?'p2-hp':''}"><span>${unit.hp}</span></div>
+      <div class="unit-hp ${unit.owner===1?'p1-hp':unit.owner===2?'p2-hp':''}${(unit._tempStatMods?.hp || unit._tempStatMods?.max_hp) ? ' stat-modified' : ''}"><span>${unit.hp}</span></div>
       <div class="unit-name">${cardDisplayName(unit)}</div>
       ${bottomHtml}`;
     if (unit.artId) {
@@ -9529,7 +9696,9 @@ const state = {
         ...storedAbility,
         key,
         apCost: Number.isFinite(Number(storedAbility.apCost ?? storedAbility.abilityCost)) ? Number(storedAbility.apCost ?? storedAbility.abilityCost) : 1,
-        value: storedAbility.value ?? unit.value ?? unit.unitValue ?? 1,
+        value: storedAbility.abilityValue ?? storedAbility.ability_value ?? storedAbility.value ?? unit.abilityValue ?? unit.unitValue ?? unit.value ?? 1,
+        modifierStat: normaliseAbilityModifierStat(storedAbility.modifierStat ?? storedAbility.modifier_stat ?? unit.modifierStat ?? unit.modifier_stat, key === 'move_then_fight' ? 'damage' : 'none'),
+        duration: normaliseAbilityDurationValue(storedAbility.duration ?? storedAbility.abilityDuration ?? storedAbility.ability_duration ?? unit.duration ?? unit.abilityDuration ?? unit.ability_duration ?? 'end_turn'),
         target: normaliseAbilityTarget(storedAbility.target || unit.abilityTarget || abilityTargetForEffect(key), unit)
       };
     }
@@ -9629,8 +9798,16 @@ const state = {
     return normaliseAbilityEffectValue(ability?.key || ability?.effect || '') === 'move_then_fight';
   }
 
+  function chargeModifierStat(ability) {
+    return normaliseAbilityModifierStat(ability?.modifierStat ?? ability?.modifier_stat ?? ability?.bonusStat ?? ability?.bonus_stat, 'damage');
+  }
+
+  function chargeAbilityValue(ability) {
+    return Math.max(0, Number(ability?.abilityValue ?? ability?.ability_value ?? ability?.value ?? ability?.unitValue ?? ability?.unit_value ?? 1) || 0);
+  }
+
   function chargeDamageBonus(ability) {
-    return Math.max(0, Number(ability?.damageBonus ?? ability?.bonusAmount ?? ability?.value ?? 1) || 0);
+    return chargeModifierStat(ability) === 'damage' ? chargeAbilityValue(ability) : 0;
   }
 
   function chargeActionCost(ability) {
@@ -9641,9 +9818,12 @@ const state = {
     const caster = state.board[casterTileId] || state.activeUnit?.card;
     const target = state.board[targetTileId];
     if (!caster || !target || target.owner === (caster.owner ?? state.activePlayer)) return [];
-    const moveSteps = Math.max(0, Number(caster.move) || 0);
+    const stat = chargeModifierStat(ability);
+    const amount = chargeAbilityValue(ability);
+    const baseMove = typeof getEffectiveMove === 'function' ? getEffectiveMove(caster, casterTileId) : Number(caster.move) || 0;
+    const moveSteps = Math.max(0, Number(baseMove) + (stat === 'move' ? amount : 0));
     if (moveSteps <= 0) return [];
-    const weaponRange = caster.weapon?.range ?? 1;
+    const weaponRange = Math.max(0, Number(caster.weapon?.range ?? 1) + (stat === 'range' ? amount : 0));
     return getReachableTiles(casterTileId, moveSteps).filter(destId => {
       if (!tileMap[destId] || tileMap[destId].zone === 'centre') return false;
       if (state.board[destId]) return false;
@@ -9759,6 +9939,8 @@ const state = {
       name: ability.name || 'Charge',
       attackerRef: caster.uid || caster.id || caster.name,
       targetTileId,
+      modifierStat: chargeModifierStat(ability),
+      value: chargeAbilityValue(ability),
       damageBonus: chargeDamageBonus(ability)
     };
 
@@ -9855,6 +10037,72 @@ const state = {
     });
   }
 
+
+  function normaliseAbilityDurationValue(value, fallback='end_turn') {
+    const raw = String(value ?? '').trim();
+    if (!raw) return fallback;
+    const key = String(raw).toLowerCase().replace(/[^a-z0-9]+/g,'');
+    const map = {
+      instant:'instant', none:'instant', immediate:'instant',
+      endaction:'end_action', action:'end_action', thisaction:'end_action',
+      endactivation:'end_activation', activation:'end_activation', thisactivation:'end_activation',
+      endturn:'end_turn', turn:'end_turn', thisturn:'end_turn',
+      endround:'end_round', round:'end_round', thisround:'end_round',
+      battle:'battle', permanent:'battle', endbattle:'battle'
+    };
+    return map[key] || fallback;
+  }
+
+  function revModAmount(ability, fallback=1) {
+    const raw = ability?.abilityValue ?? ability?.ability_value ?? ability?.value ?? ability?.unitValue ?? ability?.unit_value ?? fallback;
+    return Number(raw) || 0;
+  }
+
+  function rebuildUnitTempStatMods(unit) {
+    if (!unit) return;
+    const mods = Array.isArray(unit._tempModifiers) ? unit._tempModifiers : [];
+    unit._tempStatMods = {};
+    mods.forEach(mod => {
+      const stat = normaliseAbilityModifierStat(mod.stat || mod.modifier_stat, 'none');
+      const value = Number(mod.value) || 0;
+      if (!stat || stat === 'none' || !value) return;
+      unit._tempStatMods[stat] = (Number(unit._tempStatMods[stat]) || 0) + value;
+    });
+  }
+
+  function clearUnitTempModifiersByDuration(unit, duration) {
+    if (!unit || !Array.isArray(unit._tempModifiers)) return false;
+    const before = unit._tempModifiers.length;
+    unit._tempModifiers = unit._tempModifiers.filter(mod => normaliseAbilityDurationValue(mod.duration, 'end_turn') !== duration);
+    if (unit._tempModifiers.length !== before) {
+      rebuildUnitTempStatMods(unit);
+      return true;
+    }
+    return false;
+  }
+
+  function clearAllTempModifiersByDuration(duration) {
+    let changed = false;
+    Object.values(state?.board || {}).forEach(unit => { if (clearUnitTempModifiersByDuration(unit, duration)) changed = true; });
+    if (changed) { try { refreshAllUnitIndicators(); renderHub(); } catch(err) {} }
+  }
+
+  function applyTemporaryModifierToUnit(unit, ability, sourceTileId=null) {
+    if (!unit || !ability) return false;
+    const stat = normaliseAbilityModifierStat(ability.modifierStat ?? ability.modifier_stat, 'none');
+    const value = revModAmount(ability, 0);
+    const duration = normaliseAbilityDurationValue(ability.duration ?? ability.abilityDuration ?? ability.ability_duration, 'end_turn');
+    if (!stat || stat === 'none' || !value || duration === 'instant') return false;
+    if (!Array.isArray(unit._tempModifiers)) unit._tempModifiers = [];
+    unit._tempModifiers.push({ stat, value, duration, source:'ability', sourceTileId, appliedRound: state.round, appliedPlayer: state.activePlayer });
+    rebuildUnitTempStatMods(unit);
+    return true;
+  }
+
+  function tempMod(unit, stat) {
+    return Number(unit?._tempStatMods?.[stat] || 0) || 0;
+  }
+
 // ── ABILITY REGISTRY ──
   function spendCasterAbilityAction(caster, ability) {
     const cost = Math.max(1, Number(ability?.apCost ?? ability?.abilityCost ?? 1) || 1);
@@ -9907,6 +10155,21 @@ const state = {
       state.activeUnit = caster.actionsLeft > 0 ? { tileId: targetTileId, card: caster } : null;
       state.selectedBoardTile = caster.actionsLeft > 0 ? targetTileId : null;
       return true;
+    },
+    apply_modifier(caster, targetTileId, ability) {
+      const casterTileId = state.activeUnit?.tileId;
+      const targetIds = ability?.target?.side === 'self' || !targetTileId
+        ? [casterTileId].filter(Boolean)
+        : abilityTargetIds(ability, targetTileId);
+      targetIds.forEach(tid => {
+        const target = state.board[tid];
+        if (!target) return;
+        applyTemporaryModifierToUnit(target, ability, casterTileId);
+        const tile = document.querySelector(`[data-id="${tid}"]`);
+        if (tile) renderUnit(tile, target);
+      });
+      spendCasterAbilityAction(caster, ability);
+      return { activateTarget:false };
     },
     damage(caster, targetTileId, ability) {
       const value = Math.max(1, Number(ability?.value ?? 1) || 1);
@@ -10097,7 +10360,24 @@ const state = {
     const attackerTileId = state.activeUnit?.tileId;
     const shootingCtx = getShootingPenaltyContext(atk, def, attackerTileId, targetTileId);
     const shootingMsg = shootingPenaltyLabel(shootingCtx);
-    const displayDamage = (Number(atk.weapon?.damage) || 0) + (Number(combatCtx?.damageBonus) || 0);
+    const previewWeapon = { ...(atk.weapon || {}) };
+    const previewModifiedStats = [];
+    const previewStat = typeof normaliseAbilityModifierStat === 'function'
+      ? normaliseAbilityModifierStat(combatCtx?.modifierStat ?? combatCtx?.modifier_stat ?? (combatCtx?.damageBonus ? 'damage' : 'none'), combatCtx ? 'damage' : 'none')
+      : (combatCtx?.modifierStat || (combatCtx?.damageBonus ? 'damage' : 'none'));
+    const previewAmount = Math.max(0, Number(combatCtx?.value ?? combatCtx?.abilityValue ?? combatCtx?.ability_value ?? combatCtx?.damageBonus ?? 0) || 0);
+    if (combatCtx && previewStat && previewStat !== 'none' && previewAmount) {
+      previewModifiedStats.push(previewStat);
+      if (previewStat === 'damage') previewWeapon.damage = (Number(previewWeapon.damage) || 0) + previewAmount;
+      if (previewStat === 'ap') previewWeapon.ap = (Number(previewWeapon.ap) || 0) + previewAmount;
+      if (previewStat === 'attacks') previewWeapon.attacks = (Number(previewWeapon.attacks) || 0) + previewAmount;
+      if (previewStat === 'hit') {
+        const baseHit = parseInt(previewWeapon.hit || '7', 10);
+        if (Number.isFinite(baseHit)) previewWeapon.hit = `${Math.max(2, baseHit - previewAmount)}+`;
+      }
+    }
+    const previewAttackCard = { ...atk, weapon: previewWeapon, _modifiedStats: previewModifiedStats };
+    const displayDamage = previewWeapon.damage ?? atk.weapon?.damage ?? 0;
 
     function battleCardHtml(card, role, currentHp) {
       const ownerCol = card.owner === 1 ? 'p1' : card.owner === 2 ? 'p2' : '';
@@ -10149,7 +10429,7 @@ const state = {
           ${battleCardHtml(def,'defender',def.hp)}
         </div>
         <div class="battle-attack-profile">
-          ${battleAttackProfileHtml(combatCtx ? {...atk, weapon:{...atk.weapon, damage:displayDamage}} : atk)}
+          ${battleAttackProfileHtml(previewAttackCard)}
         </div>
         <div class="battle-cta" id="battle-cta"></div>
       </div>`;
@@ -10168,7 +10448,7 @@ const state = {
           <div class="battle-row-track">
             <div class="battle-roll-stat attack" id="battle-hit-box">
               <div class="battle-roll-stat-icon">🎯</div>
-              <div class="battle-roll-stat-value" id="battle-hit-stat">${escapeHtml(atk.weapon?.hit ?? '')}</div>
+              <div class="battle-roll-stat-value${previewModifiedStats.includes('hit') ? ' stat-modified' : ''}" id="battle-hit-stat">${escapeHtml(previewWeapon.hit ?? atk.weapon?.hit ?? '')}</div>
             </div>
             <div class="battle-dice-wrap"><div class="battle-dice-row" id="battle-attack-row"></div></div>
             <div class="battle-roll-stat damage right" id="battle-dmg-box">
@@ -10179,7 +10459,7 @@ const state = {
           <div class="battle-row-summary" id="battle-attack-summary"></div>
         </div>
         <div class="battle-ap-bridge pre-attack" id="battle-ap-bridge">
-          <div class="battle-ap-chip" id="battle-ap-chip"><span class="battle-ap-chip-icon">🛡</span><span class="battle-ap-chip-value" id="battle-ap-value">${atk.weapon?.ap > 0 ? `-${escapeHtml(atk.weapon.ap)}` : '0'}</span></div>
+          <div class="battle-ap-chip" id="battle-ap-chip"><span class="battle-ap-chip-icon">🛡</span><span class="battle-ap-chip-value${previewModifiedStats.includes('ap') ? ' stat-modified' : ''}" id="battle-ap-value">${previewWeapon.ap > 0 ? `-${escapeHtml(previewWeapon.ap)}` : '0'}</span></div>
         </div>
         <div class="battle-roll-panel defence-panel pre-attack" id="battle-defence-panel">
           <div class="battle-row-track">
@@ -10265,8 +10545,14 @@ const state = {
       apBridge?.classList.add('pre-attack');
       if (defenceRow) defenceRow.innerHTML = '';
       setDefenceSummary('');
-      if (saveStatEl) saveStatEl.textContent = escapeHtml(def.save ?? '');
-      if (hpStatEl) hpStatEl.textContent = escapeHtml(def.hp ?? '');
+      if (saveStatEl) {
+        saveStatEl.textContent = escapeHtml(def.save ?? '');
+        saveStatEl.classList.toggle('stat-modified', !!def?._tempStatMods?.save);
+      }
+      if (hpStatEl) {
+        hpStatEl.textContent = escapeHtml(def.hp ?? '');
+        hpStatEl.classList.toggle('stat-modified', !!(def?._tempStatMods?.hp || def?._tempStatMods?.max_hp));
+      }
       saveBox?.classList.remove('applied');
       apChip?.classList.remove('transfer');
     };
@@ -10310,9 +10596,15 @@ const state = {
       }, 600);
     };
 
-    setupGhostRow(attackRow, atk.weapon?.attacks ?? 0);
-    if (hitStatEl) hitStatEl.textContent = escapeHtml(hitTargetDisplay(atk.weapon?.hit, shootingCtx));
-    if (dmgStatEl) dmgStatEl.textContent = escapeHtml(displayDamage);
+    setupGhostRow(attackRow, previewWeapon.attacks ?? atk.weapon?.attacks ?? 0);
+    if (hitStatEl) {
+      hitStatEl.textContent = escapeHtml(previewWeapon.hit ?? hitTargetDisplay(atk.weapon?.hit, shootingCtx));
+      hitStatEl.classList.toggle('stat-modified', previewModifiedStats.includes('hit'));
+    }
+    if (dmgStatEl) {
+      dmgStatEl.textContent = escapeHtml(displayDamage);
+      dmgStatEl.classList.toggle('stat-modified', previewModifiedStats.includes('damage'));
+    }
     setAttackSummary(shootingMsg, shootingMsg ? 'bad' : '');
     setPreAttackDefenceRow();
     setRowButton('<button class="battle-attack-btn" id="battle-start-attack"><span class="battle-action-star">✦</span> Attack</button>', startAttackSequence);
@@ -10324,11 +10616,20 @@ const state = {
       const slain = hpAfter <= 0;
       const { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, hitThresh } = result;
       const failed = Math.max(0, hits - saved);
-      const ap = atk.weapon?.ap ?? 0;
+      const ap = result.effectiveAp ?? atk.weapon?.ap ?? 0;
+      const modifiedStat = result.modifierStat || 'none';
       if (attackProfile) attackProfile.classList.add('sequence-live');
       setRowButton('', null);
       setupGhostRow(attackRow, baseAttackCount ?? atkDice.length);
-      if (hitStatEl) hitStatEl.textContent = escapeHtml(hitTargetDisplay(atk.weapon?.hit, result.shootingPenaltyContext || shootingCtx));
+      if (hitStatEl) {
+        hitStatEl.textContent = `${hitThresh}+`;
+        hitStatEl.classList.toggle('stat-modified', modifiedStat === 'hit');
+      }
+      if (dmgStatEl) {
+        dmgStatEl.textContent = escapeHtml(result.damagePerHit ?? displayDamage);
+        dmgStatEl.classList.toggle('stat-modified', modifiedStat === 'damage');
+      }
+      if (apValue) apValue.classList.toggle('stat-modified', modifiedStat === 'ap');
       setAttackSummary(shootingPenaltyLabel(result.shootingPenaltyContext || shootingCtx), shootingPenaltyLabel(result.shootingPenaltyContext || shootingCtx) ? 'bad' : '');
       setPreAttackDefenceRow();
 
@@ -10377,8 +10678,14 @@ const state = {
 
         activateDefenceRow();
         if (apValue) apValue.textContent = ap > 0 ? `-${ap}` : '0';
-        if (saveStatEl) saveStatEl.textContent = escapeHtml(def.save ?? '');
-        if (hpStatEl) hpStatEl.textContent = escapeHtml(def.hp ?? '');
+        if (saveStatEl) {
+          saveStatEl.textContent = escapeHtml(def.save ?? '');
+          saveStatEl.classList.toggle('stat-modified', !!def?._tempStatMods?.save);
+        }
+        if (hpStatEl) {
+          hpStatEl.textContent = escapeHtml(def.hp ?? '');
+          hpStatEl.classList.toggle('stat-modified', !!(def?._tempStatMods?.hp || def?._tempStatMods?.max_hp));
+        }
         setupGhostRow(defenceRow, hits);
         setDefenceSummary('');
         const defClass = def.owner === 1 ? 'p1-def' : 'p2-def';
@@ -11369,7 +11676,7 @@ const state = {
   function resetGame() {
     if(!confirm('Reset game? This cannot be undone.')) return;
     localStorage.removeItem('grim_save');
-    state.round=1; state.maxRounds=5; state.activePlayer=1; state.phase='setup';
+    state.round=1; state.maxRounds=5; state.activePlayer=1; state.phase='setup'; state.tideTurnsShown=false;
     state.board={}; state.selectedHandCard=null; state.pendingTile=null;
     state.activeUnit=null; state.activeAction=null;
     state.players[1]={name:'Player I',  score:0, resources:3, deck:[], hand:[], graveyard:[], color:'p1', passed:false, drawnThisRound:false};
@@ -12161,7 +12468,7 @@ chainhits:'chain_hits',chainhit:'chain_hits',chains:'chain_hits',chain:'chain_hi
 jumplane:'jump_lane',jump:'jump_lane',
 movethenfight:'move_then_fight',movefight:'move_then_fight',charge:'move_then_fight',cavalrycharge:'move_then_fight',thunderingcharge:'move_then_fight',
 damage:'damage',dealdamage:'damage',heal:'heal',healing:'heal',draw:'draw',drawcards:'draw',
-addresource:'add_resource',addresources:'add_resource',resource:'add_resource',resources:'add_resource'
+addresource:'add_resource',addresources:'add_resource',resource:'add_resource',resources:'add_resource',applymodifier:'apply_modifier',modifier:'apply_modifier',buff:'apply_modifier',debuff:'apply_modifier',stance:'apply_modifier'
 };
 return map[key] || raw;
 }
@@ -12324,9 +12631,11 @@ const abilityRoll = get(
 const abilityAmount = get(
 'abilityAmount','ability_amount','extraHits','extra_hits','extraChains','extra_chains','diceValue','dice_value','diceAmount','dice_amount','amount'
 );
+const modifierStatRaw = get('modifierStat','modifier_stat','abilityModifierStat','ability_modifier_stat','bonusStat','bonus_stat','subEffect','sub_effect','affectedStat','affected_stat');
 const abilityCost = get(
 'abilityCost','ability_cost','apCost','ap_cost','actionCost','action_cost'
 );
+const abilityDuration = normaliseAbilityDurationValue(get('duration','ability_duration','effect_duration','modifier_duration') || '');
 
 if(isPower){
 if(powerEffect) card.effect = powerEffect;
@@ -12347,6 +12656,11 @@ if(abilityCost) {
 card.apCost = csvNumberOrString(abilityCost);
 card.abilityCost = csvNumberOrString(abilityCost);
 }
+if(abilityDuration) {
+card.duration = abilityDuration;
+card.abilityDuration = abilityDuration;
+}
+if(modifierStatRaw) card.modifierStat = normaliseAbilityModifierStat(modifierStatRaw, effect === 'move_then_fight' ? 'damage' : 'none');
 if(abilityRoll) card.threshold = csvNumberOrString(abilityRoll);
 
 const targetSide = normaliseCSVTargetValue(get('ability_target_side','abilityTargetSide','target_side','targetSide'));
@@ -12390,12 +12704,15 @@ value: Math.max(1, Number(amountValue) || 1)
 
 if(trigger === 'action' && effect && effect !== 'none'){
 const resolvedValue = csvNumberOrString(value || abilityAmount || 1);
+const resolvedModifierStat = normaliseAbilityModifierStat(modifierStatRaw, effect === 'move_then_fight' ? 'damage' : 'none');
 card.ability = {
 key: effect,
-apCost: abilityCost ? csvNumberOrString(abilityCost) : 1,
+apCost: abilityCost ? csvNumberOrString(abilityCost) : (effect === 'move_then_fight' ? 2 : 1),
 name: csvAbilityLabel(effect),
 value: resolvedValue,
-target: card.abilityTarget || null
+modifierStat: resolvedModifierStat,
+duration: abilityDuration || 'end_turn',
+target: card.abilityTarget || abilityTargetForEffect(effect)
 };
 }
 
@@ -12404,6 +12721,8 @@ card.mechanic = {
 trigger,
 effect,
 value: csvNumberOrString(value || abilityAmount || ''),
+modifierStat: modifierStatRaw ? normaliseAbilityModifierStat(modifierStatRaw, effect === 'move_then_fight' ? 'damage' : 'none') : undefined,
+duration: abilityDuration || undefined,
 target: card.abilityTarget || null,
 diceTrigger: card.diceTrigger || null
 };
@@ -13507,7 +13826,8 @@ window.REV_MECHANIC_REGISTRY = {
     { id:'draw', label:'Draw', description:'Draw cards.' },
     { id:'add_resource', label:'Add Resource', description:'Add resources to the player.' },
     { id:'jump_lane', label:'Jump Lane', description:'Action ability. Move this unit to an empty tile in the same row of the opposite lane.' },
-    { id:'move_then_fight', label:'Charge / Move + Fight', description:'Action ability. Choose a reachable enemy, choose a valid charge position, move there, then Fight with a temporary damage bonus. Recommended defaults: trigger action, cost 2, target enemy unit, target location reachable_attack, value 1.' },
+    { id:'move_then_fight', label:'Charge / Move + Fight', description:'Action ability. Targeting is baked in: choose a reachable enemy, choose a valid charge position, move there, then Fight. Use modifier_stat plus ability_value to set the bonus, e.g. ap +1 or damage +1.' },
+    { id:'apply_modifier', label:'Apply Modifier / Stance', description:'Apply a temporary modifier to self or a target. Uses modifier_stat, ability_value and duration.' },
     { id:'exploding_hits', label:'Exploding Hits', description:'On matching attack dice, create extra hits without rolling extra dice.' },
     { id:'chain_hits', label:'Chain Hits', description:'On matching attack dice, roll extra attack dice. Extra dice can continue the chain.' }
   ],
@@ -14176,6 +14496,7 @@ function simpleEffectOptions(){
     { id:'add_action', label:'Add Action' },
     { id:'jump_lane', label:'Jump Lane' },
     { id:'move_then_fight', label:'Charge / Move + Fight' },
+    { id:'apply_modifier', label:'Apply Modifier / Stance' },
     { id:'damage', label:'Damage' },
     { id:'heal', label:'Heal' },
     { id:'draw', label:'Draw' },
@@ -14266,6 +14587,26 @@ function draftAbilityState(card={}){
   };
 }
 
+
+function modifierStatOptions(){
+  return [
+    ['damage','Outgoing Damage'], ['ap','Outgoing AP'], ['hit','Outgoing Hit'], ['attacks','Outgoing Attacks'], ['range','Outgoing Range'],
+    ['damage_taken','Damage Taken'], ['ap_taken','AP Taken'], ['hit_taken','Hit Taken'], ['attacks_taken','Attacks Taken'],
+    ['move','Move'], ['save','Save'], ['hp','HP'], ['max_hp','Max HP'], ['cost','Cost'], ['none','None']
+  ];
+}
+function abilityDurationOptions(){
+  return [
+    ['end_action','End of Action'], ['end_activation','End of Activation'], ['end_turn','End of Turn'], ['end_round','End of Round'], ['battle','Battle'], ['instant','Instant']
+  ];
+}
+function abilityTargetSideOptions(){
+  return [['self','Self'],['friendly','Friendly'],['enemy','Enemy']];
+}
+function abilityTargetLocationOptions(){
+  return [['self','Self'],['same_lane','Same Lane'],['adjacent','Adjacent'],['range','Range'],['anywhere','Anywhere']];
+}
+
 function draftAbilityContextHtml(trigger, effect='none', value='', threshold='6', abilityCost=''){
   const cleanTrigger = normaliseAbilityTriggerValue(trigger);
   if (!cleanTrigger) return '';
@@ -14285,18 +14626,34 @@ function draftAbilityContextHtml(trigger, effect='none', value='', threshold='6'
     const costValue = abilityCost === '' || abilityCost == null
       ? (cleanEffect === 'move_then_fight' ? 2 : 1)
       : abilityCost;
-    const valueLabel = cleanEffect === 'move_then_fight' ? 'Damage Bonus' : 'Value';
     const defaultValue = value === '' || value == null
       ? (cleanEffect === 'move_then_fight' ? 1 : '')
       : value;
-    const help = cleanEffect === 'move_then_fight'
-      ? '<div class="revDraftHint full revUnitField" style="margin:0;">Charge defaults: target enemy unit, reachable_attack, choose target then position, then Fight with +Damage Bonus.</div>'
-      : '';
+    if (cleanEffect === 'move_then_fight') {
+      return `
+        ${selectField('Effect','unitEffect',cleanEffect,simpleEffectOptions(),true,'revUnitField')}
+        ${field('Action Cost','abilityCost',costValue,false,false,'revUnitField')}
+        ${selectField('Modifier Stat','modifierStat','damage',modifierStatOptions(),true,'revUnitField')}
+        ${field('Ability Value','unitValue',defaultValue,false,false,'revUnitField')}
+        <div class="revDraftHint full revUnitField" style="margin:0;">Move Then Fight bakes in targeting: choose a reachable enemy, choose a valid charge position, move, then fight. Only set what the charge modifies.</div>
+      `;
+    }
+    if (cleanEffect === 'apply_modifier') {
+      return `
+        ${selectField('Effect','unitEffect',cleanEffect,simpleEffectOptions(),true,'revUnitField')}
+        ${field('Action Cost','abilityCost',costValue,false,false,'revUnitField')}
+        ${selectField('Modifier Stat','modifierStat','damage_taken',modifierStatOptions(),true,'revUnitField')}
+        ${field('Ability Value','unitValue',defaultValue || 1,false,false,'revUnitField')}
+        ${selectField('Duration','abilityDuration','end_turn',abilityDurationOptions(),true,'revUnitField')}
+        ${selectField('Target','abilityTargetSide','self',abilityTargetSideOptions(),true,'revUnitField')}
+        ${selectField('Target Location','abilityTargetLocation','self',abilityTargetLocationOptions(),true,'revUnitField')}
+        <div class="revDraftHint full revUnitField" style="margin:0;">Apply Modifier uses modifier_stat + ability_value + duration. Self-targeted defensive stances can leave target as Self.</div>
+      `;
+    }
     return `
       ${selectField('Effect','unitEffect',cleanEffect,simpleEffectOptions(),true,'revUnitField')}
       ${field('Action Cost','abilityCost',costValue,false,false,'revUnitField')}
-      ${field(valueLabel,'unitValue',defaultValue,false,false,'revUnitField')}
-      ${help}
+      ${field('Value','unitValue',defaultValue,false,false,'revUnitField')}
     `;
   }
 
@@ -14384,13 +14741,17 @@ function collectDraftFields(tile, original){
   const unitType = get('unitType') || draftUnitType(original);
   const trigger = normaliseAbilityTriggerValue(get('trigger')) || (kind === 'Power' ? 'on_play' : '');
   const unitEffect = get('unitEffect') || 'none';
-  const unitValue = parseDraftValue(get('unitValue'));
+  const modifierStat = normaliseAbilityModifierStat(get('modifierStat'), (unitEffect === 'move_then_fight' || unitEffect === 'apply_modifier') ? 'damage' : 'none');
+  const abilityDuration = normaliseAbilityDurationValue(get('abilityDuration') || get('duration') || 'end_turn');
+  const unitValue = parseDraftValue(get('unitValue')) ?? (unitEffect === 'move_then_fight' ? 1 : null);
   const abilityCost = Number.isFinite(Number(get('abilityCost')))
     ? Number(get('abilityCost'))
     : (unitEffect === 'move_then_fight' ? 2 : null);
   const abilityTarget = unitEffect === 'move_then_fight'
-    ? { side:'enemy', location:'reachable_attack', state:'any', type:'unit' }
-    : (original.abilityTarget || original.target || original.mechanic?.target || null);
+    ? null
+    : unitEffect === 'apply_modifier'
+      ? { side: get('abilityTargetSide') || 'self', type:'unit', location: get('abilityTargetLocation') || 'self', state:'any', count:'single', unitType:'any', faction:'any' }
+      : (original.abilityTarget || original.target || original.mechanic?.target || null);
   const weapon = kind === 'Power'
     ? {
         name: get('weaponName') || original.weapon?.name || get('effect') || 'Power',
@@ -14421,6 +14782,8 @@ function collectDraftFields(tile, original){
     trigger,
     effect:unitEffect,
     value:unitValue,
+    modifierStat: (unitEffect === 'move_then_fight' || unitEffect === 'apply_modifier') ? modifierStat : undefined,
+    duration: abilityDuration,
     abilityCost,
     target: abilityTarget,
     diceTrigger
@@ -14446,6 +14809,8 @@ function collectDraftFields(tile, original){
     value: kind === 'Power' ? parseDraftValue(get('value')) : unitValue,
     unitEffect: kind === 'Power' ? null : unitEffect,
     unitValue: kind === 'Power' ? null : unitValue,
+    modifierStat: kind === 'Power' || !['move_then_fight','apply_modifier'].includes(unitEffect) ? null : modifierStat,
+    duration: kind === 'Power' ? null : abilityDuration,
     abilityCost: kind === 'Power' ? null : abilityCost,
     apCost: kind === 'Power' ? null : abilityCost,
     abilityTarget,
@@ -17191,6 +17556,7 @@ function displayRange(r) {
 
     state.round = 1;
     state.maxRounds = 5;
+    state.tideTurnsShown = false;
     state.activePlayer = 1;
     state.phase = 'setup';
     state.board = {};
@@ -18617,6 +18983,671 @@ function displayRange(r) {
 
   // Re-render immediately in case a save/load left lane cards already revealed.
   setTimeout(() => { try { renderLaneEffects(); } catch(err) {} }, 0);
+})();
+</script>
+
+
+
+<script id="rev-patch-203-live-csv-rebalance">
+(function(){
+  if (window.__revPatch203LiveCsvRebalance) return;
+  window.__revPatch203LiveCsvRebalance = true;
+
+  const WATCH_KEYS = new Set(['grim_repo_official','grim_card_repo','grim_lane_deck']);
+  let reconcileTimer = null;
+
+  function readJSON(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(err) { return fallback; }
+  }
+
+  function writeJSON(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function slug(value) {
+    if (typeof cardSlug === 'function') return cardSlug(value);
+    return String(value ?? '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  }
+
+  function normaliseCard(card) {
+    try { return typeof normaliseImportedCard === 'function' ? normaliseImportedCard(card) : card; }
+    catch(err) { return card; }
+  }
+
+  function normaliseLane(lane, index=0) {
+    try { return typeof normaliseLaneEffect === 'function' ? normaliseLaneEffect(lane, index) : lane; }
+    catch(err) { return lane; }
+  }
+
+  function cardIdentityKeys(card) {
+    return [card?.id, card?.internalName, card?.name, card?.displayName, card?.display_name]
+      .filter(v => v != null && String(v).trim() !== '')
+      .flatMap(v => [String(v).trim().toLowerCase(), slug(v)]);
+  }
+
+  function buildCardMap(repo) {
+    const map = new Map();
+    (Array.isArray(repo) ? repo : []).map(normaliseCard).filter(Boolean).forEach(card => {
+      cardIdentityKeys(card).forEach(k => { if (k && !map.has(k)) map.set(k, card); });
+    });
+    return map;
+  }
+
+  function buildLaneMap(deck) {
+    const map = new Map();
+    (Array.isArray(deck) ? deck : []).map(normaliseLane).filter(Boolean).forEach((lane, idx) => {
+      [lane.id, lane.key, lane.name, lane.displayName, lane.display_name]
+        .filter(v => v != null && String(v).trim() !== '')
+        .flatMap(v => [String(v).trim().toLowerCase(), slug(v)])
+        .forEach(k => { if (k && !map.has(k)) map.set(k, lane); });
+    });
+    return map;
+  }
+
+  function findCardDef(card, map) {
+    for (const k of cardIdentityKeys(card)) {
+      if (map.has(k)) return map.get(k);
+    }
+    return null;
+  }
+
+  function findLaneDef(lane, map) {
+    const keys = [lane?.id, lane?.key, lane?.name, lane?.displayName, lane?.display_name]
+      .filter(v => v != null && String(v).trim() !== '')
+      .flatMap(v => [String(v).trim().toLowerCase(), slug(v)]);
+    for (const k of keys) {
+      if (map.has(k)) return map.get(k);
+    }
+    return null;
+  }
+
+  function numberOrNull(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function refreshCardInstance(card, map, context, stats) {
+    if (!card || typeof card !== 'object') return card;
+    const def = findCardDef(card, map);
+    if (!def) {
+      if (card.id || card.name) stats.missing.add(card.displayName || card.name || card.id);
+      return card;
+    }
+
+    const normalisedDef = normaliseCard(def) || def;
+    const transient = {
+      uid: card.uid,
+      owner: card.owner,
+      actionsLeft: card.actionsLeft,
+      bonusAttacks: card.bonusAttacks,
+      deployedRound: card.deployedRound,
+      scoreMult: card.scoreMult,
+      _activatedByHold: card._activatedByHold,
+      _lastActivatedAt: card._lastActivatedAt
+    };
+
+    const refreshed = { ...normalisedDef };
+    Object.entries(transient).forEach(([key, val]) => {
+      if (val !== undefined) refreshed[key] = val;
+    });
+
+    if (context === 'board') {
+      const oldMax = numberOrNull(card.maxHp ?? card.hp);
+      const oldHp = numberOrNull(card.hp ?? card.maxHp);
+      const newMax = numberOrNull(refreshed.maxHp ?? refreshed.hp ?? oldMax ?? oldHp);
+      if (newMax != null) {
+        const damageTaken = oldMax != null && oldHp != null ? Math.max(0, oldMax - oldHp) : 0;
+        refreshed.maxHp = newMax;
+        refreshed.hp = Math.max(0, newMax - damageTaken);
+      } else if (card.hp != null) {
+        refreshed.hp = card.hp;
+      }
+      stats.board += 1;
+    } else if (context === 'hand') {
+      stats.hand += 1;
+    } else if (context === 'deck') {
+      stats.deck += 1;
+    } else if (context === 'graveyard') {
+      stats.graveyard += 1;
+    } else {
+      stats.cards += 1;
+    }
+
+    return refreshed;
+  }
+
+  function refreshCardList(list, map, context, stats) {
+    if (!Array.isArray(list)) return list;
+    return list.map(card => refreshCardInstance(card, map, context, stats));
+  }
+
+  function refreshCurrentLaneEffects(laneMap, stats) {
+    if (!state?.laneEffects) return;
+    ['A','B'].forEach(laneId => {
+      const current = state.laneEffects[laneId];
+      if (!current) return;
+      const def = findLaneDef(current, laneMap);
+      if (!def) {
+        if (current.id || current.name) stats.missingLanes.add(current.displayName || current.name || current.id);
+        return;
+      }
+      state.laneEffects[laneId] = {
+        ...normaliseLane(def),
+        revealed: !!current.revealed,
+        scoreMult: current.scoreMult
+      };
+      stats.lanes += 1;
+    });
+  }
+
+  function refreshStructures(cardMap, stats) {
+    if (!state?.structures) return;
+    Object.keys(state.structures).forEach(tileId => {
+      const s = state.structures[tileId];
+      if (!s?.card) return;
+      s.card = refreshCardInstance(s.card, cardMap, 'structure', stats);
+    });
+  }
+
+  function reconnectActiveUnit() {
+    if (state?.activeUnit?.tileId && state.board?.[state.activeUnit.tileId]) {
+      state.activeUnit.card = state.board[state.activeUnit.tileId];
+    }
+    if (state?.pendingReturnUnit?.tileId && state.board?.[state.pendingReturnUnit.tileId]) {
+      state.pendingReturnUnit.card = state.board[state.pendingReturnUnit.tileId];
+    }
+  }
+
+  function persistRefreshedSave() {
+    try {
+      if (localStorage.getItem('grim_save') && state && state.players && state.board) {
+        localStorage.setItem('grim_save', JSON.stringify(state));
+      }
+    } catch(err) {
+      console.warn('[Revenant] save refresh failed', err);
+    }
+  }
+
+  function showRebalanceSummary(stats) {
+    const bits = [];
+    if (stats.board) bits.push(`${stats.board} board`);
+    if (stats.hand) bits.push(`${stats.hand} hand`);
+    if (stats.deck) bits.push(`${stats.deck} deck`);
+    if (stats.graveyard) bits.push(`${stats.graveyard} graveyard`);
+    if (stats.lanes) bits.push(`${stats.lanes} lanes`);
+    const msg = bits.length ? `CSV refreshed: ${bits.join(', ')}` : 'CSV imported: no active instances changed';
+    try { showToastMsg(msg); } catch(err) { console.log(msg); }
+    if (stats.missing.size || stats.missingLanes.size) {
+      console.warn('[Revenant] CSV reconcile missing ids', {
+        cards: [...stats.missing],
+        lanes: [...stats.missingLanes]
+      });
+    }
+  }
+
+  window.revReconcileLiveCsv = function(options={}) {
+    if (!state || !state.players) return null;
+    const repo = readJSON('grim_card_repo', []);
+    const laneDeck = readJSON('grim_lane_deck', []);
+    const cardMap = buildCardMap(repo);
+    const laneMap = buildLaneMap(laneDeck);
+    const stats = { board:0, hand:0, deck:0, graveyard:0, cards:0, lanes:0, missing:new Set(), missingLanes:new Set() };
+
+    [1,2].forEach(player => {
+      const p = state.players[player];
+      if (!p) return;
+      p.deck = refreshCardList(p.deck, cardMap, 'deck', stats);
+      p.hand = refreshCardList(p.hand, cardMap, 'hand', stats);
+      p.graveyard = refreshCardList(p.graveyard, cardMap, 'graveyard', stats);
+    });
+
+    Object.keys(state.board || {}).forEach(tileId => {
+      state.board[tileId] = refreshCardInstance(state.board[tileId], cardMap, 'board', stats);
+    });
+
+    refreshStructures(cardMap, stats);
+    refreshCurrentLaneEffects(laneMap, stats);
+    reconnectActiveUnit();
+
+    try { refreshAllUnitIndicators(); } catch(err) {}
+    try { renderLaneEffects(); } catch(err) {}
+    try { renderHub(); } catch(err) {}
+    try { if (profileCard) updateProfile?.(profileCard, profileContext, profileTileId); } catch(err) {}
+
+    if (options.persist !== false) persistRefreshedSave();
+    if (options.silent !== true) showRebalanceSummary(stats);
+    console.log('[Revenant] live CSV reconcile complete', stats);
+    return stats;
+  };
+
+  function scheduleReconcile() {
+    clearTimeout(reconcileTimer);
+    reconcileTimer = setTimeout(() => {
+      try { window.revReconcileLiveCsv({ silent:false, persist:true }); }
+      catch(err) { console.warn('[Revenant] live CSV reconcile failed', err); }
+    }, 180);
+  }
+
+  const originalSetItem = Storage.prototype.setItem;
+  if (!window.__revPatch203StorageWatch) {
+    window.__revPatch203StorageWatch = true;
+    Storage.prototype.setItem = function(key, value) {
+      const result = originalSetItem.call(this, key, value);
+      if (WATCH_KEYS.has(String(key))) scheduleReconcile();
+      return result;
+    };
+  }
+
+  const originalLoadGame = window.loadGame;
+  if (typeof originalLoadGame === 'function' && !window.__revPatch203LoadWrapped) {
+    window.__revPatch203LoadWrapped = true;
+    window.loadGame = function() {
+      const result = originalLoadGame.apply(this, arguments);
+      setTimeout(() => {
+        try { window.revReconcileLiveCsv({ silent:true, persist:false }); }
+        catch(err) { console.warn('[Revenant] load reconcile failed', err); }
+      }, 80);
+      return result;
+    };
+    try { loadGame = window.loadGame; } catch(err) {}
+  }
+})();
+</script>
+
+
+<script id="rev-patch-205-tide-editor-fix">
+(function(){
+  if (window.__revPatch205TideEditorFix) return;
+  window.__revPatch205TideEditorFix = true;
+
+  window.openInGameEditor = function(){
+    try {
+      const menu = document.getElementById('save-menu');
+      if (menu) menu.classList.remove('open');
+      if (typeof window.revOpenEditor === 'function') {
+        window.revOpenEditor();
+      } else {
+        const editor = document.getElementById('revSafeEditor');
+        if (editor) editor.style.display = 'flex';
+      }
+      try { showToastMsg('Editor opened — import CSV/TSV to update this match'); } catch(err) {}
+    } catch(err) {
+      console.warn('[Revenant] open editor failed', err);
+    }
+  };
+
+  // Keep the editor close button as a simple return-to-match action when opened in-game.
+  function installInGameEditorClose(){
+    const close = document.getElementById('revSafeClose');
+    if (!close || close.__revPatch205CloseBound) return;
+    close.__revPatch205CloseBound = true;
+    close.addEventListener('click', () => {
+      setTimeout(() => {
+        try { renderHub(); refreshAllUnitIndicators(); renderLaneEffects(); } catch(err) {}
+      }, 80);
+    }, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installInGameEditorClose);
+  } else {
+    installInGameEditorClose();
+  }
+  setTimeout(installInGameEditorClose, 1200);
+})();
+</script>
+
+
+
+
+<script id="rev-patch-207-ability-value-stat-modifiers">
+(function(){
+  if (window.__revPatch207AbilityValueStatModifiers) return;
+  window.__revPatch207AbilityValueStatModifiers = true;
+
+  function statKey(value, fallback='damage') {
+    if (typeof normaliseAbilityModifierStat === 'function') return normaliseAbilityModifierStat(value, fallback);
+    const raw = String(value ?? '').trim().toLowerCase().replace(/[^a-z0-9]+/g,'');
+    const map = {
+      dmg:'damage', damage:'damage', ap:'ap', armourpiercing:'ap', armorpiercing:'ap',
+      hit:'hit', tohit:'hit', attacks:'attacks', attackdice:'attacks',
+      range:'range', move:'move', movement:'move', save:'save', armoursave:'save', armorsave:'save',
+      hp:'hp', maxhp:'max_hp', cost:'cost', none:'none'
+    };
+    return map[raw] || fallback;
+  }
+
+  function abilityAmount(src, fallback=1) {
+    return Math.max(0, Number(src?.abilityValue ?? src?.ability_value ?? src?.value ?? src?.unitValue ?? src?.unit_value ?? fallback) || 0);
+  }
+
+  function saveThreshold(unit) {
+    const base = parseInt(unit?.save || '7', 10);
+    const bonus = Number(unit?._tempStatMods?.save || 0) || 0;
+    return Math.max(2, Math.min(7, base - bonus));
+  }
+
+  function applyPostMoveUnitStatModifier(unit, ability) {
+    const stat = statKey(ability?.modifierStat ?? ability?.modifier_stat, 'none');
+    const amount = abilityAmount(ability, 0);
+    if (!unit || !amount) return;
+    if (!unit._tempStatMods) unit._tempStatMods = {};
+    if (stat === 'save') {
+      unit._tempStatMods.save = (Number(unit._tempStatMods.save) || 0) + amount;
+    } else if (stat === 'hp') {
+      unit._tempStatMods.hp = (Number(unit._tempStatMods.hp) || 0) + amount;
+      const max = Number(unit.maxHp ?? unit.hp) || 0;
+      unit.hp = Math.min(max || Number(unit.hp) || 0, (Number(unit.hp) || 0) + amount);
+    } else if (stat === 'max_hp') {
+      unit._tempStatMods.max_hp = (Number(unit._tempStatMods.max_hp) || 0) + amount;
+      unit.maxHp = (Number(unit.maxHp ?? unit.hp) || 0) + amount;
+      unit.hp = (Number(unit.hp) || 0) + amount;
+    } else if (['move','range','attacks','hit','ap','damage'].includes(stat)) {
+      unit._tempStatMods[stat] = (Number(unit._tempStatMods[stat]) || 0) + amount;
+    }
+  }
+
+  window.revChargeModifierSummary = function revChargeModifierSummary(ctxOrAbility) {
+    const stat = statKey(ctxOrAbility?.modifierStat ?? ctxOrAbility?.modifier_stat ?? ctxOrAbility?.bonusStat, 'damage');
+    const amount = abilityAmount(ctxOrAbility, 1);
+    const labels = { damage:'Damage', ap:'AP', hit:'Hit', attacks:'Attack', range:'Range', move:'Move', save:'Save', hp:'HP', max_hp:'Max HP', cost:'Cost' };
+    return stat === 'none' || !amount ? '' : `+${amount} ${labels[stat] || stat}`;
+  };
+
+  const oldExecuteChargeTo = typeof executeChargeTo === 'function' ? executeChargeTo : null;
+  if (oldExecuteChargeTo && !window.__revPatch207ChargeWrapper) {
+    window.__revPatch207ChargeWrapper = true;
+    executeChargeTo = async function(destinationTileId) {
+      const ability = state?.chargeState?.ability || getUnitAbility?.(state?.activeUnit?.card);
+      const result = await oldExecuteChargeTo.call(this, destinationTileId);
+      if (result !== false && ability && state?.activeUnit?.card) {
+        applyPostMoveUnitStatModifier(state.activeUnit.card, ability);
+        try { renderHub(); refreshAllUnitIndicators(); } catch(err) {}
+      }
+      return result;
+    };
+    try { window.executeChargeTo = executeChargeTo; } catch(err) {}
+  }
+
+  const oldReq = typeof requisitionPhase === 'function' ? requisitionPhase : null;
+  if (oldReq && !window.__revPatch207ReqWrapper) {
+    window.__revPatch207ReqWrapper = true;
+    requisitionPhase = function() {
+      try {
+        Object.values(state?.board || {}).forEach(unit => { if (unit?._tempStatMods) delete unit._tempStatMods; });
+      } catch(err) {}
+      return oldReq.apply(this, arguments);
+    };
+    try { window.requisitionPhase = requisitionPhase; } catch(err) {}
+  }
+
+  window.resolveCombat = resolveCombat = function resolveCombat(atk, def, laneKey=null, combatOptions={}) {
+    const fx = getLaneEffect(laneKey);
+    const eff = fx ? EFFECT_REGISTRY[fx.effect] : null;
+    const baseHitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    const attackerTileId = combatOptions?.attackerTileId || state.activeUnit?.tileId || null;
+    const targetTileId = combatOptions?.targetTileId || state.pendingCombatContext?.targetTileId || null;
+    const combatCtx = typeof pendingCombatContextFor === 'function' ? pendingCombatContextFor(atk, targetTileId) : null;
+    const stat = statKey(combatCtx?.modifierStat ?? (combatCtx?.damageBonus ? 'damage' : 'none'), combatCtx ? 'damage' : 'none');
+    const amount = abilityAmount(combatCtx, combatCtx?.damageBonus || 0);
+    const shootingPenaltyContext = getShootingPenaltyContext(atk, def, attackerTileId, targetTileId);
+
+    let laneHitThresh = baseHitThresh;
+    if (eff?.modifyHit) laneHitThresh = eff.modifyHit(fx, laneHitThresh, atk, attackerTileId, targetTileId);
+    let hitThresh = Math.min(7, laneHitThresh + Math.max(0, Number(shootingPenaltyContext.penalty) || 0));
+    if (stat === 'hit') hitThresh = Math.max(2, hitThresh - amount);
+
+    const effectiveRange = Math.max(0, Number(atk.weapon?.range ?? 1) + (stat === 'range' ? amount : 0));
+    const saveThresh = saveThreshold(def);
+    const effectiveAp = (Number(atk.weapon?.ap) || 0) + (stat === 'ap' ? amount : 0);
+    let modSave = saveThresh + effectiveAp;
+    if (eff?.modifySave) modSave = eff.modifySave(fx, modSave);
+    const autoFail = modSave > 6;
+    const attackCount = (Number(atk.weapon?.attacks) || 0) + (atk.bonusAttacks || 0) + (stat === 'attacks' ? amount : 0);
+    const diceTrigger = typeof revDiceTriggerFromUnit === 'function' ? revDiceTriggerFromUnit(atk) : null;
+    const atkDice = [];
+    const rollEvents = [];
+    let hits = 0;
+    let bonusHits = 0;
+    let chainRolls = 0;
+    const baseAttackCount = Math.max(0, attackCount);
+    const queue = Array.from({ length: baseAttackCount }, () => 'base');
+    const MAX_ATTACK_DICE = 60;
+
+    while (queue.length && atkDice.length < MAX_ATTACK_DICE) {
+      const source = queue.shift() || 'base';
+      const d = Math.ceil(Math.random() * 6);
+      atkDice.push(d);
+      const isHit = d >= hitThresh;
+      let bonusAdded = 0;
+      let chainAdded = 0;
+      if (isHit) hits += 1;
+      if (diceTrigger && isHit && d >= diceTrigger.threshold) {
+        if (diceTrigger.effect === 'exploding_hits') {
+          bonusAdded = Math.max(1, Number(diceTrigger.value) || 1);
+          bonusHits += bonusAdded;
+          hits += bonusAdded;
+        } else if (diceTrigger.effect === 'chain_hits') {
+          const toAdd = Math.max(1, Number(diceTrigger.value) || 1);
+          for (let i = 0; i < toAdd && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
+            queue.push('chain');
+            chainRolls += 1;
+            chainAdded += 1;
+          }
+        }
+      }
+      rollEvents.push({ value:d, source, isHit, bonusAdded, chainAdded });
+    }
+
+    const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
+    const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
+    const damageBonus = stat === 'damage' ? amount : 0;
+    const damagePerHit = (Number(atk.weapon?.damage) || 0) + damageBonus;
+    let totalDmg = (hits - saved) * damagePerHit;
+    if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
+    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, baseHitThresh, shootingPenaltyContext, diceTrigger, bonusHits, chainRolls, damageBonus, damagePerHit, modifierStat:stat, value:amount, effectiveAp, effectiveRange };
+  };
+})();
+</script>
+
+
+<script id="rev-patch-209-temp-modifier-runtime-v1">
+(function(){
+  if (window.__revPatch209TempModifierRuntime) return;
+  window.__revPatch209TempModifierRuntime = true;
+
+  const statAliases = {
+    damage:'damage', dmg:'damage', ap:'ap', armour_piercing:'ap', armor_piercing:'ap', hit:'hit', to_hit:'hit', attacks:'attacks', attack:'attacks', range:'range', move:'move', movement:'move', save:'save', armour_save:'save', armor_save:'save', hp:'hp', max_hp:'max_hp', cost:'cost',
+    damage_taken:'damage_taken', incoming_damage:'damage_taken', damage_received:'damage_taken',
+    ap_taken:'ap_taken', incoming_ap:'ap_taken', ap_received:'ap_taken',
+    hit_taken:'hit_taken', incoming_hit:'hit_taken', hit_received:'hit_taken',
+    attacks_taken:'attacks_taken', incoming_attacks:'attacks_taken',
+    none:'none'
+  };
+  const oldNormStat = typeof normaliseAbilityModifierStat === 'function' ? normaliseAbilityModifierStat : null;
+  normaliseAbilityModifierStat = function(value, fallback='damage') {
+    const raw = String(value ?? '').trim();
+    if (!raw) return fallback;
+    const key = raw.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+    const compact = key.replace(/_/g,'');
+    return statAliases[key] || statAliases[compact] || (oldNormStat ? oldNormStat(value, fallback) : key);
+  };
+  try { window.normaliseAbilityModifierStat = normaliseAbilityModifierStat; } catch(err) {}
+
+  const oldNormEffect = typeof normaliseAbilityEffectValue === 'function' ? normaliseAbilityEffectValue : null;
+  normaliseAbilityEffectValue = function(value) {
+    const raw = String(value ?? '').trim();
+    const key = raw.toLowerCase().replace(/[^a-z0-9]+/g,'');
+    if (['applymodifier','modifier','buff','debuff','stance'].includes(key)) return 'apply_modifier';
+    return oldNormEffect ? oldNormEffect(value) : raw;
+  };
+  try { window.normaliseAbilityEffectValue = normaliseAbilityEffectValue; } catch(err) {}
+
+  const oldCsvEffect = typeof normaliseCSVAbilityEffect === 'function' ? normaliseCSVAbilityEffect : null;
+  if (oldCsvEffect) {
+    normaliseCSVAbilityEffect = function(value) {
+      const raw = String(value ?? '').trim();
+      const key = raw.toLowerCase().replace(/[^a-z0-9]+/g,'');
+      if (['applymodifier','modifier','buff','debuff','stance'].includes(key)) return 'apply_modifier';
+      return oldCsvEffect(value);
+    };
+  }
+
+  window.REV_MECHANIC_REGISTRY = window.REV_MECHANIC_REGISTRY || { triggers:[], effects:[] };
+  if (!window.REV_MECHANIC_REGISTRY.effects.some(e => e.id === 'apply_modifier')) {
+    window.REV_MECHANIC_REGISTRY.effects.push({ id:'apply_modifier', label:'Apply Modifier / Stance', description:'Apply a temporary stat modifier using modifier_stat, ability_value and duration.' });
+  }
+
+  function durationKey(value, fallback='end_turn') {
+    const raw = String(value ?? '').trim();
+    if (!raw) return fallback;
+    const key = raw.toLowerCase().replace(/[^a-z0-9]+/g,'');
+    const map = { instant:'instant', none:'instant', immediate:'instant', endaction:'end_action', action:'end_action', endactivation:'end_activation', activation:'end_activation', endturn:'end_turn', turn:'end_turn', endround:'end_round', round:'end_round', battle:'battle', permanent:'battle' };
+    return map[key] || fallback;
+  }
+  window.revTempModDurationKey = durationKey;
+
+  function rebuild(unit) {
+    if (!unit) return;
+    const mods = Array.isArray(unit._tempModifiers) ? unit._tempModifiers : [];
+    unit._tempStatMods = {};
+    mods.forEach(m => {
+      const stat = normaliseAbilityModifierStat(m.stat, 'none');
+      const value = Number(m.value) || 0;
+      if (!stat || stat === 'none' || !value) return;
+      unit._tempStatMods[stat] = (Number(unit._tempStatMods[stat]) || 0) + value;
+    });
+  }
+  function clearDuration(duration) {
+    let changed = false;
+    Object.values(state?.board || {}).forEach(unit => {
+      if (!Array.isArray(unit?._tempModifiers)) return;
+      const before = unit._tempModifiers.length;
+      unit._tempModifiers = unit._tempModifiers.filter(m => durationKey(m.duration) !== duration);
+      if (unit._tempModifiers.length !== before) { rebuild(unit); changed = true; }
+    });
+    if (changed) { try { refreshAllUnitIndicators(); renderHub(); } catch(err) {} }
+  }
+  window.revClearTempModifiersByDuration = clearDuration;
+
+  const oldEndCurrentTurn = typeof endCurrentTurn === 'function' ? endCurrentTurn : null;
+  if (oldEndCurrentTurn && !window.__revPatch209EndTurnWrap) {
+    window.__revPatch209EndTurnWrap = true;
+    endCurrentTurn = function() {
+      clearDuration('end_action');
+      clearDuration('end_turn');
+      return oldEndCurrentTurn.apply(this, arguments);
+    };
+    try { window.endCurrentTurn = endCurrentTurn; } catch(err) {}
+  }
+
+  const oldEndUnit = typeof endUnit === 'function' ? endUnit : null;
+  if (oldEndUnit && !window.__revPatch209EndUnitWrap) {
+    window.__revPatch209EndUnitWrap = true;
+    endUnit = function() {
+      clearDuration('end_activation');
+      return oldEndUnit.apply(this, arguments);
+    };
+    try { window.endUnit = endUnit; } catch(err) {}
+  }
+
+  const oldReq = typeof requisitionPhase === 'function' ? requisitionPhase : null;
+  if (oldReq && !window.__revPatch209ReqWrap) {
+    window.__revPatch209ReqWrap = true;
+    requisitionPhase = function() {
+      clearDuration('end_round');
+      return oldReq.apply(this, arguments);
+    };
+    try { window.requisitionPhase = requisitionPhase; } catch(err) {}
+  }
+
+  const oldGetMove = typeof getEffectiveMove === 'function' ? getEffectiveMove : null;
+  if (oldGetMove && !window.__revPatch209MoveWrap) {
+    window.__revPatch209MoveWrap = true;
+    getEffectiveMove = function(unit, tileId) {
+      const base = oldGetMove.call(this, unit, tileId);
+      return Math.max(0, Number(base || 0) + (Number(unit?._tempStatMods?.move) || 0));
+    };
+    try { window.getEffectiveMove = getEffectiveMove; } catch(err) {}
+  }
+
+  function mod(unit, stat) { return Number(unit?._tempStatMods?.[stat] || 0) || 0; }
+
+  window.resolveCombat = resolveCombat = function resolveCombat(atk, def, laneKey=null, combatOptions={}) {
+    const fx = getLaneEffect(laneKey);
+    const eff = fx ? EFFECT_REGISTRY[fx.effect] : null;
+    const baseHitThresh = parseInt(atk.weapon?.hit || '7', 10);
+    const attackerTileId = combatOptions?.attackerTileId || state.activeUnit?.tileId || null;
+    const targetTileId = combatOptions?.targetTileId || state.pendingCombatContext?.targetTileId || null;
+    const combatCtx = typeof pendingCombatContextFor === 'function' ? pendingCombatContextFor(atk, targetTileId) : null;
+    const chargeStat = normaliseAbilityModifierStat(combatCtx?.modifierStat ?? (combatCtx?.damageBonus ? 'damage' : 'none'), combatCtx ? 'damage' : 'none');
+    const chargeAmount = Math.max(0, Number(combatCtx?.value ?? combatCtx?.abilityValue ?? combatCtx?.ability_value ?? combatCtx?.damageBonus ?? 0) || 0);
+    const shootingPenaltyContext = getShootingPenaltyContext(atk, def, attackerTileId, targetTileId);
+
+    let laneHitThresh = baseHitThresh;
+    if (eff?.modifyHit) laneHitThresh = eff.modifyHit(fx, laneHitThresh, atk, attackerTileId, targetTileId);
+    let hitThresh = Math.min(7, laneHitThresh + Math.max(0, Number(shootingPenaltyContext.penalty) || 0));
+    hitThresh -= mod(atk, 'hit');
+    hitThresh += mod(def, 'hit_taken');
+    if (chargeStat === 'hit') hitThresh -= chargeAmount;
+    hitThresh = Math.max(2, Math.min(7, hitThresh));
+
+    const effectiveRange = Math.max(0, Number(atk.weapon?.range ?? 1) + mod(atk, 'range') + (chargeStat === 'range' ? chargeAmount : 0));
+    const baseSave = parseInt(def.save || '7', 10);
+    const saveThresh = Math.max(2, Math.min(7, baseSave - mod(def, 'save')));
+    const outgoingAp = (Number(atk.weapon?.ap) || 0) + mod(atk, 'ap') + (chargeStat === 'ap' ? chargeAmount : 0);
+    const effectiveAp = Math.max(0, outgoingAp - mod(def, 'ap_taken'));
+    let modSave = saveThresh + effectiveAp;
+    if (eff?.modifySave) modSave = eff.modifySave(fx, modSave);
+    const autoFail = modSave > 6;
+    const attackCount = Math.max(0, (Number(atk.weapon?.attacks) || 0) + (atk.bonusAttacks || 0) + mod(atk, 'attacks') + (chargeStat === 'attacks' ? chargeAmount : 0) - mod(def, 'attacks_taken'));
+    const diceTrigger = typeof revDiceTriggerFromUnit === 'function' ? revDiceTriggerFromUnit(atk) : null;
+    const atkDice = [];
+    const rollEvents = [];
+    let hits = 0;
+    let bonusHits = 0;
+    let chainRolls = 0;
+    const baseAttackCount = Math.max(0, attackCount);
+    const queue = Array.from({ length: baseAttackCount }, () => 'base');
+    const MAX_ATTACK_DICE = 60;
+
+    while (queue.length && atkDice.length < MAX_ATTACK_DICE) {
+      const source = queue.shift() || 'base';
+      const d = Math.ceil(Math.random() * 6);
+      atkDice.push(d);
+      const isHit = d >= hitThresh;
+      let bonusAdded = 0;
+      let chainAdded = 0;
+      if (isHit) hits += 1;
+      if (diceTrigger && isHit && d >= diceTrigger.threshold) {
+        if (diceTrigger.effect === 'exploding_hits') {
+          bonusAdded = Math.max(1, Number(diceTrigger.value) || 1);
+          bonusHits += bonusAdded;
+          hits += bonusAdded;
+        } else if (diceTrigger.effect === 'chain_hits') {
+          const toAdd = Math.max(1, Number(diceTrigger.value) || 1);
+          for (let i = 0; i < toAdd && atkDice.length + queue.length < MAX_ATTACK_DICE; i++) {
+            queue.push('chain');
+            chainRolls += 1;
+            chainAdded += 1;
+          }
+        }
+      }
+      rollEvents.push({ value:d, source, isHit, bonusAdded, chainAdded });
+    }
+
+    const saveDice = autoFail ? [] : Array.from({ length:hits }, () => Math.ceil(Math.random() * 6));
+    const saved = autoFail ? 0 : saveDice.filter(d => d >= modSave).length;
+    const damageBonus = (chargeStat === 'damage' ? chargeAmount : 0) + mod(atk, 'damage');
+    const damagePerHit = Math.max(0, (Number(atk.weapon?.damage) || 0) + damageBonus - mod(def, 'damage_taken'));
+    let totalDmg = (hits - saved) * damagePerHit;
+    if (eff?.onRollSix) totalDmg += eff.onRollSix(fx, atkDice);
+    const modifiedStats = [];
+    ['hit','ap','attacks','damage','range'].forEach(s => { if (mod(atk,s) || (chargeStat === s && chargeAmount)) modifiedStats.push(s); });
+    ['hit_taken','ap_taken','attacks_taken','damage_taken','save'].forEach(s => { if (mod(def,s)) modifiedStats.push(s); });
+    return { atkDice, rollEvents, baseAttackCount, hits, saveDice, saved, autoFail, modSave, totalDmg, hitThresh, baseHitThresh, shootingPenaltyContext, diceTrigger, bonusHits, chainRolls, damageBonus, damagePerHit, modifierStat:chargeStat, value:chargeAmount, effectiveAp, effectiveRange, modifiedStats };
+  };
 })();
 </script>
 
