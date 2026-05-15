@@ -4911,6 +4911,63 @@ body.p2-turn .player-area-glow {
 }
 </style>
 
+
+<style id="rev-patch-210-editor-dropdown-visibility-fix">
+/* Patch 210 — make editor dropdown values readable on mobile/native selects. */
+.revTileExpand label,
+.revDraftEditor label,
+.revFieldGrid label,
+.revLaneFields label {
+  opacity: 1 !important;
+  color: #d8c49a !important;
+}
+.revTileExpand label > input,
+.revTileExpand label > textarea,
+.revTileExpand label > select,
+.revDraftEditor label > input,
+.revDraftEditor label > textarea,
+.revDraftEditor label > select,
+.revFieldGrid label > input,
+.revFieldGrid label > textarea,
+.revFieldGrid label > select,
+.revLaneFields label > input,
+.revLaneFields label > textarea,
+.revLaneFields label > select {
+  margin-top: 4px;
+}
+.revFieldGrid select,
+.revLaneFields select,
+.revDraftEditor select,
+.revTileExpand select,
+select[data-field],
+select[data-lane-field] {
+  color: #f0d8a0 !important;
+  background: #120d08 !important;
+  border-color: #7a5424 !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: #f0d8a0 !important;
+  text-shadow: none !important;
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+}
+.revFieldGrid select option,
+.revLaneFields select option,
+.revDraftEditor select option,
+.revTileExpand select option,
+select[data-field] option,
+select[data-lane-field] option {
+  color: #f0d8a0 !important;
+  background: #120d08 !important;
+}
+.revFieldGrid select:focus,
+.revLaneFields select:focus,
+.revDraftEditor select:focus,
+.revTileExpand select:focus {
+  outline: 1px solid #c8a060;
+  box-shadow: 0 0 10px rgba(200,160,96,0.24);
+}
+</style>
+
 </head>
 <body>
 
@@ -14446,9 +14503,14 @@ function field(label, key, value, full=false, textarea=false, extraClass=''){
 function selectField(label, key, value, options, full=false, extraClass=''){
   const val = String(value ?? '');
   const opts = options.map(opt => {
-    const item = typeof opt === 'string' ? { value:opt, label:opt } : opt;
-    const selected = String(item.value) === val ? ' selected' : '';
-    return `<option value="${escapeHtml(item.value)}"${selected}>${escapeHtml(item.label)}</option>`;
+    let item;
+    if (typeof opt === 'string') item = { value:opt, label:opt };
+    else if (Array.isArray(opt)) item = { value:opt[0], label:opt[1] ?? opt[0] };
+    else item = opt || {};
+    const optValue = String(item.value ?? '');
+    const optLabel = String(item.label ?? item.name ?? optValue);
+    const selected = optValue === val ? ' selected' : '';
+    return `<option value="${escapeHtml(optValue)}"${selected}>${escapeHtml(optLabel)}</option>`;
   }).join('');
   return `<label class="${full ? 'full' : ''} ${extraClass}">${label}<select data-field="${key}">${opts}</select></label>`;
 }
