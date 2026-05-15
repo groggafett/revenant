@@ -19713,5 +19713,350 @@ function displayRange(r) {
 })();
 </script>
 
+
+
+<style id="rev-patch-212-editor-save-feedback-purple-mods">
+/* Patch 212 — editor save feedback + ability confirmation burst + visible modified stat values. */
+.rev-save-toast,
+.rev-ability-toast {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .18s ease, transform .18s ease;
+  font-family: 'Spectral', Georgia, serif;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #f3dcff;
+  background: linear-gradient(160deg, rgba(42,18,72,.94), rgba(18,10,30,.94));
+  border: 1px solid rgba(199,125,255,.78);
+  box-shadow: 0 0 18px rgba(199,125,255,.42), inset 0 0 12px rgba(199,125,255,.14);
+  border-radius: 999px;
+  padding: 8px 14px;
+}
+.rev-save-toast { bottom: calc(18px + env(safe-area-inset-bottom)); }
+.rev-ability-toast { top: 45%; }
+.rev-save-toast.show,
+.rev-ability-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.rev-ability-burst {
+  position: fixed;
+  z-index: 9998;
+  width: 74px;
+  height: 74px;
+  margin-left: -37px;
+  margin-top: -37px;
+  pointer-events: none;
+  border-radius: 50%;
+  border: 2px solid rgba(199,125,255,.92);
+  box-shadow: 0 0 22px rgba(199,125,255,.72), inset 0 0 20px rgba(199,125,255,.18);
+  animation: revAbilityBurst .62s ease-out forwards;
+}
+@keyframes revAbilityBurst {
+  0% { transform: scale(.35); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+.revDraftEditor input[data-field="unitValue"],
+.revDraftEditor input[data-field="abilityCost"] {
+  font-variant-numeric: tabular-nums;
+}
+</style>
+
+<script id="rev-patch-212-editor-save-modifier-feedback">
+(function(){
+  if (window.__revPatch212EditorSaveModifierFeedback) return;
+  window.__revPatch212EditorSaveModifierFeedback = true;
+
+  function signedNumber(value, fallback=0) {
+    const text = String(value ?? '').trim();
+    if (!text) return fallback;
+    const n = Number(text);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function getAbilityValueFromCard(card, fallback=0) {
+    return signedNumber(card?.abilityValue ?? card?.ability_value ?? card?.unitValue ?? card?.unit_value ?? card?.value, fallback);
+  }
+
+  function toHitNumber(value) {
+    const n = parseInt(String(value ?? '').replace(/[^0-9-]/g,''), 10);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function hitLabelFromNumber(n, fallback='') {
+    return Number.isFinite(n) ? `${Math.max(2, Math.min(7, n))}+` : fallback;
+  }
+
+  function showSmallToast(message, type='save') {
+    const cls = type === 'ability' ? 'rev-ability-toast' : 'rev-save-toast';
+    const old = document.querySelector(`.${cls}`);
+    if (old) old.remove();
+    const el = document.createElement('div');
+    el.className = cls;
+    el.textContent = message;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => el.remove(), 220);
+    }, type === 'ability' ? 760 : 1050);
+  }
+  window.revShowSmallToast = showSmallToast;
+
+  function showAbilityBurst(tileId, message='Ability Active') {
+    const tile = tileId ? document.querySelector(`[data-id="${tileId}"]`) : null;
+    const rect = tile?.getBoundingClientRect();
+    const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    const y = rect ? rect.top + rect.height / 2 : window.innerHeight * .46;
+    const burst = document.createElement('div');
+    burst.className = 'rev-ability-burst';
+    burst.style.left = `${x}px`;
+    burst.style.top = `${y}px`;
+    document.body.appendChild(burst);
+    setTimeout(() => burst.remove(), 720);
+    showSmallToast(message, 'ability');
+  }
+  window.revShowAbilityBurst = showAbilityBurst;
+
+  // Make draft ability state reload saved modifier/duration/target values instead of falling back to defaults.
+  const oldDraftAbilityState = typeof draftAbilityState === 'function' ? draftAbilityState : null;
+  if (oldDraftAbilityState) {
+    draftAbilityState = function(card={}) {
+      const s = oldDraftAbilityState(card) || {};
+      const mech = card.mechanic || {};
+      s.modifierStat = card.modifierStat ?? card.modifier_stat ?? mech.modifierStat ?? mech.modifier_stat ?? 'damage';
+      s.duration = card.duration ?? card.abilityDuration ?? card.ability_duration ?? mech.duration ?? 'end_turn';
+      const target = card.abilityTarget || card.target || mech.target || {};
+      s.targetSide = target.side || card.target_side || card.ability_target_side || 'self';
+      s.targetLocation = target.location || card.target_location || card.ability_target_location || 'self';
+      return s;
+    };
+    try { window.draftAbilityState = draftAbilityState; } catch(err) {}
+  }
+
+  // Rebuild the dynamic ability section with the saved values present on the selected draft.
+  const oldDraftAbilityContextHtml = typeof draftAbilityContextHtml === 'function' ? draftAbilityContextHtml : null;
+  if (oldDraftAbilityContextHtml) {
+    draftAbilityContextHtml = function(trigger, effect='none', value='', threshold='6', abilityCost='', extra={}) {
+      const cleanTrigger = normaliseAbilityTriggerValue(trigger);
+      const cleanEffect = normaliseAbilityEffectValue(effect || 'none');
+      if (cleanTrigger === 'action' && cleanEffect === 'move_then_fight') {
+        const costValue = abilityCost === '' || abilityCost == null ? 2 : abilityCost;
+        const defaultValue = value === '' || value == null ? 1 : value;
+        return `
+          ${selectField('Effect','unitEffect',cleanEffect,simpleEffectOptions(),true,'revUnitField')}
+          ${field('Action Cost','abilityCost',costValue,false,false,'revUnitField')}
+          ${selectField('Modifier Stat','modifierStat',extra.modifierStat || 'damage',modifierStatOptions(),true,'revUnitField')}
+          ${field('Ability Value','unitValue',defaultValue,false,false,'revUnitField')}
+          <div class="revDraftHint full revUnitField" style="margin:0;">Move Then Fight bakes in targeting. Use Modifier Stat + Ability Value for the bonus, e.g. ap +1 or damage +1.</div>
+        `;
+      }
+      if (cleanTrigger === 'action' && cleanEffect === 'apply_modifier') {
+        const costValue = abilityCost === '' || abilityCost == null ? 1 : abilityCost;
+        const defaultValue = value === '' || value == null ? 1 : value;
+        return `
+          ${selectField('Effect','unitEffect',cleanEffect,simpleEffectOptions(),true,'revUnitField')}
+          ${field('Action Cost','abilityCost',costValue,false,false,'revUnitField')}
+          ${selectField('Modifier Stat','modifierStat',extra.modifierStat || 'damage_taken',modifierStatOptions(),true,'revUnitField')}
+          ${field('Ability Value','unitValue',defaultValue,false,false,'revUnitField')}
+          ${selectField('Duration','abilityDuration',extra.duration || 'end_turn',abilityDurationOptions(),true,'revUnitField')}
+          ${selectField('Target','abilityTargetSide',extra.targetSide || 'self',abilityTargetSideOptions(),true,'revUnitField')}
+          ${selectField('Target Location','abilityTargetLocation',extra.targetLocation || 'self',abilityTargetLocationOptions(),true,'revUnitField')}
+          <div class="revDraftHint full revUnitField" style="margin:0;">Apply Modifier uses modifier_stat + ability_value + duration. Ability Value can be + or -.</div>
+        `;
+      }
+      return oldDraftAbilityContextHtml.apply(this, arguments);
+    };
+    try { window.draftAbilityContextHtml = draftAbilityContextHtml; } catch(err) {}
+  }
+
+  const oldDraftEditorHtml = typeof draftEditorHtml === 'function' ? draftEditorHtml : null;
+  if (oldDraftEditorHtml && oldDraftAbilityContextHtml) {
+    draftEditorHtml = function(card, id) {
+      const html = oldDraftEditorHtml(card, id);
+      // Avoid a broad rewrite; the context is corrected immediately after render via render hook below.
+      return html;
+    };
+    try { window.draftEditorHtml = draftEditorHtml; } catch(err) {}
+  }
+
+  function repopulateExpandedAbilityFields(root=document) {
+    root.querySelectorAll('.revDraftEditor').forEach(editor => {
+      const tile = editor.closest('.revTile');
+      const id = tile?.querySelector('.revSaveDraftBtn')?.dataset?.cardid;
+      if (!id) return;
+      const card = (typeof draftRepo === 'function' ? draftRepo() : []).find(c => c.id === id);
+      if (!card) return;
+      const state = draftAbilityState(card);
+      const contextEl = editor.querySelector('.revAbilityContextFields');
+      if (!contextEl) return;
+      contextEl.innerHTML = draftAbilityContextHtml(state.trigger, state.effect, state.value, state.threshold, state.abilityCost, state);
+    });
+  }
+
+  const oldRenderEditorView = typeof renderEditorView === 'function' ? renderEditorView : null;
+  if (oldRenderEditorView && !window.__revPatch212RenderWrap) {
+    window.__revPatch212RenderWrap = true;
+    renderEditorView = function() {
+      const result = oldRenderEditorView.apply(this, arguments);
+      setTimeout(() => repopulateExpandedAbilityFields(document), 0);
+      return result;
+    };
+    try { window.renderEditorView = renderEditorView; } catch(err) {}
+  }
+
+  const oldUpdateDraftAbilityContext = typeof updateDraftAbilityContext === 'function' ? updateDraftAbilityContext : null;
+  if (oldUpdateDraftAbilityContext) {
+    updateDraftAbilityContext = function(editor) {
+      if (!editor) return oldUpdateDraftAbilityContext.apply(this, arguments);
+      const triggerEl = editor.querySelector('label.revUnitField [data-field="trigger"]');
+      const contextEl = editor.querySelector('.revAbilityContextFields');
+      if (!triggerEl || !contextEl) return oldUpdateDraftAbilityContext.apply(this, arguments);
+      const trigger = normaliseAbilityTriggerValue(triggerEl.value);
+      const currentEffect = editor.querySelector('[data-field="unitEffect"]')?.value || 'none';
+      const currentValue = editor.querySelector('[data-field="unitValue"]')?.value || '';
+      const currentThreshold = editor.querySelector('[data-field="diceThreshold"]')?.value || '6';
+      const currentAbilityCost = editor.querySelector('[data-field="abilityCost"]')?.value || '';
+      const extra = {
+        modifierStat: editor.querySelector('[data-field="modifierStat"]')?.value || undefined,
+        duration: editor.querySelector('[data-field="abilityDuration"]')?.value || undefined,
+        targetSide: editor.querySelector('[data-field="abilityTargetSide"]')?.value || undefined,
+        targetLocation: editor.querySelector('[data-field="abilityTargetLocation"]')?.value || undefined
+      };
+      contextEl.innerHTML = draftAbilityContextHtml(trigger, currentEffect, currentValue, currentThreshold, currentAbilityCost, extra);
+    };
+    try { window.updateDraftAbilityContext = updateDraftAbilityContext; } catch(err) {}
+  }
+
+  // Use signed values for editor ability_value and preserve saved modifier fields.
+  const oldCollectDraftFields = typeof collectDraftFields === 'function' ? collectDraftFields : null;
+  if (oldCollectDraftFields) {
+    collectDraftFields = function(tile, original) {
+      const card = oldCollectDraftFields.apply(this, arguments);
+      const get = key => tile.querySelector(`[data-field="${key}"]`)?.value ?? '';
+      const unitEffect = get('unitEffect') || card.unitEffect || 'none';
+      const trigger = normaliseAbilityTriggerValue(get('trigger')) || card.trigger;
+      if (trigger === 'action' && ['move_then_fight','apply_modifier'].includes(unitEffect)) {
+        const modifierStat = normaliseAbilityModifierStat(get('modifierStat'), unitEffect === 'apply_modifier' ? 'damage_taken' : 'damage');
+        const rawValue = get('unitValue');
+        const value = rawValue === '' ? 0 : parseDraftValue(rawValue);
+        const duration = normaliseAbilityDurationValue(get('abilityDuration') || get('duration') || card.duration || 'end_turn');
+        const abilityTarget = unitEffect === 'move_then_fight'
+          ? null
+          : { side: get('abilityTargetSide') || 'self', type:'unit', location: get('abilityTargetLocation') || 'self', state:'any', count:'single', unitType:'any', faction:'any' };
+        card.unitValue = value;
+        card.abilityValue = value;
+        card.value = card.kind === 'Power' ? card.value : value;
+        card.modifierStat = modifierStat;
+        card.duration = duration;
+        card.abilityTarget = abilityTarget;
+        if (card.mechanic) {
+          card.mechanic.value = value;
+          card.mechanic.modifierStat = modifierStat;
+          card.mechanic.duration = duration;
+          card.mechanic.target = abilityTarget;
+        }
+      }
+      return card;
+    };
+    try { window.collectDraftFields = collectDraftFields; } catch(err) {}
+  }
+
+  const oldSaveDraftFromButton = typeof saveDraftFromButton === 'function' ? saveDraftFromButton : null;
+  if (oldSaveDraftFromButton && !window.__revPatch212SaveWrap) {
+    window.__revPatch212SaveWrap = true;
+    saveDraftFromButton = function(btn) {
+      const beforeId = btn?.dataset?.cardid;
+      const result = oldSaveDraftFromButton.apply(this, arguments);
+      showSmallToast('Unit saved');
+      // Re-open visual feedback target if it is still visible after render.
+      setTimeout(() => {
+        const savedId = btn?.dataset?.cardid || beforeId;
+        const tile = savedId ? document.querySelector(`.revSaveDraftBtn[data-cardid="${CSS.escape(savedId)}"]`)?.closest('.revTile') : null;
+        if (tile) tile.classList.add('revJustSaved');
+        setTimeout(() => tile?.classList.remove('revJustSaved'), 700);
+      }, 20);
+      return result;
+    };
+    try { window.saveDraftFromButton = saveDraftFromButton; } catch(err) {}
+  }
+
+  // Wrap apply_modifier and other ability handlers with a tiny confirmation burst when they succeed.
+  function wrapAbilityHandler(key) {
+    if (!window.ABILITY_REGISTRY && typeof ABILITY_REGISTRY === 'undefined') return;
+    const reg = window.ABILITY_REGISTRY || ABILITY_REGISTRY;
+    if (!reg || !reg[key] || reg[key].__revPatch212Wrapped) return;
+    const old = reg[key];
+    const wrapped = function(caster, targetTileId, ability) {
+      const result = old.apply(this, arguments);
+      const finish = res => {
+        const ok = res !== false;
+        if (ok) {
+          const tid = targetTileId || state?.activeUnit?.tileId;
+          showAbilityBurst(tid, ability?.name ? `${ability.name} Active` : 'Ability Active');
+          try { renderHub(); refreshAllUnitIndicators(); } catch(err) {}
+        }
+        return res;
+      };
+      return result && typeof result.then === 'function' ? result.then(finish) : finish(result);
+    };
+    wrapped.__revPatch212Wrapped = true;
+    reg[key] = wrapped;
+  }
+  ['apply_modifier','move_then_fight','command_unit','add_action','jump_lane','damage','heal','draw','add_resource'].forEach(wrapAbilityHandler);
+
+  function effectiveProfileValue(card, stat) {
+    const m = card?._tempStatMods || {};
+    if (stat === 'range') return Math.max(0, Number(card?.weapon?.range ?? 0) + signedNumber(m.range, 0));
+    if (stat === 'attacks') return Math.max(0, Number(card?.weapon?.attacks ?? 0) + signedNumber(m.attacks, 0));
+    if (stat === 'hit') {
+      const base = toHitNumber(card?.weapon?.hit);
+      return base == null ? (card?.weapon?.hit ?? '') : hitLabelFromNumber(base - signedNumber(m.hit, 0));
+    }
+    if (stat === 'ap') return Math.max(0, Number(card?.weapon?.ap ?? 0) + signedNumber(m.ap, 0));
+    if (stat === 'damage') return Math.max(0, Number(card?.weapon?.damage ?? 0) + signedNumber(m.damage, 0));
+    if (stat === 'move') return Math.max(0, Number(card?.move ?? 0) + signedNumber(m.move, 0));
+    if (stat === 'save') {
+      const base = toHitNumber(card?.save);
+      return base == null ? (card?.save ?? '') : hitLabelFromNumber(base - signedNumber(m.save, 0));
+    }
+    return null;
+  }
+
+  const oldOpenProfile = typeof openProfile === 'function' ? openProfile : null;
+  if (oldOpenProfile && !window.__revPatch212OpenProfileWrap) {
+    window.__revPatch212OpenProfileWrap = true;
+    openProfile = function(card, context, tileId=null, opts={}) {
+      const result = oldOpenProfile.apply(this, arguments);
+      try {
+        const mods = card?._tempStatMods || {};
+        const pairs = [
+          ['prof-range','range'], ['prof-atk','attacks'], ['prof-hit','hit'], ['prof-ap','ap'], ['prof-dmg','damage']
+        ];
+        pairs.forEach(([id, stat]) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const has = !!signedNumber(mods[stat], 0);
+          if (has) el.textContent = effectiveProfileValue(card, stat);
+          el.classList.toggle('stat-modified', has);
+        });
+        const moveEl = document.getElementById('badge-move-val');
+        const saveEl = document.getElementById('badge-save-val');
+        if (moveEl && signedNumber(mods.move,0)) moveEl.textContent = effectiveProfileValue(card,'move');
+        if (saveEl && signedNumber(mods.save,0)) saveEl.textContent = effectiveProfileValue(card,'save');
+        document.getElementById('badge-move')?.classList.toggle('stat-modified', !!signedNumber(mods.move,0));
+        document.getElementById('badge-save')?.classList.toggle('stat-modified', !!signedNumber(mods.save,0));
+      } catch(err) {}
+      return result;
+    };
+    try { window.openProfile = openProfile; } catch(err) {}
+  }
+})();
+</script>
+
 </body>
 </html>
